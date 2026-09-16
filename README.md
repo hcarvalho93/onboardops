@@ -46,3 +46,5 @@ O cadastro de usuários já vem com e-mails fictícios da equipe Trinus (ex.: `v
 
 - Dados são fictícios e ficam só no navegador (sem backend real, sem sincronização entre usuários).
 - Se quiser evoluir para uso real da equipe, os próximos passos naturais seriam: (1) um backend/API + banco de dados de verdade, (2) autenticação corporativa (Entra ID, como já sinalizado na tela de login), e (3) hospedagem compartilhada (ex.: publicado num servidor interno ou serviço de hosting).
+
+Mudança para testar Cummit
