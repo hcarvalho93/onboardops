@@ -15,7 +15,7 @@ $mime = @{
   '.html'='text/html; charset=utf-8'; '.htm'='text/html; charset=utf-8'
   '.css'='text/css'; '.js'='application/javascript'; '.json'='application/json'
   '.png'='image/png'; '.jpg'='image/jpeg'; '.jpeg'='image/jpeg'; '.gif'='image/gif'
-  '.svg'='image/svg+xml'; '.ico'='image/x-icon'; '.woff'='font/woff'; '.woff2'='font/woff2'
+  '.svg'='image/svg+xml'; '.ico'='image/x-icon'; '.woff'='font/woff'; '.woff2'='font/woff2'; '.txt'='text/plain; charset=utf-8'; '.mjs'='application/javascript'; '.map'='application/json'; '.webp'='image/webp'; '.pdf'='application/pdf'
 }
 
 try {
