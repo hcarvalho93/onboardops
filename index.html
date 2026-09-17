@@ -1923,38 +1923,88 @@ const RACI = [
 /* ---------------------------------------------------------------------------
    3. DADOS SEMENTE (clientes reais da carteira)
 --------------------------------------------------------------------------- */
+// Datas relativas a "hoje" — garante que a massa de exemplo nunca pareça "velha",
+// não importa quando o app for aberto (dias atrás/à frente do momento do load).
+function ago(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+function ahead(n){ return ago(-n); }
+
 function seed(){
   return {
     clientes:[
       {id:'rdville',nome:'RD VILLE CONSTRUTORA E INCORPORADORA LTDA',produtos:['Backoffice'],
-       tipologia:'Incorporação',dataAssinatura:'2026-05-19',dataKickoff:'2026-05-25',
-       goLivePrevisto:'2026-08-01',goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
+       tipologia:'Incorporação',dataAssinatura:ago(120),dataKickoff:ago(114),
+       goLivePrevisto:ago(46),goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
        keyAccount:'Ester Silva de Souza',respComercial:'Felipe Henrique',respKickoff:'Victor Abreu Espíndola',
-       status:'Em andamento',etapa:'onboarding',obs:'',estado:'GO',cidade:'Goiânia',criadoEm:'2026-05-19',criadoPor:'Waleria Santos',
-       ativos:[{id:'at_rd1',nome:'SPE Jardim Aurora',estado:'GO',cidade:'Goiânia',regiao:'Centro-Oeste',tipologia:'Incorporação',quantidade:1,unidades:240,vgv:180000000,statusAtivo:'Comercialização',criadoEm:'2026-05-25',criadoPor:'Victor Abreu Espíndola',obs:''},
-               {id:'at_rd2',nome:'SPE Mar Azul',estado:'BA',cidade:'Salvador',regiao:'Nordeste',tipologia:'Multipropriedade',quantidade:3,unidades:520,vgv:420000000,statusAtivo:'Lançamento',criadoEm:'2026-05-25',criadoPor:'Victor Abreu Espíndola',obs:'Resort em fase de lançamento'}]},
+       status:'Em andamento',etapa:'onboarding',obs:'',estado:'GO',cidade:'Goiânia',criadoEm:ago(120),criadoPor:'Waleria Santos',
+       ativos:[{id:'at_rd1',nome:'SPE Jardim Aurora',estado:'GO',cidade:'Goiânia',regiao:'Centro-Oeste',tipologia:'Incorporação',quantidade:1,unidades:240,vgv:180000000,statusAtivo:'Comercialização',criadoEm:ago(114),criadoPor:'Victor Abreu Espíndola',obs:''},
+               {id:'at_rd2',nome:'SPE Mar Azul',estado:'BA',cidade:'Salvador',regiao:'Nordeste',tipologia:'Multipropriedade',quantidade:3,unidades:520,vgv:420000000,statusAtivo:'Lançamento',criadoEm:ago(114),criadoPor:'Victor Abreu Espíndola',obs:'Resort em fase de lançamento'}]},
       {id:'barion',nome:'BARION EMPREENDIMENTOS IMOBILIARIOS LTDA.',produtos:[],
-       tipologia:'Incorporação',dataAssinatura:'2026-05-15',dataKickoff:'',
+       tipologia:'Incorporação',dataAssinatura:ago(122),dataKickoff:'',
        goLivePrevisto:'',goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
        keyAccount:'Ester Silva de Souza',respComercial:'Paulo Roberto',respKickoff:'',
-       status:'Aguardando Cliente',etapa:'contrato',obs:'',estado:'SP',cidade:'São Paulo',criadoEm:'2026-05-15',criadoPor:'Waleria Santos',
-       ativos:[{id:'at_ba1',nome:'Loteamento Bosque Verde',estado:'SP',cidade:'Campinas',regiao:'Sudeste',tipologia:'Loteamento',quantidade:2,unidades:380,vgv:150000000,statusAtivo:'Obras',criadoEm:'2026-05-16',criadoPor:'Victor Abreu Espíndola',obs:''}]},
+       status:'Aguardando Cliente',etapa:'contrato',obs:'',estado:'SP',cidade:'São Paulo',criadoEm:ago(122),criadoPor:'Waleria Santos',
+       ativos:[{id:'at_ba1',nome:'Loteamento Bosque Verde',estado:'SP',cidade:'Campinas',regiao:'Sudeste',tipologia:'Loteamento',quantidade:2,unidades:380,vgv:150000000,statusAtivo:'Obras',criadoEm:ago(121),criadoPor:'Victor Abreu Espíndola',obs:''}]},
       {id:'calftech',nome:'CALFTECH CONSTRUTORA E INCORPORADORA LTDA.',produtos:[],
-       tipologia:'Incorporação',dataAssinatura:'2026-05-22',dataKickoff:'',
+       tipologia:'Incorporação',dataAssinatura:ago(118),dataKickoff:'',
        goLivePrevisto:'',goLiveReal:'',respOnboarding:'Natalia Yoshimura Lopes',
        keyAccount:'Ester Silva de Souza',respComercial:'',respKickoff:'',
-       status:'Aguardando Cliente',etapa:'contrato',obs:'',estado:'PR',cidade:'Curitiba',criadoEm:'2026-05-22',criadoPor:'Waleria Santos',ativos:[]}
+       status:'Aguardando Cliente',etapa:'contrato',obs:'',estado:'PR',cidade:'Curitiba',criadoEm:ago(118),criadoPor:'Waleria Santos',ativos:[]},
+      {id:'novaalianca',nome:'NOVA ALIANÇA INCORPORADORA LTDA',produtos:['Backoffice','Gerente de Projetos'],
+       tipologia:'Incorporação',dataAssinatura:ago(210),dataKickoff:ago(204),
+       goLivePrevisto:ago(180),goLiveReal:ago(178),respOnboarding:'Natalia Yoshimura Lopes',
+       keyAccount:'Ester Silva de Souza',respComercial:'Felipe Henrique',respKickoff:'Natalia Yoshimura Lopes',
+       status:'Concluído',etapa:'operacao',obs:'Cliente operando com saúde excelente — referência de onboarding bem-sucedido.',estado:'SP',cidade:'Campinas',criadoEm:ago(210),criadoPor:'Waleria Santos',
+       ativos:[{id:'at_na1',nome:'SPE Alto da Serra',estado:'SP',cidade:'Campinas',regiao:'Sudeste',tipologia:'Incorporação',quantidade:1,unidades:300,vgv:220000000,statusAtivo:'Comercialização',criadoEm:ago(204),criadoPor:'Natalia Yoshimura Lopes',obs:''}]},
+      {id:'solaris',nome:'SOLARIS EMPREENDIMENTOS LTDA',produtos:['Backoffice'],
+       tipologia:'Incorporação',dataAssinatura:ago(160),dataKickoff:ago(150),
+       goLivePrevisto:ago(90),goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
+       keyAccount:'Ester Silva de Souza',respComercial:'Paulo Roberto',respKickoff:'Victor Abreu Espíndola',
+       status:'Em andamento',etapa:'onboarding',obs:'Cliente com dificuldade recorrente em liberar acessos bancários — onboarding travado.',estado:'RJ',cidade:'Rio de Janeiro',criadoEm:ago(160),criadoPor:'Waleria Santos',
+       ativos:[{id:'at_so1',nome:'Residencial Vista Mar',estado:'RJ',cidade:'Rio de Janeiro',regiao:'Sudeste',tipologia:'Incorporação',quantidade:1,unidades:150,vgv:95000000,statusAtivo:'Obras',criadoEm:ago(150),criadoPor:'Victor Abreu Espíndola',obs:''}]}
     ],
     surveys:{
-      rdville:{dataResposta:'2026-05-27',q1:5,q2:5,q3:5,q4:5,q5:5,
-        comentarios:'Espero construir uma parceria de longo prazo, com troca de conhecimento, visão estratégica e apoio na tomada de decisões importantes para o crescimento da empresa.'}
+      rdville:{dataResposta:ago(112),q1:5,q2:5,q3:4,q4:5,q5:5,
+        comentarios:'Espero construir uma parceria de longo prazo, com troca de conhecimento, visão estratégica e apoio na tomada de decisões importantes para o crescimento da empresa.'},
+      novaalianca:{dataResposta:ago(200),q1:5,q2:5,q3:5,q4:4,q5:5,
+        comentarios:'Onboarding muito bem conduzido, equipe extremamente atenciosa e prazos cumpridos à risca.'},
+      solaris:{dataResposta:ago(145),q1:2,q2:3,q3:2,q4:3,q5:2,
+        comentarios:'Estamos com dificuldades internas para disponibilizar os acessos solicitados — o processo está mais lento do que esperávamos.'}
     },
     activation:{
-      rdville:{items:{'plano.elaborado':'PENDENTE','plano.validInterno':'PENDENTE','plano.compartilhado':'PENDENTE','plano.aprovCliente':'PENDENTE',
-        'bancario.solicitado':'PENDENTE','bancario.recebido':'PENDENTE','bancario.validado':'PENDENTE'},dates:{}}
+      rdville:{items:{
+        'plano.elaborado':'SIM','plano.validInterno':'SIM','plano.compartilhado':'SIM','plano.aprovCliente':'SIM',
+        'erp.solicitado':'SIM','erp.recebido':'SIM','erp.validado':'PENDENTE',
+        'bancario.solicitado':'SIM','bancario.recebido':'PENDENTE','bancario.validado':'',
+        'master.identificado':'SIM','master.agenda':'SIM','master.treino':'PENDENTE',
+        'doc.solicitada':'SIM','doc.recebida':'PENDENTE',
+        'treino.agendado':'PENDENTE','treino.realizado':'',
+        'entrega.concluida':''
+      },dates:{'plano.inicio':ago(114),'plano.fim':ago(108),'erp.inicio':ago(108),'bancario.inicio':ago(100)}},
+      novaalianca:{items:{
+        'plano.elaborado':'SIM','plano.validInterno':'SIM','plano.compartilhado':'SIM','plano.aprovCliente':'SIM',
+        'erp.solicitado':'SIM','erp.recebido':'SIM','erp.validado':'SIM',
+        'bancario.solicitado':'SIM','bancario.recebido':'SIM','bancario.validado':'SIM',
+        'master.identificado':'SIM','master.agenda':'SIM','master.treino':'SIM',
+        'doc.solicitada':'SIM','doc.recebida':'SIM',
+        'treino.agendado':'SIM','treino.realizado':'SIM',
+        'entrega.concluida':'SIM'
+      },dates:{'plano.inicio':ago(204),'plano.fim':ago(200),'erp.inicio':ago(200),'erp.fim':ago(196),
+        'bancario.inicio':ago(200),'bancario.fim':ago(195),'master.inicio':ago(195),'master.fim':ago(190),
+        'doc.inicio':ago(196),'doc.fim':ago(192),'treino.inicio':ago(190),'treino.fim':ago(182),
+        'entrega.inicio':ago(180),'entrega.fim':ago(178)}},
+      solaris:{items:{
+        'plano.elaborado':'SIM','plano.validInterno':'PENDENTE','plano.compartilhado':'','plano.aprovCliente':'',
+        'erp.solicitado':'PENDENTE','erp.recebido':'','erp.validado':'',
+        'bancario.solicitado':'SIM','bancario.recebido':'PENDENTE','bancario.validado':'',
+        'master.identificado':'PENDENTE','master.agenda':'','master.treino':'',
+        'doc.solicitada':'PENDENTE','doc.recebida':'',
+        'treino.agendado':'','treino.realizado':'',
+        'entrega.concluida':''
+      },dates:{'plano.inicio':ago(150),'bancario.inicio':ago(130)}}
     },
     ttfv:{
-      rdville:{tipo:'Primeira demanda atendida',dataValor:'2026-05-26'}
+      rdville:{tipo:'Primeira demanda atendida',dataValor:ago(113)},
+      novaalianca:{tipo:'Primeira demanda atendida',dataValor:ago(202)}
     },
     config:{
       empresa:'Trinus', tagline:'Portal de Customer Success & Jornada do Cliente',
@@ -1965,17 +2015,45 @@ function seed(){
     users:USERS_SEED.map(u=>({...u})),
     activities:[
       {id:'a1',cliente:'rdville',titulo:'Validar Plano de Sucesso com o cliente',descricao:'Revisar e obter aprovação formal do plano.',
-        responsavel:'Victor Abreu Espíndola',prioridade:'Alta',status:'Em Andamento',criacao:'2026-05-26',prazo:'2026-06-05'},
-      {id:'a2',cliente:'rdville',titulo:'Solicitar acessos bancários',descricao:'Coletar credenciais para integração financeira.',
-        responsavel:'Victor Abreu Espíndola',prioridade:'Crítica',status:'Aguardando Cliente',criacao:'2026-05-27',prazo:'2026-05-30'},
+        responsavel:'Victor Abreu Espíndola',prioridade:'Alta',status:'Concluído',criacao:ago(113),prazo:ago(103),dataConclusao:ago(105)},
+      {id:'a2',cliente:'rdville',titulo:'Validar acessos bancários com o cliente',descricao:'Confirmar recebimento e validar credenciais para integração financeira.',
+        responsavel:'Victor Abreu Espíndola',prioridade:'Crítica',status:'Aguardando Cliente',criacao:ago(100),prazo:ago(5)},
+      {id:'a1b',cliente:'rdville',titulo:'Agendar treinamento do usuário master',descricao:'Marcar sessão de treinamento com o responsável técnico do cliente.',
+        responsavel:'Victor Abreu Espíndola',prioridade:'Média',status:'A Fazer',criacao:ago(10),prazo:ahead(7)},
       {id:'a3',cliente:'barion',titulo:'Agendar reunião de kickoff',descricao:'Definir data de kickoff com o cliente.',
-        responsavel:'Victor Abreu Espíndola',prioridade:'Média',status:'A Fazer',criacao:'2026-05-20',prazo:'2026-06-10'}
+        responsavel:'Victor Abreu Espíndola',prioridade:'Média',status:'A Fazer',criacao:ago(20),prazo:ahead(10)},
+      {id:'a4',cliente:'calftech',titulo:'Confirmar responsável técnico do cliente',descricao:'Identificar e registrar o usuário master indicado pela Calftech.',
+        responsavel:'Natalia Yoshimura Lopes',prioridade:'Média',status:'A Fazer',criacao:ago(6),prazo:ahead(4)},
+      {id:'a5',cliente:'novaalianca',titulo:'Validar Plano de Sucesso com o cliente',descricao:'Revisar e obter aprovação formal do plano.',
+        responsavel:'Natalia Yoshimura Lopes',prioridade:'Alta',status:'Concluído',criacao:ago(203),prazo:ago(195),dataConclusao:ago(198)},
+      {id:'a6',cliente:'novaalianca',titulo:'Registrar Time to First Value',descricao:'Confirmar e registrar a primeira entrega de valor percebida pelo cliente.',
+        responsavel:'Natalia Yoshimura Lopes',prioridade:'Alta',status:'Concluído',criacao:ago(202),prazo:ago(200),dataConclusao:ago(202)},
+      {id:'a7',cliente:'solaris',titulo:'Cobrar validação dos acessos bancários',descricao:'Cliente ainda não validou as credenciais enviadas.',
+        responsavel:'Victor Abreu Espíndola',prioridade:'Alta',status:'Em Andamento',criacao:ago(40),prazo:ago(20)},
+      {id:'a8',cliente:'solaris',titulo:'Reagendar treinamento com o cliente',descricao:'Cliente cancelou a sessão de treinamento pela segunda vez.',
+        responsavel:'Victor Abreu Espíndola',prioridade:'Crítica',status:'Aguardando Cliente',criacao:ago(15),prazo:ago(8)}
     ],
     interactions:[
-      {id:'i1',cliente:'rdville',data:'2026-05-27',hora:'14:32',canal:'WhatsApp',responsavel:'Victor Abreu Espíndola',
-        tipo:'Pendência documental',status:'Aguardando cliente',resumo:'Cliente confirmou envio das credenciais bancárias até sexta-feira.',
-        texto:'[14:30] Onboarding: Olá! Precisamos das credenciais para a integração.\n[14:32] Cliente: Perfeito, envio até sexta sem falta.',
-        proximaAcao:'Cobrar envio das credenciais',prazoAcao:'2026-05-30',tags:['Pendência','Follow-up'],anexos:[]}
+      {id:'i1',cliente:'rdville',data:ago(112),hora:'14:32',canal:'WhatsApp',responsavel:'Victor Abreu Espíndola',
+        tipo:'Pendência documental',status:'Aguardando cliente',resumo:'Cliente confirmou envio das credenciais bancárias em breve.',
+        texto:'[14:30] Onboarding: Olá! Precisamos das credenciais para a integração.\n[14:32] Cliente: Perfeito, envio em breve.',
+        proximaAcao:'Cobrar envio das credenciais',prazoAcao:ago(109),tags:['Pendência','Follow-up'],anexos:[]},
+      {id:'i2',cliente:'barion',data:ago(15),hora:'10:05',canal:'Telefone',responsavel:'Paulo Roberto',
+        tipo:'Confirmação de agenda',status:'Aguardando cliente',resumo:'Contato para agendar reunião de kickoff; cliente pediu mais alguns dias para confirmar disponibilidade da equipe.',
+        texto:'[10:00] Comercial: Bom dia! Podemos agendar o kickoff para a próxima semana?\n[10:05] Cliente: Precisamos alinhar internamente, retornamos em breve.',
+        proximaAcao:'Reforçar contato para confirmar data',prazoAcao:ahead(5),tags:['Follow-up','Comercial'],anexos:[]},
+      {id:'i3',cliente:'calftech',data:ago(10),hora:'09:40',canal:'E-mail',responsavel:'Natalia Yoshimura Lopes',
+        tipo:'Alinhamento operacional',status:'Registrado',resumo:'Primeiro contato pós-assinatura, apresentação da equipe de onboarding e próximos passos.',
+        texto:'E-mail de boas-vindas enviado com apresentação da equipe e cronograma inicial de implantação.',
+        proximaAcao:'Aguardar indicação do usuário master',prazoAcao:ahead(6),tags:['Operacional'],anexos:[]},
+      {id:'i4',cliente:'novaalianca',data:ago(179),hora:'16:20',canal:'Reunião',responsavel:'Natalia Yoshimura Lopes',
+        tipo:'Decisão acordada',status:'Resolvido',resumo:'Reunião de encerramento do onboarding; cliente aprovou a operação assistida e elogiou o processo.',
+        texto:'[16:20] Cliente: Equipe muito atenciosa, superou nossas expectativas em todo o processo.',
+        proximaAcao:'Nenhuma — cliente em operação plena',prazoAcao:'',tags:['Decisão acordada'],anexos:[]},
+      {id:'i5',cliente:'solaris',data:ago(9),hora:'11:15',canal:'WhatsApp',responsavel:'Victor Abreu Espíndola',
+        tipo:'Registro de insatisfação',status:'Aguardando cliente',resumo:'Cliente relatou dificuldade interna para liberar os acessos bancários e pediu mais prazo, gerando atraso na ativação.',
+        texto:'[11:10] Onboarding: Precisamos dos acessos bancários para avançar com a ativação.\n[11:15] Cliente: Estamos com dificuldades internas, vamos precisar de mais alguns dias.',
+        proximaAcao:'Escalar internamente se não houver retorno em 5 dias',prazoAcao:ahead(5),tags:['Risco','Cliente insatisfeito','Pendência documental'],anexos:[]}
     ],
     history:[],
     logins:[],
@@ -1995,7 +2073,11 @@ function seed(){
       {id:'pp7',cliente:'COSTA AZUL MULTIPROPRIEDADE LTDA',status:'Proposta Elaborada',valor:175000,bookedValue:175000,produto:'Gerente de Projetos',responsavel:'',
         dataElaboracao:'2026-05-24',dataPrevista:'2026-07-10',dataAprovacao:'',dataAssinatura:'',obs:''},
       {id:'pp8',cliente:'PRIME DESENVOLVIMENTO IMOBILIÁRIO',status:'Proposta Perdida',valor:130000,bookedValue:130000,produto:'Backoffice',responsavel:'Paulo Roberto',
-        dataElaboracao:'2026-04-30',dataPrevista:'2026-05-30',dataAprovacao:'',dataAssinatura:'',dataPerdida:'2026-05-28',obs:'Optou por concorrente.'}
+        dataElaboracao:'2026-04-30',dataPrevista:'2026-05-30',dataAprovacao:'',dataAssinatura:'',dataPerdida:'2026-05-28',obs:'Optou por concorrente.'},
+      {id:'pp9',cliente:'NOVA ALIANÇA INCORPORADORA LTDA',status:'Contrato Assinado',valor:200000,bookedValue:200000,produto:'Gerente de Projetos',responsavel:'Felipe Henrique',
+        dataElaboracao:ago(215),dataPrevista:ago(212),dataAprovacao:ago(213),dataAssinatura:ago(210),obs:'Contrato fechado — Gerente de Projetos.'},
+      {id:'pp10',cliente:'SOLARIS EMPREENDIMENTOS LTDA',status:'Contrato Assinado',valor:140000,bookedValue:140000,produto:'Backoffice',responsavel:'Paulo Roberto',
+        dataElaboracao:ago(165),dataPrevista:ago(162),dataAprovacao:ago(163),dataAssinatura:ago(160),obs:'Contrato fechado — Backoffice.'}
     ]
   };
 }
