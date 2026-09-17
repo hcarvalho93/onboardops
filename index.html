@@ -2419,7 +2419,7 @@ function logClienteDiff(cli,before,after,labels){
   Object.keys(labels).forEach(f=>{
     const a=before[f]==null?'':before[f]; const b=after[f]==null?'':after[f];
     const av=Array.isArray(a)?a.join(', '):String(a); const bv=Array.isArray(b)?b.join(', '):String(b);
-    if(av!==bv) addHistory({modulo:'Cadastro Mestre',cliente:cli.nome,campo:labels[f],de:av||'Vazio',para:bv||'Vazio'});
+    if(av!==bv) addHistory({modulo:'Cadastro',cliente:cli.nome,campo:labels[f],de:av||'Vazio',para:bv||'Vazio'});
   });
 }
 function logLogin(u){ const t=nowParts(); DB.logins.unshift({usuario:u.nome,email:u.email,perfil:u.perfil,data:t.data,hora:t.hora,iso:t.iso});
@@ -2486,7 +2486,7 @@ const NAV = [
   ['dashboard','Dashboard Executivo','Visão consolidada da carteira de onboarding em tempo real',I.dashboard,'OPERAÇÃO'],
   ['pipeline','Pipeline da Carteira','Funil de propostas, evolução da carteira e jornada por etapa',I.kanban],
   ['jornada','Jornada do Cliente','Painel 360° do cliente — atividades, interações e histórico',I.route],
-  ['cadastro','Cadastro Mestre','Registro de clientes em processo de implantação',I.clients],
+  ['cadastro','Cadastro','Registro de clientes em processo de implantação',I.clients],
   ['pesquisa','Pesquisa Pós-Kickoff','Voz do cliente e satisfação imediata após o kickoff',I.survey],
   ['ativacao','Ativação Operacional','Marcos técnicos e operacionais da implantação',I.activation],
   ['ttfv','Time to First Value','Tempo até a primeira geração de valor percebido',I.ttfv],
@@ -2985,7 +2985,7 @@ function renderCadastro(){
   const cs=filteredClients();
   el('view-cadastro').innerHTML=`
   <div class="card">
-    <div class="card-head"><div class="ico">${svg(I.clients)}</div><h3>Cadastro Mestre de Clientes</h3>
+    <div class="card-head"><div class="ico">${svg(I.clients)}</div><h3>Cadastro de Clientes</h3>
       <span class="desc">${cs.length} cliente(s)</span><div class="spacer"></div>
       ${gate('createClient',`<button class="btn sm" onclick="App.abrirImportador()" title="Importar base operacional a partir de uma planilha Excel">${svg(I.upload)} Importar Base Excel</button>`)}
       ${gate('createClient',`<button class="btn primary sm" onclick="App.novoCliente()">${svg(I.plus)} Novo Cliente</button>`)}</div>
@@ -3146,7 +3146,7 @@ function renderTTFV(){
   el('view-ttfv').innerHTML=`
   <div class="card">
     <div class="card-head"><div class="ico">${svg(I.ttfv)}</div><h3>Time to First Value (TTFV)</h3>
-      <span class="desc">dias entre kickoff e a primeira geração de valor · datas herdadas do Cadastro Mestre</span></div>
+      <span class="desc">dias entre kickoff e a primeira geração de valor · datas herdadas do Cadastro</span></div>
     <div class="tbl-wrap"><table class="data"><thead><tr>
       <th>Cliente</th><th>Primeira Entrega de Valor</th><th>Data Kickoff</th><th>Go Live Prev.</th><th>Data 1ª Geração</th>
       <th>Dias</th><th>Classificação</th><th></th>
@@ -3155,8 +3155,8 @@ function renderTTFV(){
       return `<tr>
       <td>${clientCell(c)}</td>
       <td>${ttfvTipo(c.id,t)}</td>
-      <td class="num herdado" title="herdado do Cadastro Mestre">${fmtD(c.dataKickoff)}</td>
-      <td class="num herdado" title="herdado do Cadastro Mestre">${fmtD(c.goLivePrevisto)}</td>
+      <td class="num herdado" title="herdado do Cadastro">${fmtD(c.dataKickoff)}</td>
+      <td class="num herdado" title="herdado do Cadastro">${fmtD(c.goLivePrevisto)}</td>
       <td><input class="cell" type="date" value="${t.dataValor||''}" onchange="App.setTTFV('${c.id}','dataValor',this.value)"></td>
       <td class="num"><b>${r?(r.dias+(r.projetado?'*':'')):'—'}</b></td>
       <td>${r?badge(r.cls,r.tone):'<span class="badge b-slate"><span class="d"></span>aguardando</span>'}</td>
@@ -3164,7 +3164,7 @@ function renderTTFV(){
       </tr>`;}).join('') : emptyRow(8)}
     </tbody></table></div>
   </div>
-  <p style="font-size:12px;color:var(--txt-3);margin-top:10px">Classificação: ≤30 Excelente · 31–60 Bom · 61–90 Atenção · &gt;90 Crítico. * dias projetados (ainda sem geração de valor registrada). Datas de Kickoff e Go Live são herdadas automaticamente do Cadastro Mestre.</p>`;
+  <p style="font-size:12px;color:var(--txt-3);margin-top:10px">Classificação: ≤30 Excelente · 31–60 Bom · 61–90 Atenção · &gt;90 Crítico. * dias projetados (ainda sem geração de valor registrada). Datas de Kickoff e Go Live são herdadas automaticamente do Cadastro.</p>`;
 }
 function ttfvTipo(cid,t){
   const isPreset=TTFV_TIPOS.includes(t.tipo);
@@ -4825,7 +4825,7 @@ window.App = {
     d.activities=(d.activities||[]).filter(a=>a.cliente!==id);
     d.interactions=(d.interactions||[]).filter(i=>i.cliente!==id);
     d.propostas=(d.propostas||[]).filter(p=>p.cliente!==c.nome);
-    addHistory({modulo:'Cadastro Mestre',cliente:c.nome,campo:'Cliente',de:c.nome,para:'Excluído'});
+    addHistory({modulo:'Cadastro',cliente:c.nome,campo:'Cliente',de:c.nome,para:'Excluído'});
     save(d); this.refresh(); toast('Cliente excluído'); },
   saveCliente(id){
     if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
@@ -4847,7 +4847,7 @@ window.App = {
       dataAssinatura:v('f_assin'),dataKickoff:v('f_kick'),goLivePrevisto:v('f_glp'),goLiveReal:v('f_glr'),
       respOnboarding:v('f_onb'),keyAccount:v('f_ka'),respComercial:v('f_com'),respKickoff:v('f_rk'),obs:v('f_obs'),ativos:ativosDepois};
     Object.assign(c,after);
-    if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; d.clientes.push(c); addHistory({modulo:'Cadastro Mestre',cliente:nome,campo:'Cliente',de:'Vazio',para:'Cadastrado em '+np.iso.slice(0,10)+(quem?' por '+quem:'')}); }
+    if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; d.clientes.push(c); addHistory({modulo:'Cadastro',cliente:nome,campo:'Cliente',de:'Vazio',para:'Cadastrado em '+np.iso.slice(0,10)+(quem?' por '+quem:'')}); }
     else logClienteDiff(c,before,after,{nome:'Nome',tipologia:'Tipologia',status:'Status',etapa:'Etapa',estado:'Estado do Cliente',cidade:'Cidade do Cliente',
       dataAssinatura:'Data Assinatura',dataKickoff:'Data Kickoff',goLivePrevisto:'Go Live Previsto',goLiveReal:'Go Live Real',
       respOnboarding:'Resp. Onboarding',keyAccount:'Key Account',respComercial:'Resp. pela Proposta',respKickoff:'Resp. Kickoff',produtos:'Produtos',obs:'Observações'});
@@ -4901,7 +4901,7 @@ window.App = {
     d.surveys={}; d.activation={}; d.ttfv={};
     // usuários, senhas, perfis, permissões, config, histórico: intocados
     const st=_impAnalise.stats;
-    addHistory({modulo:'Cadastro Mestre',cliente:'—',campo:'Importação de Base Excel',
+    addHistory({modulo:'Cadastro',cliente:'—',campo:'Importação de Base Excel',
       de:'base anterior ('+(snapshot.clientes||[]).length+' clientes)',
       para:`${_impArquivo} · ${st.linhas} linhas · ${_impBase.clientes.length} clientes · ${_impBase.propostas.length} operações · ${_impBase.clientes.reduce((s,c)=>s+(c.ativos||[]).length,0)} ativos · ${_impAnalise.alertas.length} alerta(s)`});
     save(d);
@@ -4929,7 +4929,7 @@ window.App = {
       produtos:produtosSel, produto:produtosSel[0]||'', responsavel:v('pp_resp'),
       dataElaboracao:v('pp_del')||p.dataElaboracao||hoje,dataPrevista:v('pp_dprev'),dataAprovacao:dap,dataAssinatura:das,dataPerdida:dperd,obs:v('pp_obs')});
     addHistory({modulo:'Middle Plataforma',cliente:cliente,campo:'Proposta',de:isNew?'Vazio':(antesStatus||'—'),para:(isNew?'Criada · ':'Atualizada · ')+p.status});
-    // Integração: Contrato Assinado cria/atualiza o cliente no Cadastro Mestre (registro único)
+    // Integração: Contrato Assinado cria/atualiza o cliente no Cadastro (registro único)
     let msg='Proposta salva';
     if(st==='Contrato Assinado' && antesStatus!=='Contrato Assinado'){
       const norm=s=>String(s||'').trim().toLowerCase();
@@ -4940,13 +4940,13 @@ window.App = {
            dataAssinatura:das,status:'Aguardando Cliente',etapa:'contrato',estado:'',cidade:'',ativos:[],
            criadoEm:hoje,criadoPor:quem,obs:'Criado automaticamente a partir de proposta assinada.'};
         d.clientes.push(c); p.clienteId=c.id;
-        addHistory({modulo:'Cadastro Mestre',cliente:cliente,campo:'Cliente',de:'Vazio',para:'Criado via contrato assinado'});
-        msg='Contrato assinado — cliente criado no Cadastro Mestre';
+        addHistory({modulo:'Cadastro',cliente:cliente,campo:'Cliente',de:'Vazio',para:'Criado via contrato assinado'});
+        msg='Contrato assinado — cliente criado no Cadastro';
       } else {
         const prods=Array.from(new Set([...(c.produtos||[]),...produtosSel]));
         c.produtos=prods; c.bookedValue=p.bookedValue; if(das) c.dataAssinatura=das; p.clienteId=c.id;
-        addHistory({modulo:'Cadastro Mestre',cliente:c.nome,campo:'Contrato',de:'—',para:'Atualizado via contrato assinado'});
-        msg='Contrato assinado — cliente atualizado no Cadastro Mestre';
+        addHistory({modulo:'Cadastro',cliente:c.nome,campo:'Contrato',de:'—',para:'Atualizado via contrato assinado'});
+        msg='Contrato assinado — cliente atualizado no Cadastro';
       }
     }
     save(d); this.closeModal(); this.refresh(); toast(msg); },
