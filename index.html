@@ -1416,7 +1416,7 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
 
 /* ---------- CABEÇALHO DE MÓDULO: plano diagonal + identidade ---------- */
 .topbar{
-  position:relative; overflow:hidden;
+  position:sticky; top:0; overflow:hidden;
   padding:16px 28px;
   border-bottom:1px solid color-mix(in srgb,var(--line) 50%, transparent);
 }
@@ -1429,6 +1429,29 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
   transition:background .35s var(--ease);
 }
 .topbar > *{ position:relative; z-index:1; }
+
+/* ---------- BUSCA GLOBAL (topbar) ---------- */
+.gs-wrap{ position:relative; flex:1; max-width:440px; min-width:160px; }
+.gs-input-box{ position:relative; display:flex; align-items:center; }
+.gs-input-box svg{ position:absolute; left:12px; width:16px; height:16px; color:var(--txt-3); pointer-events:none; }
+.gs-input{
+  width:100%; height:38px; padding:0 12px 0 36px; border-radius:10px;
+  border:1px solid var(--line); background:var(--surface-2); font:inherit; color:var(--txt);
+}
+.gs-input:focus{ outline:2px solid var(--blue-soft); border-color:var(--blue); }
+.gs-results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; max-height:360px; overflow-y:auto;
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow-lg);
+  z-index:60; padding:6px;
+}
+.gs-item{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; cursor:pointer; }
+.gs-item:hover{ background:var(--surface-2); }
+.gs-ico{ color:var(--blue); flex:none; display:flex; }
+.gs-info{ flex:1; min-width:0; display:flex; flex-direction:column; }
+.gs-info b{ font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gs-info small{ color:var(--txt-3); font-size:11.5px; }
+.gs-empty{ padding:14px; text-align:center; color:var(--txt-3); font-size:13px; }
+@media(max-width:900px){ .gs-wrap{ display:none; } }
 .mod-ico{ display:flex; align-items:center; }
 .mod-tile{
   display:inline-flex; align-items:center; justify-content:center;
@@ -1574,7 +1597,14 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
         <div class="mod-tag" id="modTag"></div>
         <p id="pageSub">Visão consolidada da carteira de onboarding em tempo real</p>
       </div>
-      <div class="spacer"></div>
+      <div class="gs-wrap">
+        <div class="gs-input-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input class="gs-input" id="gsInput" placeholder="Buscar cliente, CNPJ, cidade…" autocomplete="off"
+            oninput="App.gsInput(this.value)" onkeydown="App.gsKey(event)"
+            onfocus="App.gsInput(this.value)" onblur="setTimeout(()=>App.closeGS(),150)">
+        </div>
+        <div class="gs-results" id="gsResults" hidden></div>
+      </div>
       <button class="btn sm" id="exportBtn" onclick="App.go('relatorios')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12l-4-4m4 4l4-4M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3"/></svg>
         Relatórios
@@ -1684,7 +1714,8 @@ const I = {
   eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
   database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
   route:'<circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M9 19h6a4 4 0 004-4V9a4 4 0 00-4-4H9"/>',
-  logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>'
+  logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>'
 };
 const svg = (p,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 
@@ -1912,31 +1943,31 @@ function ahead(n){ return ago(-n); }
 function seed(){
   return {
     clientes:[
-      {id:'rdville',nome:'RD VILLE CONSTRUTORA E INCORPORADORA LTDA',produtos:['Backoffice'],
+      {id:'rdville',nome:'RD VILLE CONSTRUTORA E INCORPORADORA LTDA',cnpj:'12.345.678/0001-90',produtos:['Backoffice'],
        tipologia:'Incorporação',dataAssinatura:ago(120),dataKickoff:ago(114),
        goLivePrevisto:ago(46),goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
        keyAccount:'Ester Silva de Souza',respComercial:'Felipe Henrique',respKickoff:'Victor Abreu Espíndola',
        status:'Em andamento',etapa:'onboarding',obs:'',estado:'GO',cidade:'Goiânia',criadoEm:ago(120),criadoPor:'Waleria Santos',
        ativos:[{id:'at_rd1',nome:'SPE Jardim Aurora',estado:'GO',cidade:'Goiânia',regiao:'Centro-Oeste',tipologia:'Incorporação',quantidade:1,unidades:240,vgv:180000000,statusAtivo:'Comercialização',criadoEm:ago(114),criadoPor:'Victor Abreu Espíndola',obs:''},
                {id:'at_rd2',nome:'SPE Mar Azul',estado:'BA',cidade:'Salvador',regiao:'Nordeste',tipologia:'Multipropriedade',quantidade:3,unidades:520,vgv:420000000,statusAtivo:'Lançamento',criadoEm:ago(114),criadoPor:'Victor Abreu Espíndola',obs:'Resort em fase de lançamento'}]},
-      {id:'barion',nome:'BARION EMPREENDIMENTOS IMOBILIARIOS LTDA.',produtos:[],
+      {id:'barion',nome:'BARION EMPREENDIMENTOS IMOBILIARIOS LTDA.',cnpj:'23.456.789/0001-11',produtos:[],
        tipologia:'Incorporação',dataAssinatura:ago(122),dataKickoff:'',
        goLivePrevisto:'',goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
        keyAccount:'Ester Silva de Souza',respComercial:'Paulo Roberto',respKickoff:'',
        status:'Aguardando Cliente',etapa:'contrato',obs:'',estado:'SP',cidade:'São Paulo',criadoEm:ago(122),criadoPor:'Waleria Santos',
        ativos:[{id:'at_ba1',nome:'Loteamento Bosque Verde',estado:'SP',cidade:'Campinas',regiao:'Sudeste',tipologia:'Loteamento',quantidade:2,unidades:380,vgv:150000000,statusAtivo:'Obras',criadoEm:ago(121),criadoPor:'Victor Abreu Espíndola',obs:''}]},
-      {id:'calftech',nome:'CALFTECH CONSTRUTORA E INCORPORADORA LTDA.',produtos:[],
+      {id:'calftech',nome:'CALFTECH CONSTRUTORA E INCORPORADORA LTDA.',cnpj:'34.567.890/0001-22',produtos:[],
        tipologia:'Incorporação',dataAssinatura:ago(118),dataKickoff:'',
        goLivePrevisto:'',goLiveReal:'',respOnboarding:'Natalia Yoshimura Lopes',
        keyAccount:'Ester Silva de Souza',respComercial:'',respKickoff:'',
        status:'Aguardando Cliente',etapa:'contrato',obs:'',estado:'PR',cidade:'Curitiba',criadoEm:ago(118),criadoPor:'Waleria Santos',ativos:[]},
-      {id:'novaalianca',nome:'NOVA ALIANÇA INCORPORADORA LTDA',produtos:['Backoffice','Gerente de Projetos'],
+      {id:'novaalianca',nome:'NOVA ALIANÇA INCORPORADORA LTDA',cnpj:'45.678.901/0001-33',produtos:['Backoffice','Gerente de Projetos'],
        tipologia:'Incorporação',dataAssinatura:ago(210),dataKickoff:ago(204),
        goLivePrevisto:ago(180),goLiveReal:ago(178),respOnboarding:'Natalia Yoshimura Lopes',
        keyAccount:'Ester Silva de Souza',respComercial:'Felipe Henrique',respKickoff:'Natalia Yoshimura Lopes',
        status:'Concluído',etapa:'operacao',obs:'Cliente operando com saúde excelente — referência de onboarding bem-sucedido.',estado:'SP',cidade:'Campinas',criadoEm:ago(210),criadoPor:'Waleria Santos',
        ativos:[{id:'at_na1',nome:'SPE Alto da Serra',estado:'SP',cidade:'Campinas',regiao:'Sudeste',tipologia:'Incorporação',quantidade:1,unidades:300,vgv:220000000,statusAtivo:'Comercialização',criadoEm:ago(204),criadoPor:'Natalia Yoshimura Lopes',obs:''}]},
-      {id:'solaris',nome:'SOLARIS EMPREENDIMENTOS LTDA',produtos:['Backoffice'],
+      {id:'solaris',nome:'SOLARIS EMPREENDIMENTOS LTDA',cnpj:'56.789.012/0001-44',produtos:['Backoffice'],
        tipologia:'Incorporação',dataAssinatura:ago(160),dataKickoff:ago(150),
        goLivePrevisto:ago(90),goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
        keyAccount:'Ester Silva de Souza',respComercial:'Paulo Roberto',respKickoff:'Victor Abreu Espíndola',
@@ -2086,7 +2117,7 @@ function migrate(db){
   db.propostas.forEach(p=>{ const m={'Elaborada':'Proposta Elaborada','Aprovada':'Proposta Aprovada','Assinada':'Contrato Assinado'};
     if(m[p.status]) p.status=m[p.status]; if(p.bookedValue==null) p.bookedValue=(+p.valor||0); });
   db.interactions.forEach(i=>{ if(!i.kind) i.kind='evento'; });  // v4.4: tipo de registro
-  db.clientes.forEach(c=>{ if(!Array.isArray(c.ativos)) c.ativos=[]; if(c.estado===undefined) c.estado=''; if(c.cidade===undefined) c.cidade='';
+  db.clientes.forEach(c=>{ if(!Array.isArray(c.ativos)) c.ativos=[]; if(c.estado===undefined) c.estado=''; if(c.cidade===undefined) c.cidade=''; if(c.cnpj===undefined) c.cnpj='';
     if(c.criadoEm===undefined) c.criadoEm=c.dataAssinatura||''; if(c.criadoPor===undefined) c.criadoPor='';
     c.ativos.forEach(a=>{ if(!a.regiao&&a.estado) a.regiao=regiaoDoEstado(a.estado); if(a.quantidade==null) a.quantidade=1;
       if(a.vgv==null) a.vgv=0; if(a.unidades==null) a.unidades=0; if(a.statusAtivo==null) a.statusAtivo='';
@@ -2582,6 +2613,25 @@ function prog(pct,tone){
 }
 function clientCell(c){ return `<div class="client-cell client-link" onclick="event.stopPropagation();App.abrirCliente('${c.id}')" title="Abrir a jornada de ${esc(c.nome)}"><span class="cl-nm">${esc(c.nome)}</span><small>${esc(c.tipologia)} · ${(c.produtos&&c.produtos.length)?esc(c.produtos.join(', ')):'sem produto'}</small></div>`; }
 function emptyRow(cols,msg){ return `<tr class="empty-row"><td colspan="${cols}">${msg||'Nenhum registro corresponde aos filtros.'}</td></tr>`; }
+
+/* ============================ BUSCA GLOBAL (topbar) ============================ */
+function normTxt(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function buscaGlobalResultados(q){
+  const nq=normTxt(q).trim(); if(nq.length<2) return [];
+  const cs=(DB().clientes||[]);
+  return cs.filter(c=>{
+    const hay=normTxt([c.nome,c.cnpj,c.cidade,c.estado,c.tipologia,c.keyAccount,c.respOnboarding,c.respComercial,(c.produtos||[]).join(' ')].join(' | '));
+    return hay.includes(nq);
+  }).slice(0,8);
+}
+function gsResultsHTML(list,q){
+  if(!list.length) return `<div class="gs-empty">Nenhum cliente encontrado para "${esc(q)}".</div>`;
+  return list.map(c=>`<div class="gs-item" onmousedown="App.gsSelect('${c.id}')">
+    <span class="gs-ico">${svg(I.clients,1.8)}</span>
+    <div class="gs-info"><b>${esc(c.nome)}</b><small>${esc(c.tipologia||'—')}${c.cnpj?' · '+esc(c.cnpj):''}${c.cidade?' · '+esc(c.cidade)+(c.estado?'/'+esc(c.estado):''):''}</small></div>
+    ${etapaBadge(c)}
+  </div>`).join('');
+}
 
 /* ============================ MÓDULO 1 — DASHBOARD ============================ */
 
@@ -3603,6 +3653,7 @@ function clienteModal(cli){
     <div class="field"><label>Status Operacional</label><select id="f_status">${STATUS_OPCOES.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
     <div class="field"><label>Estado do Cliente</label><select id="f_estado">${ufOpts(c.estado||'')}</select></div>
     <div class="field"><label>Cidade do Cliente</label><input id="f_cidade" value="${esc(c.cidade||'')}" placeholder="Sede da empresa"></div>
+    <div class="field"><label>CNPJ</label><input id="f_cnpj" value="${esc(c.cnpj||'')}" placeholder="00.000.000/0000-00"></div>
     <div class="field"><label>Data Assinatura</label><input id="f_assin" type="date" value="${c.dataAssinatura||''}"></div>
     <div class="field"><label>Data Kickoff</label><input id="f_kick" type="date" value="${c.dataKickoff||''}"></div>
     <div class="field"><label>Go Live Previsto</label><input id="f_glp" type="date" value="${c.goLivePrevisto||''}"></div>
@@ -4843,12 +4894,12 @@ window.App = {
         .filter(a=>a.nome||a.estado||a.cidade) : ativosAntes;
     const after={nome,produtos,tipologia:v('f_tip'),status:el('f_status').value,
       etapa:(el('f_etapa')?el('f_etapa').value:(c.etapa||'contrato')),
-      estado:(el('f_estado')?el('f_estado').value:(c.estado||'')),cidade:v('f_cidade'),
+      estado:(el('f_estado')?el('f_estado').value:(c.estado||'')),cidade:v('f_cidade'),cnpj:v('f_cnpj'),
       dataAssinatura:v('f_assin'),dataKickoff:v('f_kick'),goLivePrevisto:v('f_glp'),goLiveReal:v('f_glr'),
       respOnboarding:v('f_onb'),keyAccount:v('f_ka'),respComercial:v('f_com'),respKickoff:v('f_rk'),obs:v('f_obs'),ativos:ativosDepois};
     Object.assign(c,after);
     if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; d.clientes.push(c); addHistory({modulo:'Cadastro',cliente:nome,campo:'Cliente',de:'Vazio',para:'Cadastrado em '+np.iso.slice(0,10)+(quem?' por '+quem:'')}); }
-    else logClienteDiff(c,before,after,{nome:'Nome',tipologia:'Tipologia',status:'Status',etapa:'Etapa',estado:'Estado do Cliente',cidade:'Cidade do Cliente',
+    else logClienteDiff(c,before,after,{nome:'Nome',tipologia:'Tipologia',status:'Status',etapa:'Etapa',estado:'Estado do Cliente',cidade:'Cidade do Cliente',cnpj:'CNPJ',
       dataAssinatura:'Data Assinatura',dataKickoff:'Data Kickoff',goLivePrevisto:'Go Live Previsto',goLiveReal:'Go Live Real',
       respOnboarding:'Resp. Onboarding',keyAccount:'Key Account',respComercial:'Resp. pela Proposta',respKickoff:'Resp. Kickoff',produtos:'Produtos',obs:'Observações'});
     if(canAtivos()) logAtivosDiff(nome,ativosAntes,ativosDepois);
@@ -5046,6 +5097,27 @@ window.App = {
   limparContexto(){ filters.cliente=''; buildFilters(); this.refresh(); buildCrumb(el('pageTitle')?el('pageTitle').textContent:''); },
   abrirCliente(id){ filters.cliente=id; jTab='geral'; this.go('jornada'); },
   fecharCliente(){ filters.cliente=''; this.refresh(); },
+  // ---- Busca global (topbar) ----
+  gsInput(v){
+    const box=el('gsResults'); if(!box) return;
+    const list=buscaGlobalResultados(v);
+    if(!v || v.trim().length<2){ box.hidden=true; box.innerHTML=''; return; }
+    box.innerHTML=gsResultsHTML(list,v);
+    box.hidden=false;
+  },
+  gsKey(e){
+    if(e.key==='Escape'){ this.closeGS(); e.target.blur(); return; }
+    if(e.key==='Enter'){
+      const list=buscaGlobalResultados(e.target.value);
+      if(list.length) this.gsSelect(list[0].id);
+    }
+  },
+  gsSelect(id){
+    const inp=el('gsInput'); if(inp) inp.value='';
+    this.closeGS();
+    this.abrirCliente(id);
+  },
+  closeGS(){ const box=el('gsResults'); if(box){ box.hidden=true; box.innerHTML=''; } },
   jTab(t){ jTab=t; renderJornada(); },
 
   /* ---- V4: atividades / kanban ---- */
