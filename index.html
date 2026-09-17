@@ -1455,9 +1455,21 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
 .topbar .brand .sub{ font-size:8.5px; color:rgba(255,255,255,.6); }
 @media(max-width:640px){ .topbar .brand-sub-wrap{ display:none; } }
 
-/* ---------- CABEÇALHO DA PÁGINA (acima dos filtros, fora da topbar) ---------- */
-.page-head{ display:flex; align-items:center; gap:14px; margin-bottom:18px; }
-.page-head .page-title{ min-width:0; }
+/* ---------- CABEÇALHO DA PÁGINA: fino, fixo abaixo da topbar, filtros ao lado ---------- */
+.page-head{
+  position:sticky; top:var(--topbar-h); z-index:20;
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap; row-gap:8px;
+  padding:11px 0; margin:0 0 18px;
+  background:var(--bg);
+  box-shadow:0 8px 14px -12px rgba(15,23,42,.4);
+}
+.page-head .page-title{ min-width:0; flex:none; }
+.page-head .mod-tile{ width:32px; height:32px; border-radius:10px; }
+.page-head .mod-tile svg{ width:16px; height:16px; }
+.page-head .crumb{ margin-bottom:1px; }
+.page-head #pageTitle{ font-size:16.5px; }
+.page-head .mod-tag{ font-size:10px; margin-top:1px; }
+.page-head .filters{ flex:1; justify-content:flex-end; margin:0; min-width:280px; }
 
 /* ---------- BUSCA GLOBAL (topbar) ---------- */
 .gs-wrap{ position:relative; width:420px; max-width:100%; }
@@ -1542,13 +1554,10 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
 /* ---------- SIDEBAR: marca com textura e gradiente ---------- */
 .sidebar{
   position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));
+  /* tom levemente diferente da topbar (que é mais clara/diagonal) — sem linha separadora entre as duas */
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'%3E%3Cpath d='M8 9 L23 13.5 L13.5 16.5 Z' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E"),
-    linear-gradient(180deg,var(--navy) 0%,var(--navy-700) 62%,#0A1B33 100%);
-}
-.sidebar::after{
-  content:""; position:absolute; left:0; right:0; top:0; height:3px;
-  background:var(--grad-brand); opacity:.9;
+    linear-gradient(180deg,var(--navy-700) 0%,#0A1424 100%);
 }
 .brand{ padding:22px 18px 18px; border-bottom:1px solid rgba(255,255,255,.06); }
 .brand .sub{ color:rgba(255,255,255,.46); }
@@ -1704,9 +1713,9 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
           <div class="mod-tag" id="modTag"></div>
           <p id="pageSub">Visão consolidada da carteira de onboarding em tempo real</p>
         </div>
+        <!-- Filtros globais -->
+        <div class="filters no-print" id="filters"></div>
       </div>
-      <!-- Filtros globais -->
-      <div class="filters no-print" id="filters"></div>
       <!-- Views -->
       <section class="view active" id="view-dashboard"></section>
       <section class="view" id="view-pipeline"></section>
@@ -2671,7 +2680,7 @@ function buildFilters(){
   const opt=(v,t,sel)=>`<option value="${esc(v)}" ${v===sel?'selected':''}>${esc(t)}</option>`;
   const selCli=cs.find(c=>c.id===filters.cliente);
   el('filters').innerHTML = `
-    <span class="fl-label">${svg(I.filter,2)} Filtros</span>
+    <span class="fl-label">Filtros</span>
     <input class="cli-search" id="fCliente" list="dlClientes" placeholder="Buscar cliente…" value="${selCli?esc(selCli.nome):''}" autocomplete="off">
     <datalist id="dlClientes">${cs.map(c=>`<option value="${esc(c.nome)}"></option>`).join('')}</datalist>
     <select data-f="ka"><option value="">Key Account</option>${KEY_ACCOUNTS.map(v=>opt(v,v,filters.ka)).join('')}</select>
