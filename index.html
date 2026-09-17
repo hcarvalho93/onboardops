@@ -4821,6 +4821,9 @@ window.App = {
   delCliente(id){ if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const c=getCli(id); if(!confirm('Excluir "'+c.nome+'"? Os dados relacionados também serão removidos.')) return;
     const d=DB(); d.clientes=d.clientes.filter(x=>x.id!==id); delete d.surveys[id]; delete d.activation[id]; delete d.ttfv[id];
+    d.activities=(d.activities||[]).filter(a=>a.cliente!==id);
+    d.interactions=(d.interactions||[]).filter(i=>i.cliente!==id);
+    d.propostas=(d.propostas||[]).filter(p=>p.cliente!==c.nome);
     addHistory({modulo:'Cadastro Mestre',cliente:c.nome,campo:'Cliente',de:c.nome,para:'Excluído'});
     save(d); this.refresh(); toast('Cliente excluído'); },
   saveCliente(id){
@@ -5876,16 +5879,6 @@ if(getSession()){
 
   window.__IMP=IMP;
 })();
-
-/* =========================================================================
-   V9 · BASE OPERACIONAL REAL (TESTE_BASE_DE_CLIENTES.xlsx)
-   Carregada apenas em instalação nova; se já houver dados salvos no
-   navegador, nada é sobrescrito. Usuários, senhas, perfis e configurações
-   continuam vindo da aplicação.
-   ========================================================================= */
-
-
-
 </script>
 </body>
 </html>
