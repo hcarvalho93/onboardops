@@ -5037,7 +5037,7 @@ function renderAuth(){
       <div id="loginErr" class="login-err"></div>
       <button class="btn primary login-btn" onclick="App.criarSenha()">Criar senha e entrar</button>
       <div class="login-links"><button class="login-link" onclick="App.authMode('login')">← Voltar ao login</button></div>
-      <div class="login-hint">Se o e-mail não for interno, o acesso é criado como <b>Área Parceira (somente leitura)</b>.</div>`;
+      <div class="login-hint">Disponível apenas para e-mails corporativos <b>@trinusco.com.br</b>.</div>`;
   } else if(_authMode==='reset'){
     body=`
       <div class="login-mode">Redefinir senha</div>
@@ -5589,12 +5589,13 @@ window.App = {
   async criarSenha(){ const email=(el('loginEmail').value||'').trim().toLowerCase();
     const p1=el('loginPass').value||'', p2=el('loginPass2').value||'';
     if(!email || email.indexOf('@')<1){ authErr('Informe um e-mail válido.'); return; }
+    if(!/@trinusco\.com\.br$/i.test(email)){ authErr('Cadastro disponível apenas para e-mails corporativos @trinusco.com.br.'); return; }
     if(p1.length<6){ authErr('A senha deve ter ao menos 6 caracteres.'); return; }
     if(p1!==p2){ authErr('As senhas não coincidem.'); return; }
     const known=USERS_SEED.find(s=>s.email.toLowerCase()===email); const novo=!known;
     const meta=known?{nome:known.nome,perfil:known.perfil,cargo:known.cargo}:guestFromEmail(email);
     const {data,error}=await supa.auth.signUp({email,password:p1,options:{data:meta}});
-    if(error){ authErr(/already registered|já está cadastrado/i.test(error.message)?'Este e-mail já tem senha. Use “Esqueci minha senha”.':error.message); return; }
+    if(error){ authErr(/already registered|já está cadastrado/i.test(error.message)?'Este e-mail já tem senha. Use “Esqueci minha senha”.':/domain_not_allowed|trinusco/i.test(error.message)?'Cadastro disponível apenas para e-mails corporativos @trinusco.com.br.':error.message); return; }
     if(!data.session){ _authMode='login'; renderAuth(); toast('Conta criada! Verifique seu e-mail para confirmar o acesso.'); return; }
     logSeg(meta.nome,'Criação de senha',novo?'Novo acesso Área Parceira':'Primeiro acesso');
     entrarComUsuario({...meta,ativo:true},{msg:(novo?'Acesso de parceiro criado (somente leitura).':'Senha criada. Bem-vinda(o), '+meta.nome.split(' ')[0]+'!')}); },
