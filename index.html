@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<!-- Supabase (banco de dados + autenticação compartilhados pelo time) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 /* =========================================================================
    OnboardOps — Sistema de Gestão de Onboarding B2B
@@ -2248,14 +2250,137 @@ function migrate(db){
   });
   return db;
 }
-function load(){
-  try{ const r=localStorage.getItem(KEY); if(r) return migrate(JSON.parse(r)); }catch(e){}
-  return seed();
+/* ---- Supabase: banco compartilhado pelo time (substitui o localStorage como fonte da verdade) ---- */
+const SUPA_URL='https://bnxasipcyfmwrargrjoj.supabase.co';
+const SUPA_KEY='sb_publishable_hyFcBB3fCYtDxGz1-EVGOg_44yWhIcs';
+const supa=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+
+const nz=v=>(v===undefined||v===null)?'':v;                 // banco -> app (null vira '')
+const nn=v=>(v===undefined||v===null||v==='')?null:v;        // app -> banco ('' vira null)
+
+function rowToCliente(r){ return {id:r.id,nome:r.nome,cnpj:nz(r.cnpj),produtos:r.produtos||[],tipologia:nz(r.tipologia),
+  dataAssinatura:nz(r.data_assinatura),dataKickoff:nz(r.data_kickoff),goLivePrevisto:nz(r.go_live_previsto),goLiveReal:nz(r.go_live_real),
+  respOnboarding:nz(r.resp_onboarding),keyAccount:nz(r.key_account),respComercial:nz(r.resp_comercial),respKickoff:nz(r.resp_kickoff),
+  status:nz(r.status),etapa:nz(r.etapa),obs:nz(r.obs),estado:nz(r.estado),cidade:nz(r.cidade),
+  criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por),ativos:[]}; }
+function clienteToRow(c){ return {id:c.id,nome:c.nome,cnpj:nn(c.cnpj),produtos:c.produtos||[],tipologia:nn(c.tipologia),
+  data_assinatura:nn(c.dataAssinatura),data_kickoff:nn(c.dataKickoff),go_live_previsto:nn(c.goLivePrevisto),go_live_real:nn(c.goLiveReal),
+  resp_onboarding:nn(c.respOnboarding),key_account:nn(c.keyAccount),resp_comercial:nn(c.respComercial),resp_kickoff:nn(c.respKickoff),
+  status:nn(c.status),etapa:nn(c.etapa),obs:nn(c.obs),estado:nn(c.estado),cidade:nn(c.cidade),
+  criado_em:nn(c.criadoEm),criado_por:nn(c.criadoPor)}; }
+function rowToAtivo(r){ return {id:r.id,nome:r.nome,estado:nz(r.estado),cidade:nz(r.cidade),regiao:nz(r.regiao),
+  tipologia:nz(r.tipologia),quantidade:r.quantidade==null?1:r.quantidade,unidades:r.unidades==null?0:r.unidades,
+  vgv:r.vgv==null?0:+r.vgv,statusAtivo:nz(r.status_ativo),criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por),obs:nz(r.obs)}; }
+function ativoToRow(a,clienteId){ return {id:a.id,cliente_id:clienteId,nome:a.nome,estado:nn(a.estado),cidade:nn(a.cidade),
+  regiao:nn(a.regiao),tipologia:nn(a.tipologia),quantidade:a.quantidade||1,unidades:a.unidades||0,vgv:a.vgv||0,
+  status_ativo:nn(a.statusAtivo),criado_em:nn(a.criadoEm),criado_por:nn(a.criadoPor),obs:nn(a.obs)}; }
+function rowToSurvey(r){ return {dataResposta:nz(r.data_resposta),q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q5:r.q5,comentarios:nz(r.comentarios)}; }
+function surveyToRow(cid,s){ return {cliente_id:cid,data_resposta:nn(s.dataResposta),q1:s.q1||null,q2:s.q2||null,q3:s.q3||null,q4:s.q4||null,q5:s.q5||null,comentarios:nn(s.comentarios)}; }
+function rowToTtfv(r){ return {tipo:nz(r.tipo),dataValor:nz(r.data_valor)}; }
+function ttfvToRow(cid,t){ return {cliente_id:cid,tipo:nn(t.tipo),data_valor:nn(t.dataValor)}; }
+function rowToActivity(r){ return {id:r.id,cliente:r.cliente_id,titulo:r.titulo,descricao:nz(r.descricao),responsavel:nz(r.responsavel),
+  prioridade:nz(r.prioridade),status:nz(r.status),criacao:nz(r.criacao),prazo:nz(r.prazo),dataConclusao:nz(r.data_conclusao)}; }
+function activityToRow(a){ return {id:a.id,cliente_id:a.cliente||null,titulo:a.titulo,descricao:nn(a.descricao),responsavel:nn(a.responsavel),
+  prioridade:nn(a.prioridade),status:nn(a.status),criacao:nn(a.criacao),prazo:nn(a.prazo),data_conclusao:nn(a.dataConclusao)}; }
+function rowToInteraction(r){ return {id:r.id,cliente:r.cliente_id,data:nz(r.data),hora:nz(r.hora),canal:nz(r.canal),responsavel:nz(r.responsavel),
+  tipo:nz(r.tipo),status:nz(r.status),resumo:nz(r.resumo),texto:nz(r.texto),proximaAcao:nz(r.proxima_acao),prazoAcao:nz(r.prazo_acao),
+  tags:r.tags||[],anexos:r.anexos||[],kind:r.kind||'evento'}; }
+function interactionToRow(i){ return {id:i.id,cliente_id:i.cliente||null,data:nn(i.data),hora:nn(i.hora),canal:nn(i.canal),responsavel:nn(i.responsavel),
+  tipo:nn(i.tipo),status:nn(i.status),resumo:nn(i.resumo),texto:nn(i.texto),proxima_acao:nn(i.proximaAcao),prazo_acao:nn(i.prazoAcao),
+  tags:i.tags||[],anexos:i.anexos||[],kind:i.kind||'evento'}; }
+function rowToProposta(r){ return {id:r.id,cliente:r.cliente_nome,status:nz(r.status),valor:+r.valor||0,bookedValue:+r.booked_value||0,
+  produto:nz(r.produto),produtos:r.produtos||[],responsavel:nz(r.responsavel),dataElaboracao:nz(r.data_elaboracao),dataPrevista:nz(r.data_prevista),
+  dataAprovacao:nz(r.data_aprovacao),dataAssinatura:nz(r.data_assinatura),dataPerdida:nz(r.data_perdida),obs:nz(r.obs)}; }
+function propostaToRow(p){ return {id:p.id,cliente_nome:p.cliente,status:nn(p.status),valor:p.valor||0,booked_value:p.bookedValue!=null?p.bookedValue:(p.valor||0),
+  produto:nn(p.produto),produtos:p.produtos||[],responsavel:nn(p.responsavel),data_elaboracao:nn(p.dataElaboracao),data_prevista:nn(p.dataPrevista),
+  data_aprovacao:nn(p.dataAprovacao),data_assinatura:nn(p.dataAssinatura),data_perdida:nn(p.dataPerdida),obs:nn(p.obs)}; }
+function rowToUser(r){ return {id:r.id,nome:r.nome,email:r.email,perfil:r.perfil,cargo:nz(r.cargo),ativo:r.ativo!==false}; }
+function rowToHist(r){ return {id:r.id,usuario:nz(r.usuario),perfil:nz(r.perfil),data:nz(r.data),hora:nz(r.hora),iso:r.iso,modulo:nz(r.modulo),cliente:nz(r.cliente),campo:nz(r.campo),de:nz(r.de),para:nz(r.para)}; }
+function rowToLogin(r){ return {usuario:nz(r.usuario),email:nz(r.email),perfil:nz(r.perfil),data:nz(r.data),hora:nz(r.hora),iso:r.iso}; }
+
+async function loadFromSupabase(){
+  const [cli,ati,srv,act,ttf,acts,ints,props,cfg,usrs,hist,logs] = await Promise.all([
+    supa.from('clientes').select('*'), supa.from('ativos').select('*'), supa.from('surveys').select('*'),
+    supa.from('activation').select('*'), supa.from('ttfv').select('*'), supa.from('activities').select('*'),
+    supa.from('interactions').select('*'), supa.from('propostas').select('*'), supa.from('config').select('*').eq('id',1).maybeSingle(),
+    supa.from('users').select('*'), supa.from('history').select('*').order('iso',{ascending:false}).limit(500),
+    supa.from('logins').select('*').order('iso',{ascending:false}).limit(500)
+  ]);
+  const erros=[cli,ati,srv,act,ttf,acts,ints,props,cfg,usrs,hist,logs].filter(r=>r.error);
+  if(erros.length){ console.error('Falha ao carregar dados do Supabase',erros); throw erros[0].error; }
+
+  const clientes=(cli.data||[]).map(rowToCliente);
+  const byId={}; clientes.forEach(c=>byId[c.id]=c);
+  (ati.data||[]).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.ativos.push(rowToAtivo(r)); });
+
+  const surveys={}; (srv.data||[]).forEach(r=>{ surveys[r.cliente_id]=rowToSurvey(r); });
+  const activation={}; (act.data||[]).forEach(r=>{ activation[r.cliente_id]={items:r.items||{},dates:r.dates||{}}; });
+  const ttfv={}; (ttf.data||[]).forEach(r=>{ ttfv[r.cliente_id]=rowToTtfv(r); });
+
+  const c=cfg.data||{};
+  const config={empresa:c.empresa||'Trinus',tagline:c.tagline||'Portal de Customer Success & Jornada do Cliente',
+    thr:c.thr||{saudavel:70,atencao:40},escalaImediata:c.escala_imediata??30,escalaSemanal:c.escala_semanal??50,
+    produtos:(c.produtos&&c.produtos.length)?c.produtos:PRODUTOS.slice(),tipologias:(c.tipologias&&c.tipologias.length)?c.tipologias:TIPOLOGIAS.slice()};
+
+  return migrate({
+    clientes, surveys, activation, ttfv, config,
+    users:(usrs.data||[]).map(rowToUser),
+    activities:(acts.data||[]).map(rowToActivity),
+    interactions:(ints.data||[]).map(rowToInteraction),
+    propostas:(props.data||[]).map(rowToProposta),
+    history:(hist.data||[]).map(rowToHist),
+    logins:(logs.data||[]).map(rowToLogin)
+  });
 }
-function save(d){ if(d!==undefined) DB=d; try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){ console.warn('Persistência indisponível',e);} }
-function resetDB(){ if(confirm('Restaurar dados de exemplo? Todas as alterações locais serão perdidas.')){ DB=seed(); save(); App.refresh(); toast('Dados restaurados'); } }
-DB = load();
-save();
+
+let _syncing=false,_pendingSync=false;
+function save(d){
+  if(d!==undefined) DB=d;
+  try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){ console.warn('Cache local indisponível',e); }
+  syncToSupabase();
+}
+// substitui DB inteiro (usado no login, ao carregar do Supabase) sem re-sincronizar de volta
+function setDB(d){ DB=d; try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
+async function syncToSupabase(){
+  if(!getSession()) return; // sem sessão não há como sincronizar (RLS exige usuário autenticado)
+  if(_syncing){ _pendingSync=true; return; }
+  _syncing=true;
+  try{
+    const d=DB;
+    const clienteRows=(d.clientes||[]).map(clienteToRow);
+    const ativoRows=(d.clientes||[]).flatMap(c=>(c.ativos||[]).map(a=>ativoToRow(a,c.id)));
+    const surveyRows=Object.keys(d.surveys||{}).map(cid=>surveyToRow(cid,d.surveys[cid]));
+    const activationRows=Object.keys(d.activation||{}).map(cid=>({cliente_id:cid,items:(d.activation[cid]||{}).items||{},dates:(d.activation[cid]||{}).dates||{}}));
+    const ttfvRows=Object.keys(d.ttfv||{}).map(cid=>ttfvToRow(cid,d.ttfv[cid]));
+    const activityRows=(d.activities||[]).map(activityToRow);
+    const interactionRows=(d.interactions||[]).map(interactionToRow);
+    const propostaRows=(d.propostas||[]).map(propostaToRow);
+
+    const jobs=[];
+    if(clienteRows.length) jobs.push(supa.from('clientes').upsert(clienteRows));
+    if(ativoRows.length) jobs.push(supa.from('ativos').upsert(ativoRows));
+    if(surveyRows.length) jobs.push(supa.from('surveys').upsert(surveyRows));
+    if(activationRows.length) jobs.push(supa.from('activation').upsert(activationRows));
+    if(ttfvRows.length) jobs.push(supa.from('ttfv').upsert(ttfvRows));
+    if(activityRows.length) jobs.push(supa.from('activities').upsert(activityRows));
+    if(interactionRows.length) jobs.push(supa.from('interactions').upsert(interactionRows));
+    if(propostaRows.length) jobs.push(supa.from('propostas').upsert(propostaRows));
+    if(d.config) jobs.push(supa.from('config').update({empresa:d.config.empresa,tagline:d.config.tagline,thr:d.config.thr,
+      escala_imediata:d.config.escalaImediata,escala_semanal:d.config.escalaSemanal,produtos:d.config.produtos,tipologias:d.config.tipologias}).eq('id',1));
+
+    const results=await Promise.all(jobs);
+    const erros=results.filter(r=>r&&r.error);
+    if(erros.length){ console.error('Erro ao sincronizar com o Supabase',erros); if(typeof toast==='function') toast('⚠️ Salvo localmente, mas houve erro ao sincronizar com o banco.'); }
+  } finally {
+    _syncing=false;
+    if(_pendingSync){ _pendingSync=false; syncToSupabase(); }
+  }
+}
+async function deleteRemoto(table,id){ try{ const {error}=await supa.from(table).delete().eq('id',id);
+  if(error){ console.error('Erro ao excluir em '+table+' no Supabase',error); if(typeof toast==='function') toast('⚠️ Excluído localmente, mas houve erro ao remover do banco.'); }
+  }catch(e){ console.error(e); } }
+function resetDB(){ if(confirm('Restaurar dados de exemplo? Isso substitui os dados de TODO o time por dados fictícios.')){ DB=seed(); save(); App.refresh(); toast('Dados restaurados'); } }
+DB=seed(); // placeholder até o login carregar os dados reais do Supabase
 
 /* ---------------------------------------------------------------------------
    5. HELPERS
@@ -2477,76 +2602,46 @@ function toneVar(t){ return ({green:'var(--green)',amber:'var(--amber)',red:'var
    ║  MÓDULO: AUTH  ·  sessão, login/logout, identificação automática por e-mail ║
    ║  (camada desacoplada — substituível por Microsoft Entra ID sem tocar no resto)║
    ╚═══════════════════════════════════════════════════════════════════════════╝ */
-const SESS_KEY='onboardops_session';
 let CURRENT=null;
-function findUser(email){ return DB.users.find(u=>u.email.toLowerCase()===String(email||'').trim().toLowerCase()); }
 function guestFromEmail(email){ email=String(email||'').trim().toLowerCase();
   const local=(email.split('@')[0]||'externo').replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
   return {nome:local||'Parceiro Externo', email, perfil:'Área Parceira', cargo:'Parceiro Externo', dinamico:true}; }
-function getSession(){ if(CURRENT) return CURRENT;
-  try{ const e=localStorage.getItem(SESS_KEY); if(e){ const u=findUser(e); if(u && u.ativo!==false){ CURRENT=u; return u; } } }catch(_){} return null; }
-function setSession(u){ CURRENT=u; try{ localStorage.setItem(SESS_KEY,u.email); }catch(_){} }
-function clearSession(){ CURRENT=null; try{ localStorage.removeItem(SESS_KEY); }catch(_){} }
-
-/* ---- Senhas (hash local com salt; NUNCA armazena/exibe texto aberto) -----------------
-   Camada de obfuscação para uso local. Em produção corporativa deve ser substituída por
-   Microsoft Entra ID / backend — a interface de login já está desacoplada para isso.      */
-function sha256(ascii){
-  function rrot(v,a){return (v>>>a)|(v<<(32-a));}
-  var m=Math.pow,M=m(2,32),h=[],k=[],pr=2,i=0,j;
-  if(sha256.h){h=sha256.h.slice();k=sha256.k.slice();}
-  else{ h=[];k=[]; pr=2; i=0;
-    while(i<64){ var isP=true; for(j=2;j<=Math.sqrt(pr);j++){ if(pr%j===0){isP=false;break;} }
-      if(isP){ if(i<8) h[i]=(m(pr,.5)%1*M)|0; k[i]=(m(pr,1/3)%1*M)|0; i++; } pr++; }
-    sha256.h=h.slice(); sha256.k=k.slice(); }
-  ascii=unescape(encodeURIComponent(ascii));
-  var words=[],l=ascii.length*8,b;
-  for(i=0;i<ascii.length;i++){ b=ascii.charCodeAt(i); words[i>>2]|=b<<((3-i%4)*8); }
-  words[l>>5]|=0x80<<(24-l%32); words[((l+64>>9)<<4)+15]=l;
-  var w=[],a0,b0,c0,d0,e0,f0,g0,h0,t1,t2;
-  for(j=0;j<words.length;j+=16){
-    a0=h[0];b0=h[1];c0=h[2];d0=h[3];e0=h[4];f0=h[5];g0=h[6];h0=h[7];
-    for(i=0;i<64;i++){
-      if(i<16) w[i]=words[j+i]|0;
-      else{ var g1=w[i-15],g2=w[i-2];
-        var s0=(rrot(g1,7)^rrot(g1,18)^(g1>>>3)), s1=(rrot(g2,17)^rrot(g2,19)^(g2>>>10));
-        w[i]=(w[i-16]+s0+w[i-7]+s1)|0; }
-      var S1=(rrot(e0,6)^rrot(e0,11)^rrot(e0,25)), ch=((e0&f0)^((~e0)&g0));
-      t1=(h0+S1+ch+k[i]+w[i])|0;
-      var S0=(rrot(a0,2)^rrot(a0,13)^rrot(a0,22)), maj=((a0&b0)^(a0&c0)^(b0&c0));
-      t2=(S0+maj)|0;
-      h0=g0;g0=f0;f0=e0;e0=(d0+t1)|0;d0=c0;c0=b0;b0=a0;a0=(t1+t2)|0;
-    }
-    h[0]=(h[0]+a0)|0;h[1]=(h[1]+b0)|0;h[2]=(h[2]+c0)|0;h[3]=(h[3]+d0)|0;
-    h[4]=(h[4]+e0)|0;h[5]=(h[5]+f0)|0;h[6]=(h[6]+g0)|0;h[7]=(h[7]+h0)|0;
-  }
-  var out='';for(i=0;i<8;i++){out+=('00000000'+(h[i]>>>0).toString(16)).slice(-8);}return out;
+// busca o perfil (nome/perfil/cargo) do usuário autenticado no Supabase Auth
+async function carregarPerfil(authUser){
+  try{ const {data,error}=await supa.from('users').select('*').eq('id',authUser.id).maybeSingle();
+    if(error||!data) return null;
+    return {nome:data.nome, email:data.email, perfil:data.perfil, cargo:data.cargo||'', ativo:data.ativo!==false};
+  }catch(e){ console.error(e); return null; }
 }
-function makeSalt(){ return Math.random().toString(36).slice(2,12)+Date.now().toString(36); }
-function hashPass(pw,salt){ var h=sha256(salt+'::'+pw); for(var i=0;i<800;i++) h=sha256(h+salt); return h; }
-function hasPass(u){ return !!(u && u.pass && u.pass.hash); }
-function setPassword(u,pw,opts){ const salt=makeSalt(); u.pass={salt,hash:hashPass(String(pw),salt),temp:!!(opts&&opts.temp)};
-  if(u.ativo===undefined) u.ativo=true; save(); return u; }
-function verifyPass(u,pw){ return hasPass(u) && u.pass.hash===hashPass(String(pw),u.pass.salt); }
-function genTempPass(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; let s='';
-  for(let i=0;i<10;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
-function criarParceiro(email){ const u={...guestFromEmail(email),ativo:true}; DB.users.push(u); return u; }
-// helper de teste/integração: garante usuário + senha
-function ensurePass(email,pw){ let u=findUser(email)||criarParceiro(email); setPassword(u,pw); return u; }
+// restauração real da sessão acontece no boot() via supa.auth.getSession() — este getter só lê o estado em memória
+function getSession(){ return CURRENT; }
+function setSession(u){ CURRENT=u; }
+function clearSession(){ CURRENT=null; }
+
+/* ---- Senhas: agora 100% delegadas ao Supabase Auth (bcrypt no servidor,
+   nunca lidamos com hash no cliente). Ver App.login/criarSenha/redefinirSenha. ---- */
 // log de segurança (eventos de acesso) — usuário informado explicitamente (pré-sessão)
+async function insertHistoryRemoto(row){ if(!getSession()) return; try{ const {error}=await supa.from('history').insert(row);
+  if(error) console.error('Erro ao salvar histórico no Supabase',error); }catch(e){ console.error(e); } }
+async function insertLoginRemoto(row){ try{ const {error}=await supa.from('logins').insert(row);
+  if(error) console.error('Erro ao salvar login no Supabase',error); }catch(e){ console.error(e); } }
 function logSeg(who,evento,detalhe){ const t=nowParts();
-  DB.history.unshift({id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+  const row={id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
     usuario:who||'—', perfil:'—', data:t.data, hora:t.hora, iso:t.iso,
-    modulo:'Segurança', cliente:'—', campo:evento, de:'—', para:detalhe||''});
-  if(DB.history.length>2000) DB.history.length=2000; save(); }
+    modulo:'Segurança', cliente:'—', campo:evento, de:'—', para:detalhe||''};
+  DB.history.unshift(row);
+  if(DB.history.length>2000) DB.history.length=2000;
+  insertHistoryRemoto(row); }
 function can(cap){ const u=getSession(); if(!u) return false; const p=PERMS[u.perfil]||{}; return !!p[cap]; }
 function navAllowed(key){ const u=getSession(); if(!u) return false; const list=NAV_ACCESS[key]||PERFIS; return list.includes(u.perfil); }
 function nowParts(){ const d=new Date(); const z=n=>String(n).padStart(2,'0');
   return {data:`${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()}`, hora:`${z(d.getHours())}:${z(d.getMinutes())}`, iso:d.toISOString()}; }
 function addHistory(entry){ const u=getSession(); const t=nowParts();
-  DB.history.unshift(Object.assign({id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
-    usuario:u?u.nome:'—', perfil:u?u.perfil:'—', data:t.data, hora:t.hora, iso:t.iso},entry));
-  if(DB.history.length>2000) DB.history.length=2000; }
+  const row=Object.assign({id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    usuario:u?u.nome:'—', perfil:u?u.perfil:'—', data:t.data, hora:t.hora, iso:t.iso},entry);
+  DB.history.unshift(row);
+  if(DB.history.length>2000) DB.history.length=2000;
+  insertHistoryRemoto(row); }
 // registra diffs de campos de um cliente
 function logClienteDiff(cli,before,after,labels){
   Object.keys(labels).forEach(f=>{
@@ -2555,8 +2650,9 @@ function logClienteDiff(cli,before,after,labels){
     if(av!==bv) addHistory({modulo:'Cadastro',cliente:cli.nome,campo:labels[f],de:av||'Vazio',para:bv||'Vazio'});
   });
 }
-function logLogin(u){ const t=nowParts(); DB.logins.unshift({usuario:u.nome,email:u.email,perfil:u.perfil,data:t.data,hora:t.hora,iso:t.iso});
-  if(DB.logins.length>1000) DB.logins.length=1000; save(); }
+function logLogin(u){ const t=nowParts(); const row={usuario:u.nome,email:u.email,perfil:u.perfil,data:t.data,hora:t.hora,iso:t.iso};
+  DB.logins.unshift(row); if(DB.logins.length>1000) DB.logins.length=1000;
+  insertLoginRemoto(row); }
 // Farol operacional de atividade (por prazo e status)
 function farolAtividade(at){
   if(at.status==='Concluído') return {tone:'green',label:'Concluída'};
@@ -2587,8 +2683,8 @@ window.__OO = {I,svg,MILESTONES,TOTAL_MARCOS,PRODUTOS,TIPOLOGIAS,UFS,UF_NOME,REG
   DB:()=>DB,save,resetDB,today,parseD,fmtD,daysBetween,num,esc,el,kickoffFeito,
   calcSurvey,surveyStatus,pesquisasEmAtraso,calcAtivacao,calcAtivacaoGrupo,calcTTFV,calcHealth,getCli,emAtraso,statusEfetivo,
   produtos,etapaInfo,toneVar,calcPeriodo,getActDates,
-  findUser,guestFromEmail,criarParceiro,getSession,setSession,clearSession,can,navAllowed,nowParts,addHistory,logClienteDiff,logLogin,farolAtividade,
-  hasPass,setPassword,verifyPass,genTempPass,ensurePass,logSeg};
+  guestFromEmail,carregarPerfil,getSession,setSession,clearSession,can,navAllowed,nowParts,addHistory,logClienteDiff,logLogin,farolAtividade,
+  supa,deleteRemoto,loadFromSupabase,setDB,logSeg};
 })();
 
 /* =============================================================================
@@ -2604,8 +2700,8 @@ const {I,svg,MILESTONES,TOTAL_MARCOS,PRODUTOS,TIPOLOGIAS,UFS,UF_NOME,REGIOES,UF_
   save,resetDB,today,parseD,fmtD,daysBetween,num,esc,el,kickoffFeito,
   calcSurvey,surveyStatus,pesquisasEmAtraso,calcAtivacao,calcAtivacaoGrupo,calcTTFV,calcHealth,getCli,emAtraso,statusEfetivo,
   etapaInfo,toneVar,
-  getSession,setSession,clearSession,can,navAllowed,nowParts,addHistory,logClienteDiff,logLogin,farolAtividade,findUser,guestFromEmail,
-  criarParceiro,hasPass,setPassword,verifyPass,genTempPass,logSeg} = O;
+  getSession,setSession,clearSession,can,navAllowed,nowParts,addHistory,logClienteDiff,logLogin,farolAtividade,guestFromEmail,
+  carregarPerfil,supa,deleteRemoto,loadFromSupabase,setDB,logSeg} = O;
 const produtos = ()=>O.produtos();
 const DB = ()=>O.DB();
 // Acessores da configuração central (settings) — valores editáveis sem alterar código
@@ -4740,30 +4836,23 @@ function renderBackup(){
 /* ============================ MÓDULO — GESTÃO DE USUÁRIOS ============================ */
 function renderUsuarios(){
   const d=DB();
-  const credStatus=u=> u.ativo===false ? badge('Desativado','red')
-    : !hasPass(u) ? badge('Sem senha','amber')
-    : (u.pass.temp ? badge('Temporária','blue') : badge('Definida','green'));
   el('view-usuarios').innerHTML=`
-  <div class="section-bar"><h2>Gestão de Usuários</h2><div class="line"></div>
-    <button class="btn primary sm" onclick="App.novoUsuario()">${svg(I.plus)} Novo usuário</button></div>
+  <div class="section-bar"><h2>Gestão de Usuários</h2><div class="line"></div></div>
   <div class="card"><div class="card-head"><div class="ico">${svg(I.users)}</div><h3>Usuários do Portal</h3>
-    <span class="desc">identificação por e-mail · senhas armazenadas apenas como hash</span></div>
+    <span class="desc">pessoas com acesso ao sistema · login por e-mail + senha (Supabase Auth)</span></div>
     <div class="tbl-wrap"><table class="data"><thead><tr>
-      <th>Nome</th><th>E-mail</th><th>Cargo</th><th>Perfil</th><th>Credencial</th><th>Ações</th>
-    </tr></thead><tbody>${d.users.map((u,i)=>`<tr${u.ativo===false?' style="opacity:.55"':''}>
+      <th>Nome</th><th>E-mail</th><th>Cargo</th><th>Perfil</th><th>Ações</th>
+    </tr></thead><tbody>${d.users.length?d.users.map((u,i)=>`<tr${u.ativo===false?' style="opacity:.55"':''}>
       <td><b>${esc(u.nome)}</b></td><td>${esc(u.email)}</td><td>${esc(u.cargo||'—')}</td><td>${badge(u.perfil,perfilTone(u.perfil))}</td>
-      <td>${credStatus(u)}</td>
       <td style="text-align:right;white-space:nowrap">
         <button class="btn ghost sm" title="Editar" onclick="App.editUsuario(${i})">${svg(I.edit)}</button>
-        <button class="btn ghost sm" title="Resetar senha" onclick="App.resetarSenhaUsuario(${i})">${svg(I.history)}</button>
-        <button class="btn ghost sm" title="Gerar senha temporária" onclick="App.senhaTemporaria(${i})">${svg(I.shield)}</button>
+        <button class="btn ghost sm" title="Enviar link de redefinição de senha" onclick="App.resetarSenhaUsuario(${i})">${svg(I.history)}</button>
         <button class="btn ghost sm" title="${u.ativo===false?'Reativar':'Desativar'}" onclick="App.toggleAtivo(${i})">${svg(u.ativo===false?I.check:I.x)}</button>
-        <button class="btn ghost sm" title="Excluir" onclick="App.delUsuario(${i})">${svg(I.trash)}</button></td>
-    </tr>`).join('')}</tbody></table></div>
+        <button class="btn ghost sm" title="Remover acesso" onclick="App.delUsuario(${i})">${svg(I.trash)}</button></td>
+    </tr>`).join(''):emptyRow(5,'Ninguém acessou o sistema ainda. As contas aparecem aqui após o primeiro acesso.')}</tbody></table></div>
     <div class="card-body" style="border-top:1px solid var(--line)"><p style="font-size:12px;color:var(--txt-3);margin:0">
-      <b>Resetar senha</b>: remove a senha — o usuário define uma nova no próximo acesso. ·
-      <b>Senha temporária</b>: gera uma senha de uso único (exibida uma só vez) que exige troca no login. ·
-      A Gestão Executiva nunca visualiza a senha real de ninguém.</p></div>
+      Novos acessos são criados pela própria pessoa em "Criar senha / Primeiro acesso" na tela de login — a Gestão Executiva não cria contas manualmente. ·
+      <b>Enviar link de redefinição</b>: manda um e-mail para a pessoa definir uma nova senha. A Gestão Executiva nunca vê a senha de ninguém.</p></div>
   </div>`;
 }
 
@@ -4877,16 +4966,17 @@ function interacaoModal(i,cidPre,kindPre){
   intAnexoRender();
 }
 function usuarioModal(idx){
-  const d=DB(); const isNew=(idx==null); const u=isNew?{perfil:'Onboarding'}:d.users[idx];
+  const d=DB(); const u=d.users[idx]; if(!u) return;
   const body=`<div class="form-grid">
     <div class="field full"><label>Nome completo *</label><input id="u_nome" value="${esc(u.nome||'')}"></div>
-    <div class="field full"><label>E-mail corporativo *</label><input id="u_email" value="${esc(u.email||'')}" placeholder="nome.sobrenome@trinusco.com.br"></div>
+    <div class="field full"><label>E-mail corporativo</label><input id="u_email" value="${esc(u.email||'')}" disabled></div>
     <div class="field"><label>Cargo</label><input id="u_cargo" value="${esc(u.cargo||'')}"></div>
     <div class="field"><label>Perfil de acesso</label><select id="u_perfil">${PERFIS.map(p=>`<option ${u.perfil===p?'selected':''}>${p}</option>`).join('')}</select></div>
-  </div>`;
+  </div>
+  <p style="font-size:11.5px;color:var(--txt-3);margin-top:6px">O e-mail não pode ser alterado por aqui — ele é o login da conta.</p>`;
   const foot=`<div class="spacer"></div><button class="btn ghost" onclick="App.closeModal()">Cancelar</button>
-    <button class="btn primary" onclick="App.saveUsuario('${isNew?'':idx}')">${svg(I.check)} Salvar</button>`;
-  modalShell(I.users,isNew?'Novo Usuário':'Editar Usuário',body,foot);
+    <button class="btn primary" onclick="App.saveUsuario(${idx})">${svg(I.check)} Salvar</button>`;
+  modalShell(I.users,'Editar Usuário',body,foot);
 }
 
 /* ============================ AUTENTICAÇÃO / IDENTIDADE VISUAL ============================ */
@@ -4913,7 +5003,6 @@ function buildUserChip(){ const u=getSession(); const c=el('userChip'); if(!c) r
     </div>`;
 }
 let _authMode='login';   // 'login' | 'create' | 'reset' | 'force'
-let _forceUser=null;     // usuário em troca obrigatória (senha temporária)
 function showLogin(){
   el('app').style.display='none';
   const g=el('authGate'); g.style.display='flex';
@@ -4953,18 +5042,14 @@ function renderAuth(){
     body=`
       <div class="login-mode">Redefinir senha</div>
       <label class="login-lbl">E-mail corporativo</label>
-      <input id="loginEmail" class="login-input" placeholder="nome.sobrenome@trinusco.com.br" autocomplete="username">
-      <label class="login-lbl" style="margin-top:12px">Nova senha</label>
-      <input id="loginPass" type="password" class="login-input" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
-      <label class="login-lbl" style="margin-top:12px">Confirmar nova senha</label>
-      <input id="loginPass2" type="password" class="login-input" placeholder="Repita a senha" autocomplete="new-password" onkeydown="if(event.key==='Enter')App.redefinirSenha()">
+      <input id="loginEmail" class="login-input" placeholder="nome.sobrenome@trinusco.com.br" autocomplete="username" onkeydown="if(event.key==='Enter')App.redefinirSenha()">
       <div id="loginErr" class="login-err"></div>
-      <button class="btn primary login-btn" onclick="App.redefinirSenha()">Redefinir e entrar</button>
+      <button class="btn primary login-btn" onclick="App.redefinirSenha()">Enviar link de redefinição</button>
       <div class="login-links"><button class="login-link" onclick="App.authMode('login')">← Voltar ao login</button></div>
-      <div class="login-hint">A Gestão Executiva também pode resetar ou gerar senha temporária para usuários internos.</div>`;
+      <div class="login-hint">Enviaremos um link por e-mail para você definir uma nova senha.</div>`;
   } else if(_authMode==='force'){
     body=`
-      <div class="login-mode">Senha temporária · defina uma nova senha</div>
+      <div class="login-mode">Defina uma nova senha</div>
       <label class="login-lbl">Nova senha</label>
       <input id="loginPass" type="password" class="login-input" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
       <label class="login-lbl" style="margin-top:12px">Confirmar nova senha</label>
@@ -4973,15 +5058,22 @@ function renderAuth(){
       <button class="btn primary login-btn" onclick="App.trocarSenhaObrigatoria()">Salvar e continuar</button>`;
   }
   g.innerHTML=`<div class="login-card">${head}${body}
-    <div class="login-sec">🔒 Acesso por e-mail + senha. Senhas são guardadas apenas como hash (nunca em texto aberto). Camada local, preparada para autenticação corporativa futura (Microsoft Entra ID).</div>
+    <div class="login-sec">🔒 Acesso por e-mail + senha, autenticado via Supabase Auth. A senha nunca é vista nem armazenada por nós — só o serviço de autenticação a conhece.</div>
   </div>`;
   setTimeout(()=>{const e=el(_authMode==='force'?'loginPass':'loginEmail'); if(e) e.focus();},50);
 }
 function authErr(msg){ const e=el('loginErr'); if(e){ e.textContent=msg; e.style.display='block'; } }
-function entrarComUsuario(u,opts){
-  setSession(u); logLogin(u); logSeg(u.nome,'Login realizado','');
-  el('authGate').style.display='none'; el('app').style.display='';
-  buildBrand(); buildUserChip(); jTab='geral'; Object.keys(filters).forEach(k=>filters[k]='');
+async function entrarComUsuario(u,opts){
+  setSession(u);
+  const g=el('authGate');
+  g.innerHTML='<div class="login-card" style="text-align:center;padding:60px 34px"><div class="login-sub">Carregando dados…</div></div>';
+  try{ setDB(await loadFromSupabase()); }
+  catch(e){ console.error(e);
+    g.innerHTML='<div class="login-card" style="text-align:center;padding:40px 34px"><div class="login-sub" style="color:var(--red)">Não foi possível carregar os dados do banco. Verifique sua conexão e recarregue a página.</div></div>';
+    return; }
+  logLogin(u); logSeg(u.nome,'Login realizado','');
+  g.style.display='none'; el('app').style.display='';
+  buildBrand(); buildUserChip(); renderNotifBadge(); jTab='geral'; Object.keys(filters).forEach(k=>filters[k]='');
   App.go(defaultView());
   toast((opts&&opts.msg) || (u.dinamico?('Acesso de parceiro (somente leitura): '+u.nome):('Bem-vinda(o), '+u.nome.split(' ')[0]+'!')));
 }
@@ -5028,7 +5120,7 @@ window.App = {
     d.interactions=(d.interactions||[]).filter(i=>i.cliente!==id);
     d.propostas=(d.propostas||[]).filter(p=>p.cliente!==c.nome);
     addHistory({modulo:'Cadastro',cliente:c.nome,campo:'Cliente',de:c.nome,para:'Excluído'});
-    save(d); this.refresh(); toast('Cliente excluído'); },
+    save(d); deleteRemoto('clientes',id); this.refresh(); toast('Cliente excluído'); },
   saveCliente(id){
     if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const v=k=>{const e=el(k);return e?e.value.trim():'';};
@@ -5054,7 +5146,10 @@ window.App = {
       dataAssinatura:'Data Assinatura',dataKickoff:'Data Kickoff',goLivePrevisto:'Go Live Previsto',goLiveReal:'Go Live Real',
       respOnboarding:'Resp. Onboarding',keyAccount:'Key Account',respComercial:'Resp. pela Proposta',respKickoff:'Resp. Kickoff',produtos:'Produtos',obs:'Observações'});
     if(canAtivos()) logAtivosDiff(nome,ativosAntes,ativosDepois);
-    save(d); this.closeModal(); this.refresh(); toast('Cliente salvo');
+    save(d);
+    const idsDepois=new Set(ativosDepois.map(a=>a.id));
+    ativosAntes.filter(a=>!idsDepois.has(a.id)).forEach(a=>deleteRemoto('ativos',a.id));
+    this.closeModal(); this.refresh(); toast('Cliente salvo');
   },
   // ativos do cliente (edição no modal)
   ativoAdd(){ if(!canAtivos()){ toast('Ação não permitida.'); return; }
@@ -5155,7 +5250,7 @@ window.App = {
   delProposta(id){ if(!canComercial()){ toast('Ação não permitida.'); return; }
     const d=DB(); const p=d.propostas.find(x=>x.id===id); if(!p||!confirm('Excluir a proposta de "'+p.cliente+'"?')) return;
     d.propostas=d.propostas.filter(x=>x.id!==id); addHistory({modulo:'Middle Plataforma',cliente:p.cliente,campo:'Proposta',de:p.status,para:'Excluída'});
-    save(d); this.closeModal&&this.closeModal(); this.refresh(); toast('Proposta excluída'); },
+    save(d); deleteRemoto('propostas',id); this.closeModal&&this.closeModal(); this.refresh(); toast('Proposta excluída'); },
   relatorioComercial(){ if(!can('backup')){ toast('Ação não permitida.'); return; }
     const html=relatorioComercialHTML(); const np=nowParts(); let w=null; try{ w=window.open('','_blank'); }catch(_){}
     if(w&&w.document){ w.document.open(); w.document.write(html); w.document.close();
@@ -5322,7 +5417,7 @@ window.App = {
     const d=DB(); const a=d.activities.find(x=>x.id===id); if(!a||!confirm('Excluir esta atividade?')) return;
     if(a.origemInteracao){ const i=d.interactions.find(x=>x.id===a.origemInteracao); if(i&&i.atividadeId===id) delete i.atividadeId; }
     d.activities=d.activities.filter(x=>x.id!==id); addHistory({modulo:'Atividades',cliente:nomeCliente(a.cliente),campo:'Atividade',de:a.titulo,para:'Excluída'});
-    save(d); this.closeModal(); this.refresh(); toast('Atividade excluída'); },
+    save(d); deleteRemoto('activities',id); this.closeModal(); this.refresh(); toast('Atividade excluída'); },
   moverAtividade(id,status){ if(!can('editActivity')){ toast('Ação não permitida.'); this.refresh(); return; }
     const d=DB(); const a=d.activities.find(x=>x.id===id); if(!a||a.status===status){ this.refresh(); return; }
     const old=a.status; a.status=status; a.dataConclusao=(status==='Concluído')?(a.dataConclusao||nowParts().iso.slice(0,10)):''; addHistory({modulo:'Atividades',cliente:nomeCliente(a.cliente),campo:'Status da atividade',de:old,para:status});
@@ -5390,7 +5485,7 @@ window.App = {
     const d=DB(); const i=d.interactions.find(x=>x.id===id); if(!i||!confirm('Excluir este registro?')) return;
     if(i.atividadeId){ const a=d.activities.find(x=>x.id===i.atividadeId); if(a&&a.origemInteracao===id) delete a.origemInteracao; }
     d.interactions=d.interactions.filter(x=>x.id!==id); addHistory({modulo:'Interações',cliente:nomeCliente(i.cliente),campo:INT_KIND_LABEL[i.kind||'evento'],de:i.tipo||'',para:'Excluído'});
-    save(d); this.refresh(); toast('Registro excluído'); },
+    save(d); deleteRemoto('interactions',id); this.refresh(); toast('Registro excluído'); },
   interacaoViraAtividade(id){ if(!can('createActivity')){ toast('Ação não permitida.'); return; }
     const i=DB().interactions.find(x=>x.id===id); if(!i) return;
     if(i.atividadeId && DB().activities.some(a=>a.id===i.atividadeId)){ this.irParaAtividade(i.atividadeId); return; }
@@ -5460,86 +5555,82 @@ window.App = {
     this.go('dashboard'); toast('Backup restaurado'); },
 
   /* ---- V4: usuários ---- */
-  novoUsuario(){ if(!can('users')){ toast('Ação não permitida para seu perfil.'); return; } usuarioModal(null); },
   editUsuario(i){ if(!can('users')){ toast('Ação não permitida para seu perfil.'); return; } usuarioModal(i); },
-  saveUsuario(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
+  async saveUsuario(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
     const v=k=>{const e=el(k);return e?e.value.trim():'';};
-    const nome=v('u_nome'),email=v('u_email').toLowerCase(),perfil=el('u_perfil').value,cargo=v('u_cargo');
-    if(!nome||!email){ alert('Nome e e-mail são obrigatórios.'); return; }
-    const d=DB(); const idx=(i===''||i==null)?-1:Number(i);
-    if(d.users.some((u,j)=>j!==idx&&u.email.toLowerCase()===email)){ alert('Já existe um usuário com esse e-mail.'); return; }
-    if(idx<0){ d.users.push({nome,email,perfil,cargo}); addHistory({modulo:'Usuários',cliente:'—',campo:'Usuário',de:'Vazio',para:'Criado: '+nome}); }
-    else { Object.assign(d.users[idx],{nome,email,perfil,cargo}); addHistory({modulo:'Usuários',cliente:'—',campo:'Usuário',de:'—',para:'Editado: '+nome}); }
-    save(d); this.closeModal(); this.refresh(); toast('Usuário salvo'); },
-  delUsuario(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
+    const nome=v('u_nome'),perfil=el('u_perfil').value,cargo=v('u_cargo');
+    if(!nome){ alert('Informe o nome.'); return; }
+    const d=DB(); const idx=Number(i); const u=d.users[idx]; if(!u) return;
+    Object.assign(u,{nome,perfil,cargo});
+    addHistory({modulo:'Usuários',cliente:'—',campo:'Usuário',de:'—',para:'Editado: '+nome});
+    save(d); this.closeModal(); this.refresh(); toast('Usuário salvo');
+    const {error}=await supa.from('users').update({nome,perfil,cargo}).eq('id',u.id);
+    if(error){ console.error(error); toast('⚠️ Erro ao sincronizar usuário com o banco.'); } },
+  async delUsuario(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
     const d=DB(); const u=d.users[i]; if(!u) return;
     const me=getSession(); if(me&&me.email===u.email){ alert('Você não pode excluir o próprio usuário em uso.'); return; }
-    if(!confirm('Excluir o usuário '+u.nome+'?')) return;
+    if(!confirm('Remover o acesso de '+u.nome+'? A conta de login permanece, mas perde acesso ao sistema.')) return;
     d.users.splice(i,1); addHistory({modulo:'Usuários',cliente:'—',campo:'Usuário',de:u.nome,para:'Excluído'});
-    save(d); this.refresh(); toast('Usuário excluído'); },
+    save(d); this.refresh(); toast('Usuário removido');
+    const {error}=await supa.from('users').delete().eq('id',u.id);
+    if(error) console.error(error); },
 
   /* ---- MÓDULO AUTH: autenticação por e-mail + senha ---- */
   authMode(m){ _authMode=m; renderAuth(); },
-  login(){ const email=(el('loginEmail').value||'').trim().toLowerCase(); const pw=el('loginPass').value||'';
+  async login(){ const email=(el('loginEmail').value||'').trim().toLowerCase(); const pw=el('loginPass').value||'';
     if(!email || email.indexOf('@')<1){ authErr('Informe um e-mail válido.'); return; }
-    const u=findUser(email);
-    if(!u){ authErr('E-mail sem senha cadastrada. Use “Criar senha / Primeiro acesso”.'); logSeg(email,'Tentativa de login','E-mail não cadastrado'); return; }
-    if(u.ativo===false){ authErr('Usuário desativado. Procure a Gestão Executiva.'); logSeg(u.nome,'Tentativa de login','Usuário desativado'); return; }
-    if(!hasPass(u)){ authErr('Primeiro acesso: você ainda não tem senha. Use “Criar senha / Primeiro acesso”.'); return; }
     if(!pw){ authErr('Informe sua senha.'); return; }
-    if(!verifyPass(u,pw)){ authErr('E-mail ou senha inválidos.'); logSeg(u.nome,'Tentativa de login','Senha inválida'); return; }
-    if(u.pass.temp){ _forceUser=u; _authMode='force'; renderAuth(); toast('Senha temporária: defina uma nova senha.'); return; }
-    entrarComUsuario(u); },
-  criarSenha(){ const email=(el('loginEmail').value||'').trim().toLowerCase();
+    const {data,error}=await supa.auth.signInWithPassword({email,password:pw});
+    if(error){ authErr('E-mail ou senha inválidos.'); logSeg(email,'Tentativa de login',error.message); return; }
+    const perfil=await carregarPerfil(data.user);
+    if(!perfil){ authErr('Conta sem perfil configurado. Procure a Gestão Executiva.'); await supa.auth.signOut(); return; }
+    if(perfil.ativo===false){ authErr('Usuário desativado. Procure a Gestão Executiva.'); await supa.auth.signOut(); return; }
+    entrarComUsuario(perfil); },
+  async criarSenha(){ const email=(el('loginEmail').value||'').trim().toLowerCase();
     const p1=el('loginPass').value||'', p2=el('loginPass2').value||'';
     if(!email || email.indexOf('@')<1){ authErr('Informe um e-mail válido.'); return; }
     if(p1.length<6){ authErr('A senha deve ter ao menos 6 caracteres.'); return; }
     if(p1!==p2){ authErr('As senhas não coincidem.'); return; }
-    let u=findUser(email); let novo=false;
-    if(u){ if(hasPass(u)){ authErr('Este e-mail já tem senha. Use “Esqueci minha senha”.'); return; }
-      if(u.ativo===false){ authErr('Usuário desativado. Procure a Gestão Executiva.'); return; } }
-    else { u=criarParceiro(email); novo=true; }   // externo ⇒ Área Parceira (somente leitura)
-    setPassword(u,p1); logSeg(u.nome,'Criação de senha',novo?'Novo acesso Área Parceira':'Primeiro acesso');
-    entrarComUsuario(u,{msg:(novo?'Acesso de parceiro criado (somente leitura).':'Senha criada. Bem-vinda(o), '+u.nome.split(' ')[0]+'!')}); },
-  redefinirSenha(){ const email=(el('loginEmail').value||'').trim().toLowerCase();
-    const p1=el('loginPass').value||'', p2=el('loginPass2').value||'';
+    const known=USERS_SEED.find(s=>s.email.toLowerCase()===email); const novo=!known;
+    const meta=known?{nome:known.nome,perfil:known.perfil,cargo:known.cargo}:guestFromEmail(email);
+    const {data,error}=await supa.auth.signUp({email,password:p1,options:{data:meta}});
+    if(error){ authErr(/already registered|já está cadastrado/i.test(error.message)?'Este e-mail já tem senha. Use “Esqueci minha senha”.':error.message); return; }
+    if(!data.session){ _authMode='login'; renderAuth(); toast('Conta criada! Verifique seu e-mail para confirmar o acesso.'); return; }
+    logSeg(meta.nome,'Criação de senha',novo?'Novo acesso Área Parceira':'Primeiro acesso');
+    entrarComUsuario({...meta,ativo:true},{msg:(novo?'Acesso de parceiro criado (somente leitura).':'Senha criada. Bem-vinda(o), '+meta.nome.split(' ')[0]+'!')}); },
+  async redefinirSenha(){ const email=(el('loginEmail').value||'').trim().toLowerCase();
     if(!email || email.indexOf('@')<1){ authErr('Informe um e-mail válido.'); return; }
-    const u=findUser(email);
-    if(!u){ authErr('E-mail não cadastrado. Use “Criar senha / Primeiro acesso”.'); return; }
-    if(u.ativo===false){ authErr('Usuário desativado. Procure a Gestão Executiva.'); return; }
-    if(p1.length<6){ authErr('A senha deve ter ao menos 6 caracteres.'); return; }
-    if(p1!==p2){ authErr('As senhas não coincidem.'); return; }
-    setPassword(u,p1); logSeg(u.nome,'Reset de senha','Autoatendimento');
-    entrarComUsuario(u,{msg:'Senha redefinida com sucesso.'}); },
-  trocarSenhaObrigatoria(){ const u=_forceUser; if(!u){ _authMode='login'; renderAuth(); return; }
+    const {error}=await supa.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});
+    if(error){ authErr(error.message); return; }
+    logSeg(email,'Solicitação de redefinição de senha','Link enviado por e-mail');
+    _authMode='login'; renderAuth(); toast('Se esse e-mail estiver cadastrado, enviamos um link de redefinição.'); },
+  async trocarSenhaObrigatoria(){
     const p1=el('loginPass').value||'', p2=el('loginPass2').value||'';
     if(p1.length<6){ authErr('A senha deve ter ao menos 6 caracteres.'); return; }
     if(p1!==p2){ authErr('As senhas não coincidem.'); return; }
-    setPassword(u,p1); logSeg(u.nome,'Reset de senha','Troca de senha temporária'); _forceUser=null;
-    entrarComUsuario(u,{msg:'Senha atualizada. Bem-vinda(o), '+u.nome.split(' ')[0]+'!'}); },
-  logout(){ const u=getSession(); if(u) logSeg(u.nome,'Logout',''); clearSession(); showLogin(); },
+    const {data,error}=await supa.auth.updateUser({password:p1});
+    if(error){ authErr(error.message); return; }
+    const perfil=await carregarPerfil(data.user);
+    if(!perfil){ authErr('Conta sem perfil configurado. Procure a Gestão Executiva.'); return; }
+    logSeg(perfil.nome,'Redefinição de senha concluída','Via link de e-mail');
+    entrarComUsuario(perfil,{msg:'Senha atualizada. Bem-vinda(o), '+perfil.nome.split(' ')[0]+'!'}); },
+  async logout(){ const u=getSession(); if(u) logSeg(u.nome,'Logout',''); await supa.auth.signOut(); clearSession(); showLogin(); },
 
   /* ---- gestão de credenciais (Gestão Executiva) ---- */
-  resetarSenhaUsuario(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
+  async resetarSenhaUsuario(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
     const d=DB(); const u=d.users[i]; if(!u) return;
-    if(!confirm('Resetar a senha de '+u.nome+'? A pessoa precisará criar uma nova senha no próximo acesso.')) return;
-    delete u.pass; save(d); logSeg(u.nome,'Reset de senha','Reset pela Gestão Executiva ('+(getSession().nome)+')');
-    this.refresh(); toast('Senha resetada — o usuário fará “Primeiro acesso”.'); },
-  senhaTemporaria(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
-    const d=DB(); const u=d.users[i]; if(!u) return;
-    const temp=genTempPass(); setPassword(u,temp,{temp:true}); save(d);
-    logSeg(u.nome,'Reset de senha','Senha temporária gerada pela Gestão Executiva ('+(getSession().nome)+')');
-    this.refresh();
-    modalShell(I.shield,'Senha temporária gerada',
-      `<p style="font-size:13px;color:var(--txt-2);margin-bottom:12px">Repasse esta senha temporária para <b>${esc(u.nome)}</b>. Ela só é exibida agora e exigirá a definição de uma nova senha no primeiro acesso.</p>
-       <div class="temp-pass">${esc(temp)}</div>
-       <p style="font-size:11.5px;color:var(--txt-3);margin-top:10px">Por segurança, a senha não fica visível depois de fechar esta janela.</p>`,
-      `<div class="spacer"></div><button class="btn primary" onclick="App.closeModal()">Entendi</button>`); },
-  toggleAtivo(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
+    if(!confirm('Enviar link de redefinição de senha para '+u.nome+' ('+u.email+')?')) return;
+    const {error}=await supa.auth.resetPasswordForEmail(u.email,{redirectTo:window.location.origin+window.location.pathname});
+    if(error){ toast('Erro ao enviar: '+error.message); return; }
+    logSeg(u.nome,'Solicitação de redefinição de senha','Enviado pela Gestão Executiva ('+(getSession().nome)+')');
+    toast('Link de redefinição enviado para '+u.email); },
+  async toggleAtivo(i){ if(!can('users')){ toast('Ação não permitida.'); return; }
     const d=DB(); const u=d.users[i]; if(!u) return;
     const me=getSession(); if(me&&me.email===u.email){ alert('Você não pode desativar o próprio usuário em uso.'); return; }
     u.ativo=(u.ativo===false); save(d); logSeg(u.nome,u.ativo?'Usuário reativado':'Usuário desativado','por '+(me?me.nome:'—'));
-    this.refresh(); toast(u.ativo?'Usuário reativado':'Usuário desativado'); }
+    this.refresh(); toast(u.ativo?'Usuário reativado':'Usuário desativado');
+    const {error}=await supa.from('users').update({ativo:u.ativo}).eq('id',u.id);
+    if(error) console.error(error); }
 };
 
 /* ============================ TOAST ============================ */
@@ -5572,13 +5663,18 @@ document.addEventListener('click',e=>{
 window.addEventListener('resize',()=>{ App.closeNotif(); App.closeUserMenu(); });
 window.addEventListener('scroll',()=>{ App.closeNotif(); App.closeUserMenu(); },true);
 initTheme();
-if(getSession()){
-  el('authGate').style.display='none'; el('app').style.display='';
-  buildBrand(); buildUserChip(); renderNotifBadge();
-  App.go(defaultView());
-}else{
+supa.auth.onAuthStateChange((event)=>{
+  if(event==='PASSWORD_RECOVERY'){ el('app').style.display='none'; const g=el('authGate'); g.style.display='flex'; _authMode='force'; renderAuth(); }
+});
+(async function boot(){
+  const {data:{session}}=await supa.auth.getSession();
+  if(session){
+    const perfil=await carregarPerfil(session.user);
+    if(perfil && perfil.ativo!==false){ entrarComUsuario(perfil); return; }
+    await supa.auth.signOut();
+  }
   showLogin();
-}
+})();
 })();
 
 
