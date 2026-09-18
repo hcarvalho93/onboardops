@@ -5667,6 +5667,15 @@ supa.auth.onAuthStateChange((event)=>{
   if(event==='PASSWORD_RECOVERY'){ el('app').style.display='none'; const g=el('authGate'); g.style.display='flex'; _authMode='force'; renderAuth(); }
 });
 (async function boot(){
+  if(/type=recovery/.test(window.location.hash)){
+    // link de redefinição de senha: a sessão já vem autenticada, mas não podemos
+    // entrar direto no app — precisamos mostrar a tela de nova senha primeiro
+    // (senão corre uma corrida com o listener PASSWORD_RECOVERY e o app abre
+    // antes da pessoa conseguir digitar a senha nova).
+    el('app').style.display='none'; const g=el('authGate'); g.style.display='flex';
+    _authMode='force'; renderAuth();
+    return;
+  }
   const {data:{session}}=await supa.auth.getSession();
   if(session){
     const perfil=await carregarPerfil(session.user);
