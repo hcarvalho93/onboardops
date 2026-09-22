@@ -455,6 +455,37 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .ativo-del{margin-top:8px;color:var(--red)}
 .ativo-sub{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--txt-3);margin:6px 0 -2px;padding-top:8px;border-top:1px dashed var(--line)}
 .ativo-grid>.ativo-sub:first-child{border-top:none;padding-top:0;margin-top:0}
+.op-ativo-card{border:1px solid var(--line);border-radius:11px;margin-bottom:10px;background:var(--surface-2);overflow:hidden}
+.op-ativo-head{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer}
+.op-ativo-ico{width:30px;height:30px;border-radius:8px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;flex:none}
+.op-ativo-ico svg{width:16px;height:16px}
+.op-ativo-titulo{flex:1;min-width:0}
+.op-ativo-titulo b{display:block;font-size:13.5px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.op-ativo-titulo small{display:block;font-size:11.5px;color:var(--txt-3);margin-top:1px}
+.op-ativo-chev{width:16px;height:16px;color:var(--txt-3);flex:none;transition:transform .15s}
+.op-ativo-chev svg{width:100%;height:100%}
+.op-ativo-card.open .op-ativo-chev{transform:rotate(180deg)}
+.op-ativo-body{padding:0 13px 14px;border-top:1px solid var(--line);padding-top:13px}
+.form-flow{display:flex;flex-wrap:wrap;gap:14px 16px}
+.form-flow .field{flex:none}
+.form-flow .field.f-xs{width:86px}
+.form-flow .field.f-sm{width:140px}
+.form-flow .field.f-md{width:200px}
+.form-flow .field.f-lg{width:230px}
+.form-flow .field.f-grow{flex:1 1 260px;min-width:260px}
+.form-flow .field.f-full{flex:1 1 100%;width:100%}
+.op-busca-wrap{position:relative}
+.op-busca-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-lg);z-index:30;max-height:260px;overflow-y:auto}
+.op-busca-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--line)}
+.op-busca-item:last-child{border-bottom:none}
+.op-busca-item:hover{background:var(--surface-2)}
+.op-busca-item b{display:block;font-size:13px}
+.op-busca-item small{display:block;font-size:11.5px;color:var(--txt-3);margin-top:1px}
+.op-cliente-vinculado{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--green);background:var(--green-bg);border-radius:9px;padding:8px 12px;margin-bottom:12px}
+.op-hist{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.op-hist-label{font-size:12px;color:var(--txt-3)}
+.op-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:var(--surface-2);color:var(--blue);font-size:12px;font-weight:600;text-decoration:none}
+.op-chip:hover{border-color:var(--blue)}
 /* ---- Timeline (Ficha do Cliente) ---- */
 .timeline{display:flex;flex-direction:column;gap:0}
 .tl-item{display:flex;gap:12px;padding:0 0 16px;position:relative}
@@ -912,6 +943,7 @@ h3{ font-size:14.5px; letter-spacing:-.015em; font-weight:650; }
   padding:9px 11px; font-size:13.2px;
   transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background var(--dur) var(--ease);
 }
+.field input[type=checkbox],.field input[type=radio]{ width:auto; flex:none; padding:0; border:0; background:transparent; }
 .field input:hover,.field select:hover,.field textarea:hover{ border-color:var(--txt-3); }
 .field input:focus,.field select:focus,.field textarea:focus,.login-input:focus{
   outline:none; border-color:var(--brand); box-shadow:var(--ring);
@@ -1878,7 +1910,8 @@ const I = {
   settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09A1.65 1.65 0 0015 4.6a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
   theme:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4l1.4-1.4"/>',
   back:'<path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>',
-  star:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>'
+  star:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>'
 };
 const svg = (p,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 
@@ -2283,6 +2316,7 @@ function migrate(db){
   db.interactions.forEach(i=>{ if(!i.kind) i.kind='evento'; });  // v4.4: tipo de registro
   db.clientes.forEach(c=>{ if(!Array.isArray(c.ativos)) c.ativos=[]; if(c.estado===undefined) c.estado=''; if(c.cidade===undefined) c.cidade=''; if(c.cnpj===undefined) c.cnpj='';
     if(!Array.isArray(c.representantes)) c.representantes=[]; if(!Array.isArray(c.documentos)) c.documentos=[];
+    if(!Array.isArray(c.operacoes)) c.operacoes=[];
     if(c.nomeFantasia===undefined) c.nomeFantasia=''; if(c.endereco===undefined) c.endereco='';
     if(c.criadoEm===undefined) c.criadoEm=c.dataAssinatura||''; if(c.criadoPor===undefined) c.criadoPor='';
     c.ativos.forEach(a=>{ if(!a.regiao&&a.estado) a.regiao=regiaoDoEstado(a.estado); if(a.quantidade==null) a.quantidade=1;
@@ -2333,7 +2367,8 @@ function rowToCliente(r){ return {id:r.id,nome:r.nome,nomeFantasia:nz(r.nome_fan
   dataSolicitacaoProposta:nz(r.data_solicitacao_proposta),dataEnvioProposta:nz(r.data_envio_proposta),
   dataSolicitacaoMinuta:nz(r.data_solicitacao_minuta),dataEnvioMinuta:nz(r.data_envio_minuta),
   dataEnvioContrato:nz(r.data_envio_contrato),dataAssinaturaAditivo:nz(r.data_assinatura_aditivo),dataHandoff:nz(r.data_handoff),
-  criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por),ativos:[],representantes:[]}; }
+  numeroOperacao:nz(r.numero_operacao),classificacao:nz(r.classificacao),elite:!!r.elite,
+  criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por),ativos:[],representantes:[],operacoes:[]}; }
 function clienteToRow(c){ return {id:c.id,nome:c.nome,nome_fantasia:nn(c.nomeFantasia),cnpj:nn(c.cnpj),endereco:nn(c.endereco),
   documentos:c.documentos||[],produtos:c.produtos||[],tipologia:nn(c.tipologia),
   data_assinatura:nn(c.dataAssinatura),data_kickoff:nn(c.dataKickoff),go_live_previsto:nn(c.goLivePrevisto),go_live_real:nn(c.goLiveReal),
@@ -2343,6 +2378,7 @@ function clienteToRow(c){ return {id:c.id,nome:c.nome,nome_fantasia:nn(c.nomeFan
   data_solicitacao_proposta:nn(c.dataSolicitacaoProposta),data_envio_proposta:nn(c.dataEnvioProposta),
   data_solicitacao_minuta:nn(c.dataSolicitacaoMinuta),data_envio_minuta:nn(c.dataEnvioMinuta),
   data_envio_contrato:nn(c.dataEnvioContrato),data_assinatura_aditivo:nn(c.dataAssinaturaAditivo),data_handoff:nn(c.dataHandoff),
+  numero_operacao:nn(c.numeroOperacao),classificacao:nn(c.classificacao),elite:!!c.elite,
   criado_em:nn(c.criadoEm),criado_por:nn(c.criadoPor)}; }
 function rowToAtivo(r){ return {id:r.id,nome:r.nome,estado:nz(r.estado),cidade:nz(r.cidade),regiao:nz(r.regiao),
   tipologia:nz(r.tipologia),quantidade:r.quantidade==null?1:r.quantidade,unidades:r.unidades==null?0:r.unidades,
@@ -2366,6 +2402,8 @@ function rowToRepresentante(r){ return {id:r.id,nome:r.nome,cargo:nz(r.cargo),cp
   telefone:nz(r.telefone),principal:!!r.principal,criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por)}; }
 function representanteToRow(p,clienteId){ return {id:p.id,cliente_id:clienteId,nome:p.nome,cargo:nn(p.cargo),cpf:nn(p.cpf),
   email:nn(p.email),telefone:nn(p.telefone),principal:!!p.principal,criado_em:nn(p.criadoEm),criado_por:nn(p.criadoPor)}; }
+function rowToOperacao(r){ return {id:r.id,numero:nz(r.numero),statusNegociacao:nz(r.status_negociacao),criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por)}; }
+function operacaoToRow(o,clienteId){ return {id:o.id,cliente_id:clienteId,numero:nn(o.numero),status_negociacao:nn(o.statusNegociacao),criado_em:nn(o.criadoEm),criado_por:nn(o.criadoPor)}; }
 function rowToSurvey(r){ return {dataResposta:nz(r.data_resposta),q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q5:r.q5,comentarios:nz(r.comentarios)}; }
 function surveyToRow(cid,s){ return {cliente_id:cid,data_resposta:nn(s.dataResposta),q1:s.q1||null,q2:s.q2||null,q3:s.q3||null,q4:s.q4||null,q5:s.q5||null,comentarios:nn(s.comentarios)}; }
 function rowToTtfv(r){ return {tipo:nz(r.tipo),dataValor:nz(r.data_valor)}; }
@@ -2391,20 +2429,21 @@ function rowToHist(r){ return {id:r.id,usuario:nz(r.usuario),perfil:nz(r.perfil)
 function rowToLogin(r){ return {usuario:nz(r.usuario),email:nz(r.email),perfil:nz(r.perfil),data:nz(r.data),hora:nz(r.hora),iso:r.iso}; }
 
 async function loadFromSupabase(){
-  const [cli,ati,rep,srv,act,ttf,acts,ints,props,cfg,usrs,hist,logs] = await Promise.all([
-    supa.from('clientes').select('*'), supa.from('ativos').select('*'), supa.from('representantes').select('*'), supa.from('surveys').select('*'),
+  const [cli,ati,rep,ops,srv,act,ttf,acts,ints,props,cfg,usrs,hist,logs] = await Promise.all([
+    supa.from('clientes').select('*'), supa.from('ativos').select('*'), supa.from('representantes').select('*'), supa.from('operacoes').select('*'), supa.from('surveys').select('*'),
     supa.from('activation').select('*'), supa.from('ttfv').select('*'), supa.from('activities').select('*'),
     supa.from('interactions').select('*'), supa.from('propostas').select('*'), supa.from('config').select('*').eq('id',1).maybeSingle(),
     supa.from('users').select('*'), supa.from('history').select('*').order('iso',{ascending:false}).limit(500),
     supa.from('logins').select('*').order('iso',{ascending:false}).limit(500)
   ]);
-  const erros=[cli,ati,rep,srv,act,ttf,acts,ints,props,cfg,usrs,hist,logs].filter(r=>r.error);
+  const erros=[cli,ati,rep,ops,srv,act,ttf,acts,ints,props,cfg,usrs,hist,logs].filter(r=>r.error);
   if(erros.length){ console.error('Falha ao carregar dados do Supabase',erros); throw erros[0].error; }
 
   const clientes=(cli.data||[]).map(rowToCliente);
   const byId={}; clientes.forEach(c=>byId[c.id]=c);
   (ati.data||[]).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.ativos.push(rowToAtivo(r)); });
   (rep.data||[]).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.representantes.push(rowToRepresentante(r)); });
+  (ops.data||[]).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.operacoes.push(rowToOperacao(r)); });
 
   const surveys={}; (srv.data||[]).forEach(r=>{ surveys[r.cliente_id]=rowToSurvey(r); });
   const activation={}; (act.data||[]).forEach(r=>{ activation[r.cliente_id]={items:r.items||{},dates:r.dates||{}}; });
@@ -2443,6 +2482,7 @@ async function syncToSupabase(){
     const clienteRows=(d.clientes||[]).map(clienteToRow);
     const ativoRows=(d.clientes||[]).flatMap(c=>(c.ativos||[]).map(a=>ativoToRow(a,c.id)));
     const representanteRows=(d.clientes||[]).flatMap(c=>(c.representantes||[]).map(p=>representanteToRow(p,c.id)));
+    const operacaoRows=(d.clientes||[]).flatMap(c=>(c.operacoes||[]).map(o=>operacaoToRow(o,c.id)));
     const surveyRows=Object.keys(d.surveys||{}).map(cid=>surveyToRow(cid,d.surveys[cid]));
     const activationRows=Object.keys(d.activation||{}).map(cid=>({cliente_id:cid,items:(d.activation[cid]||{}).items||{},dates:(d.activation[cid]||{}).dates||{}}));
     const ttfvRows=Object.keys(d.ttfv||{}).map(cid=>ttfvToRow(cid,d.ttfv[cid]));
@@ -2454,6 +2494,7 @@ async function syncToSupabase(){
     if(clienteRows.length) jobs.push(supa.from('clientes').upsert(clienteRows));
     if(ativoRows.length) jobs.push(supa.from('ativos').upsert(ativoRows));
     if(representanteRows.length) jobs.push(supa.from('representantes').upsert(representanteRows));
+    if(operacaoRows.length) jobs.push(supa.from('operacoes').upsert(operacaoRows));
     if(surveyRows.length) jobs.push(supa.from('surveys').upsert(surveyRows));
     if(activationRows.length) jobs.push(supa.from('activation').upsert(activationRows));
     if(ttfvRows.length) jobs.push(supa.from('ttfv').upsert(ttfvRows));
@@ -2802,6 +2843,9 @@ const DB = ()=>O.DB();
 // Funil comercial (ciclo de negociação) — colunas da Jornada, espelha os status da planilha do Middle
 const STATUS_NEGOCIACAO = ['Proposta','Minuta','Aguardando Assinatura','Documento Assinado','Perdido'];
 const STATUS_NEG_TONE = {'Proposta':'blue','Minuta':'violet','Aguardando Assinatura':'amber','Documento Assinado':'green','Perdido':'red'};
+const CLASSIFICACOES = ['1P','3P'];
+const NOVA_OP_ID = '__nova_operacao__';
+function azoProposalUrl(numero){ return `https://trinus.azo.blue/#/workflows/11/proposals/details/${encodeURIComponent(numero)}`; }
 // Acessores da configuração central (settings) — valores editáveis sem alterar código
 const cfgTipologias = ()=> (DB().config.tipologias&&DB().config.tipologias.length)?DB().config.tipologias:TIPOLOGIAS;
 const cfgEmpresa = ()=> DB().config.empresa||'Trinus';
@@ -3453,6 +3497,14 @@ function renderFicha(id){
       <div class="field full"><label>Endereço</label><input id="f_endereco" ${ro?'disabled':''} value="${esc(c.endereco||'')}" placeholder="Logradouro, número, complemento"></div>
       <div class="field"><label>Estado</label><select id="f_estado" ${ro?'disabled':''}>${ufOpts(c.estado||'')}</select></div>
       <div class="field"><label>Cidade</label><input id="f_cidade" ${ro?'disabled':''} value="${esc(c.cidade||'')}"></div>
+      <div class="field"><label>Classificação</label><select id="f_classif" ${ro?'disabled':''}><option value="">—</option>${CLASSIFICACOES.map(v=>`<option ${c.classificacao===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:${ro?'default':'pointer'}">
+        <input type="checkbox" id="f_elite" ${ro?'disabled':''} ${c.elite?'checked':''}> <span class="ico-sm">${svg(I.star,1.8)}</span> Cliente Elite</label></div>
+      ${(c.operacoes&&c.operacoes.length)?`<div class="field full"><label>Operações</label>
+        <div class="op-hist" style="margin:0">${c.operacoes.map(o=> o.numero
+          ? `<a class="op-chip" href="${azoProposalUrl(o.numero)}" target="_blank" rel="noopener noreferrer" title="Ver operação no AZO">Nº ${esc(o.numero)} · ${esc(o.statusNegociacao||'—')}</a>`
+          : `<span class="op-chip" style="cursor:default">Sem número · ${esc(o.statusNegociacao||'—')}</span>`
+        ).join('')}</div></div>`:''}
     </div></div>
   </div>
 
@@ -3511,7 +3563,7 @@ function representanteListRender(){
           <label>&nbsp;</label>
           <label style="display:flex;align-items:center;gap:6px;cursor:${ro?'default':'pointer'};font-size:13px">
             <input type="radio" name="rep_principal" ${p.principal?'checked':''} ${ro?'disabled':''} onchange="App.repSetPrincipal(${i})">
-            ${svg(I.star,1.8)} Representante principal</label>
+            <span class="ico-sm">${svg(I.star,1.8)}</span> Representante principal</label>
         </div>
       </div>
       ${ro?'':`<button type="button" class="btn ghost sm" onclick="App.repDel(${i})" style="margin-top:8px">${svg(I.trash)} Remover</button>`}
@@ -3531,20 +3583,20 @@ function renderCadastroAtivos(){
   const c=getCli(filters.cliente);
   if(!c){ App.go('cadastro'); return; }
   const ro=!canAtivos();
-  _cliAtivos = (c.ativos&&Array.isArray(c.ativos))? JSON.parse(JSON.stringify(c.ativos)) : [];
+  _cadAtivos = (c.ativos&&Array.isArray(c.ativos))? JSON.parse(JSON.stringify(c.ativos)).map(a=>({...a,_open:false})) : [];
   el('view-cadastroAtivos').innerHTML=`
   <div class="section-bar" style="margin-top:0">
     <button class="btn ghost sm" onclick="App.go('cadastro')">${svg(I.back)} Voltar ao cadastro de ${esc(c.nome)}</button>
   </div>
   <div class="card"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos de ${esc(c.nome)}</h3>
-    <span class="desc">SPEs · empreendimentos · operações</span><span class="pill" id="ativosTotalPill">${_cliAtivos.length} ativo(s)</span>
-    <div class="spacer"></div>${ro?'':`<button type="button" class="btn primary sm" onclick="App.ativoAdd()">${svg(I.plus)} Adicionar ativo</button>`}</div>
-    <div class="card-body"><div id="ativos_list"></div></div>
+    <span class="desc">SPEs · empreendimentos · operações</span><span class="pill" id="cad_ativos_pill">${_cadAtivos.length} ativo(s)</span>
+    <div class="spacer"></div>${ro?'':`<button type="button" class="btn primary sm" onclick="App.cadAtivoAdd()">${svg(I.plus)} Adicionar ativo</button>`}</div>
+    <div class="card-body"><div id="cad_ativos_list"></div></div>
   </div>
   ${ro?'':`<div class="section-bar"><div class="spacer"></div>
     <button class="btn ghost" onclick="App.go('cadastro')">Cancelar</button>
     <button class="btn primary" onclick="App.salvarAtivosCliente('${c.id}')">${svg(I.check)} Salvar Ativos</button></div>`}`;
-  ativoListRender();
+  cadAtivoListRender();
 }
 
 /* ============================ ETAPA STRIP (dashboard) ============================ */
@@ -4220,6 +4272,118 @@ function ativoOptions(cid,sel){ return `<option value="">— (somente cliente)</
 /* ============================ MÓDULO — JORNADA DO CLIENTE (360°) ============================ */
 let jTab='geral';
 let _dragCli=null;
+const OP_DRAFT_KEY='oo_draft_nova_operacao';
+const opDraftBlank=()=>({numero:'',estagio:'Proposta',fantasia:'',nome:'',cnpj:'',classif:'',elite:false,cidade:'',estado:'',tip:TIPOLOGIAS[0],obs:''});
+let _opDraft=opDraftBlank();
+let _opClienteId='';
+let _opAtivos=[];
+function opDraftPersist(){ try{ localStorage.setItem(OP_DRAFT_KEY, JSON.stringify({draft:_opDraft, clienteId:_opClienteId, ativos:_opAtivos})); }catch(_){} }
+function opDraftLoad(){ try{ const raw=localStorage.getItem(OP_DRAFT_KEY); return raw?JSON.parse(raw):null; }catch(_){ return null; } }
+function opDraftClear(){ try{ localStorage.removeItem(OP_DRAFT_KEY); }catch(_){} }
+function renderNovaOperacao(){
+  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
+  const linkedCli = _opClienteId? getCli(_opClienteId) : null;
+  const opsExistentes = linkedCli? (linkedCli.operacoes||[]) : [];
+  el('view-jornada').innerHTML=`
+  <div class="section-bar" style="margin-top:0">
+    <button class="btn ghost sm" onclick="App.cancelarNovaOperacao()">${svg(I.back)} Voltar</button>
+  </div>
+  <div class="card"><div class="card-head"><div class="ico">${svg(I.route)}</div><h3>Nova Operação</h3>
+    <span class="desc">dados iniciais para abrir a operação comercial</span></div>
+    <div class="card-body">
+      <div class="field op-busca-wrap" style="max-width:420px;margin-bottom:14px">
+        <label>Buscar cliente já cadastrado</label>
+        <input id="op_busca" placeholder="CNPJ, Razão Social ou Nome Comercial…" autocomplete="off"
+          value="${linkedCli?esc(linkedCli.nome):''}" oninput="App.opBuscarCliente(this.value)">
+        <div class="op-busca-results" id="op_busca_results" hidden></div>
+      </div>
+      ${linkedCli?`<div class="op-cliente-vinculado"><span class="ico-sm" style="color:var(--green)">${svg(I.check)}</span> Vinculado a <b>${esc(linkedCli.nome)}</b> — dados e ativos do cadastro foram carregados.
+        <div class="spacer"></div><button type="button" class="btn ghost sm" onclick="App.opLimparCliente()">Desvincular</button></div>`:''}
+      ${opsExistentes.length?`<div class="op-hist"><span class="op-hist-label">Operações já criadas para este cliente:</span>
+        ${opsExistentes.map(o=>`<a class="op-chip" href="#cliente=${encodeURIComponent(_opClienteId)}" target="_blank" rel="noopener">Nº ${esc(o.numero||'—')} · ${esc(o.statusNegociacao||'—')}</a>`).join('')}</div>`:''}
+      <div class="form-flow">
+        <div class="field f-sm"><label>Número da Operação</label><input id="op_numero" value="${esc(_opDraft.numero)}" placeholder="Ex.: nº no ASO" onchange="App.opFieldChange('numero',this)"></div>
+        <div class="field f-md"><label>Status</label><select id="op_estagio" onchange="App.opFieldChange('estagio',this)">${STATUS_NEGOCIACAO.map(s=>`<option ${_opDraft.estagio===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field f-xs"><label>Classificação</label><select id="op_classif" onchange="App.opFieldChange('classif',this)"><option value="">—</option>${CLASSIFICACOES.map(c=>`<option ${_opDraft.classif===c?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="op_elite" ${_opDraft.elite?'checked':''} onchange="App.opFieldChange('elite',this)"> <span class="ico-sm">${svg(I.star,1.8)}</span> Cliente Elite</label></div>
+        <div class="field f-lg"><label>Nome Comercial</label><input id="op_fantasia" value="${esc(_opDraft.fantasia)}" placeholder="Como o cliente é conhecido" onchange="App.opFieldChange('fantasia',this)"></div>
+        <div class="field f-grow"><label>Razão Social *</label><input id="op_nome" value="${esc(_opDraft.nome)}" placeholder="Razão social completa" onchange="App.opFieldChange('nome',this)"></div>
+        <div class="field f-sm"><label>CNPJ</label><input id="op_cnpj" value="${esc(_opDraft.cnpj)}" placeholder="00.000.000/0000-00" onchange="App.opFieldChange('cnpj',this)"></div>
+        <div class="field f-lg"><label>Cidade</label><input id="op_cidade" value="${esc(_opDraft.cidade)}" onchange="App.opFieldChange('cidade',this)"></div>
+        <div class="field f-xs"><label>UF</label><select id="op_estado" onchange="App.opFieldChange('estado',this)">${ufOpts(_opDraft.estado)}</select></div>
+        <div class="field f-md"><label>Tipologia</label><select id="op_tip" onchange="App.opFieldChange('tip',this)">${TIPOLOGIAS.map(t=>`<option ${_opDraft.tip===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="field f-full"><label>Observações</label><textarea id="op_obs" style="min-height:52px" onchange="App.opFieldChange('obs',this)">${esc(_opDraft.obs)}</textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos</h3>
+    <span class="desc">empreendimentos vinculados a esta operação</span><span class="pill" id="op_ativos_pill">${_opAtivos.length} ativo(s)</span>
+    <div class="spacer"></div><button type="button" class="btn primary sm" onclick="App.opAtivoAdd()">${svg(I.plus)} Adicionar ativo</button></div>
+    <div class="card-body"><div id="op_ativos_list"></div></div>
+  </div>
+
+  <div class="section-bar"><div class="spacer"></div>
+    <button class="btn ghost" onclick="App.cancelarNovaOperacao()">Cancelar</button>
+    <button class="btn primary" onclick="App.salvarNovaOperacao()">${svg(I.check)} Salvar Operação</button></div>`;
+  opAtivoListRender();
+}
+function ativoAccordionMarkup(list, prefix){
+  const ufOpt=(sel)=>`<option value="">UF</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
+  const sub=(txt)=>`<div class="field full ativo-sub">${txt}</div>`;
+  return list.length ? list.map((a,i)=>{
+    const open=!!a._open;
+    const titulo = a.semNomeDefinido? 'Sem nome definido' : (a.nome||`Ativo ${i+1}`);
+    const local = [a.cidade,a.estado].filter(Boolean).join('/');
+    return `<div class="op-ativo-card ${open?'open':''}">
+      <div class="op-ativo-head" onclick="App.${prefix}Toggle(${i})">
+        <div class="op-ativo-ico">${svg(I.activation)}</div>
+        <div class="op-ativo-titulo"><b>${esc(titulo)}</b><small>${local?esc(local):'—'}</small></div>
+        <span class="badge b-slate">${esc(a.statusAtivo||'Etapa não definida')}</span>
+        <button type="button" class="btn ghost sm" onclick="event.stopPropagation();App.${prefix}Dup(${i})" title="Duplicar">${svg(I.copy)}</button>
+        <button type="button" class="btn ghost sm" onclick="event.stopPropagation();App.${prefix}Del(${i})" title="Remover">${svg(I.trash)}</button>
+        <span class="op-ativo-chev">${svg(I.chevronDown)}</span>
+      </div>
+      ${open?`<div class="op-ativo-body"><div class="ativo-grid">
+        ${sub('Identificação')}
+        <div class="field"><label>Nome do Empreendimento</label><input ${a.semNomeDefinido?'disabled':''} value="${esc(a.nome||'')}" onchange="App.${prefix}Set(${i},'nome',this.value)" placeholder="Ex.: SPE Jardim Aurora"></div>
+        <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" ${a.semNomeDefinido?'checked':''} onchange="App.${prefix}Set(${i},'semNomeDefinido',this.checked)"> Sem nome definido</label></div>
+        <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" ${a.empresaNaoConstituida?'checked':''} onchange="App.${prefix}Set(${i},'empresaNaoConstituida',this.checked)"> Empresa não constituída</label></div>
+        <div class="field"><label>Razão Social</label><input ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.razaoSocial||'')}" onchange="App.${prefix}Set(${i},'razaoSocial',this.value)" placeholder="Razão social da SPE"></div>
+        <div class="field"><label>CNPJ</label><input ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.cnpj||'')}" onchange="App.${prefix}Set(${i},'cnpj',this.value)" placeholder="00.000.000/0000-00"></div>
+        <div class="field"><label>Tipo do Ativo</label><select onchange="App.${prefix}Set(${i},'tipologia',this.value)">${TIPOLOGIAS.map(t=>`<option ${a.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        ${sub('Localização')}
+        <div class="field"><label>Estado</label><select onchange="App.${prefix}SetEstado(${i},this.value)">${ufOpt(a.estado||'')}</select></div>
+        <div class="field"><label>Cidade</label><input value="${esc(a.cidade||'')}" onchange="App.${prefix}Set(${i},'cidade',this.value)"></div>
+        ${sub('Números do Empreendimento')}
+        <div class="field"><label>Status do Ativo</label><select onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Total de Unidades</label><input type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.${prefix}Set(${i},'unidades',this.value)"></div>
+        <div class="field"><label>Unidades Vendidas</label><input type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.${prefix}Set(${i},'unidadesVendidas',this.value)"></div>
+        <div class="field"><label>VGV (R$)</label><input type="number" min="0" step="1000" value="${a.vgv!=null?a.vgv:0}" onchange="App.${prefix}Set(${i},'vgv',this.value)"></div>
+        ${sub('Cronograma da Obra')}
+        <div class="field"><label>Lançamento</label><input type="date" value="${a.dataLancamento||''}" onchange="App.${prefix}Set(${i},'dataLancamento',this.value)"></div>
+        <div class="field"><label>Início da Obra</label><input type="date" value="${a.dataInicioObra||''}" onchange="App.${prefix}Set(${i},'dataInicioObra',this.value)"></div>
+        <div class="field"><label>Fim da Obra</label><input type="date" value="${a.dataFimObra||''}" onchange="App.${prefix}Set(${i},'dataFimObra',this.value)"></div>
+        <div class="field"><label>Pós-obra (meses)</label><input type="number" min="0" value="${a.posObraMeses!=null?a.posObraMeses:0}" onchange="App.${prefix}Set(${i},'posObraMeses',this.value)"></div>
+        <div class="field"><label>Pós-operacional (meses)</label><input type="number" min="0" value="${a.posOperacionalMeses!=null?a.posOperacionalMeses:0}" onchange="App.${prefix}Set(${i},'posOperacionalMeses',this.value)"></div>
+        <div class="field full"><label>Observações</label><input value="${esc(a.obs||'')}" onchange="App.${prefix}Set(${i},'obs',this.value)"></div>
+      </div></div>`:''}
+    </div>`;
+  }).join('') : '<p style="font-size:12.5px;color:var(--txt-3);margin:4px 0 0">Nenhum ativo adicionado ainda.</p>';
+}
+function opAtivoListRender(){
+  const box=el('op_ativos_list'); if(!box) return;
+  const pill=el('op_ativos_pill'); if(pill) pill.textContent=_opAtivos.length+' ativo(s)';
+  box.innerHTML = ativoAccordionMarkup(_opAtivos,'opAtivo');
+}
+function cadAtivoListRender(){
+  const box=el('cad_ativos_list'); if(!box) return;
+  const pill=el('cad_ativos_pill'); if(pill) pill.textContent=_cadAtivos.length+' ativo(s)';
+  box.innerHTML = ativoAccordionMarkup(_cadAtivos,'cadAtivo');
+}
 function jcliKCard(c){
   const h=calcHealth(c.id), e=etapaInfo(c.etapa);
   const ab=DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status)).length;
@@ -4246,11 +4410,12 @@ function kanbanNegociacao(cs){
 }
 function renderJornada(){
   const cs=filteredClients();
+  if(filters.cliente===NOVA_OP_ID){ renderNovaOperacao(); return; }
   const sel=filters.cliente && getCli(filters.cliente);
   if(!sel){
     el('view-jornada').innerHTML=`
     <div class="section-bar"><h2>Jornada do Cliente</h2><div class="line"></div>
-      <span class="pill">selecione um cliente para abrir o painel 360°</span></div>
+      ${gate('createClient',`<button class="btn primary sm" onclick="App.novaOperacao()">${svg(I.plus)} Adicionar Operação</button>`)}</div>
     ${cs.length? kanbanNegociacao(cs) : '<p style="color:var(--txt-3)">Nenhum cliente corresponde aos filtros.</p>'}`;
     return;
   }
@@ -4670,7 +4835,8 @@ function whatsTimeline(cid){
     <div class="card-body">${dia.length?intTimeline(dia,false):'<p style="color:var(--txt-3)">Nenhum histórico diário registrado.</p>'}</div></div>`;
 }
 let _intAnexos=[];
-let _cliAtivos=[];   // ativos em edição no modal de cliente
+let _cliAtivos=[];   // ativos em edição no modal de cliente (legado — usado só pelo modal antigo)
+let _cadAtivos=[];   // ativos em edição na página dedicada de Ativos do Cadastro
 function canAtivos(){ const u=getSession(); return !!u && (u.perfil==='Gestão Executiva'||u.perfil==='Onboarding'); }
 function anxSize(n){ n=+n||0; return n<1024?n+' B':n<1048576?(n/1024).toFixed(0)+' KB':(n/1048576).toFixed(1)+' MB'; }
 function intAnexoRender(){ const box=el('in_anexos_list'); if(!box) return;
@@ -5426,7 +5592,10 @@ async function entrarComUsuario(u,opts){
   logLogin(u); logSeg(u.nome,'Login realizado','');
   g.style.display='none'; el('app').style.display='';
   buildBrand(); buildUserChip(); renderNotifBadge(); jTab='geral'; Object.keys(filters).forEach(k=>filters[k]='');
-  App.go(defaultView());
+  const hashCliente=(location.hash.match(/cliente=([^&]+)/)||[])[1];
+  if(hashCliente && getCli(decodeURIComponent(hashCliente))){ App.abrirCliente(decodeURIComponent(hashCliente)); }
+  else if(opDraftLoad()){ App.novaOperacao(); }
+  else { App.go(defaultView()); }
   toast((opts&&opts.msg) || (u.dinamico?('Acesso de parceiro (somente leitura): '+u.nome):('Bem-vinda(o), '+u.nome.split(' ')[0]+'!')));
 }
 
@@ -5547,12 +5716,13 @@ window.App = {
     if(repsDepois.length && !repsDepois.some(p=>p.principal)) repsDepois[0].principal=true;
     const after={nome,nomeFantasia:v('f_fantasia'),cnpj:v('f_cnpj'),endereco:v('f_endereco'),
       estado:(el('f_estado')?el('f_estado').value:(c.estado||'')),cidade:v('f_cidade'),
+      classificacao:(el('f_classif')?el('f_classif').value:''),elite:!!(el('f_elite')&&el('f_elite').checked),
       representantes:repsDepois,documentos:_fichaDocumentos.slice()};
     Object.assign(c,after);
-    if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; d.clientes.push(c);
+    if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; if(!Array.isArray(c.operacoes)) c.operacoes=[]; d.clientes.push(c);
       addHistory({modulo:'Cadastro',cliente:nome,campo:'Cliente',de:'Vazio',para:'Cadastrado em '+np.iso.slice(0,10)+(quem?' por '+quem:'')}); }
     else logClienteDiff(c,before,after,{nome:'Razão Social',nomeFantasia:'Nome Fantasia',cnpj:'CNPJ',endereco:'Endereço',
-      estado:'Estado do Cliente',cidade:'Cidade do Cliente'});
+      estado:'Estado do Cliente',cidade:'Cidade do Cliente',classificacao:'Classificação',elite:'Cliente Elite'});
     if(repsDepois.length!==repsAntes.length) addHistory({modulo:'Cadastro',cliente:nome,campo:'Representantes',de:repsAntes.length+' representante(s)',para:repsDepois.length+' representante(s)'});
     save(d);
     const idsDepois=new Set(repsDepois.map(p=>p.id));
@@ -5567,16 +5737,16 @@ window.App = {
     const np=nowParts(); const quem=(getSession&&getSession()?getSession().nome:'')||'';
     const ativosAntes=Array.isArray(c.ativos)?JSON.parse(JSON.stringify(c.ativos)):[];
     const antesById={}; ativosAntes.forEach(a=>{antesById[a.id]=a;});
-    const ativosDepois=_cliAtivos.map(a=>{ const prev=antesById[a.id]; return {id:a.id||('at'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),
+    const ativosDepois=_cadAtivos.map(a=>{ const prev=antesById[a.id]; return {id:(a.id&&!String(a.id).startsWith('tmp'))?a.id:('at'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),
         nome:(a.nome||'').trim(),estado:a.estado||'',cidade:(a.cidade||'').trim(),regiao:a.regiao||regiaoDoEstado(a.estado),
-        tipologia:a.tipologia||TIPOLOGIAS[0],quantidade:+a.quantidade||0,unidades:+a.unidades||0,vgv:+a.vgv||0,statusAtivo:a.statusAtivo||'',obs:(a.obs||'').trim(),
+        tipologia:a.tipologia||TIPOLOGIAS[0],quantidade:+a.quantidade||1,unidades:+a.unidades||0,vgv:+a.vgv||0,statusAtivo:a.statusAtivo||'',obs:(a.obs||'').trim(),
         semNomeDefinido:!!a.semNomeDefinido,empresaNaoConstituida:!!a.empresaNaoConstituida,
         razaoSocial:(a.razaoSocial||'').trim(),cnpj:(a.cnpj||'').trim(),unidadesVendidas:+a.unidadesVendidas||0,custoObra:+a.custoObra||0,
-        endereco:(a.endereco||'').trim(),cep:(a.cep||'').trim(),
+        endereco:a.endereco||'',cep:a.cep||'',
         dataLancamento:a.dataLancamento||'',dataInicioObra:a.dataInicioObra||'',dataFimObra:a.dataFimObra||'',
         posObraMeses:+a.posObraMeses||0,posOperacionalMeses:+a.posOperacionalMeses||0,obrasNaRegiao:+a.obrasNaRegiao||0,distanciaMaxObras:+a.distanciaMaxObras||0,
         criadoEm:(prev&&prev.criadoEm)||a.criadoEm||np.iso.slice(0,10),criadoPor:(prev&&prev.criadoPor)||a.criadoPor||quem};})
-      .filter(a=>a.nome||a.estado||a.cidade);
+      .filter(a=>a.nome||a.estado||a.cidade||a.semNomeDefinido);
     c.ativos=ativosDepois;
     logAtivosDiff(c.nome,ativosAntes,ativosDepois);
     save(d);
@@ -5584,6 +5754,19 @@ window.App = {
     ativosAntes.filter(a=>!idsDepois.has(a.id)).forEach(a=>deleteRemoto('ativos',a.id));
     toast('Ativos salvos'); this.go('cadastro');
   },
+  cadAtivoAdd(){ if(!canAtivos()){ toast('Ação não permitida.'); return; }
+    _cadAtivos.push({id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+      nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,_open:true}); cadAtivoListRender(); },
+  cadAtivoDel(i){ if(!canAtivos()){ toast('Ação não permitida.'); return; } _cadAtivos.splice(i,1); cadAtivoListRender(); },
+  cadAtivoDup(i){ if(!canAtivos()){ toast('Ação não permitida.'); return; } const a=_cadAtivos[i]; if(!a) return;
+    const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', _open:true};
+    _cadAtivos.splice(i+1,0,copy); cadAtivoListRender(); },
+  cadAtivoToggle(i){ if(!_cadAtivos[i]) return; _cadAtivos[i]._open=!_cadAtivos[i]._open; cadAtivoListRender(); },
+  cadAtivoSet(i,campo,val){ if(!_cadAtivos[i]) return;
+    const NUM=['quantidade','vgv','unidades','unidadesVendidas','posObraMeses','posOperacionalMeses'];
+    _cadAtivos[i][campo]= NUM.includes(campo)? (+val||0) : val;
+    if(NUM.includes(campo)||campo==='semNomeDefinido'||campo==='empresaNaoConstituida') cadAtivoListRender(); },
+  cadAtivoSetEstado(i,uf){ if(!_cadAtivos[i]) return; _cadAtivos[i].estado=uf; _cadAtivos[i].regiao=regiaoDoEstado(uf); cadAtivoListRender(); },
   // ativos do cliente (edição no modal)
   ativoAdd(){ if(!canAtivos()){ toast('Ação não permitida.'); return; }
     _cliAtivos.push({id:'at'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,obs:''}); ativoListRender(); },
@@ -5792,6 +5975,91 @@ window.App = {
   endDropN(col){ if(col) col.classList.remove('drag-over'); },
   dropN(e,status,col){ e.preventDefault(); if(col) col.classList.remove('drag-over');
     let id=_dragCli; if(!id){ try{ id=e.dataTransfer.getData('text/plain'); }catch(_){} } _dragCli=null; if(id) this.setStatusNegociacao(id,status); },
+  novaOperacao(){
+    if(!can('createClient')){ toast('Ação não permitida para seu perfil.'); return; }
+    const draft=opDraftLoad();
+    if(draft){ _opDraft=Object.assign(opDraftBlank(),draft.draft); _opClienteId=draft.clienteId||''; _opAtivos=Array.isArray(draft.ativos)?draft.ativos:[]; }
+    else { _opDraft=opDraftBlank(); _opClienteId=''; _opAtivos=[]; }
+    filters.cliente=NOVA_OP_ID; this.go('jornada');
+  },
+  cancelarNovaOperacao(){ opDraftClear(); _opDraft=opDraftBlank(); _opClienteId=''; _opAtivos=[]; this.fecharCliente(); },
+  opFieldChange(key,elm){ _opDraft[key]= elm.type==='checkbox'? elm.checked : elm.value; opDraftPersist(); },
+  opBuscarCliente(v){
+    const box=el('op_busca_results'); if(!box) return;
+    const q=(v||'').trim().toLowerCase();
+    if(q.length<2){ box.hidden=true; box.innerHTML=''; return; }
+    const matches=DB().clientes.filter(c=>(c.nome||'').toLowerCase().includes(q)||(c.nomeFantasia||'').toLowerCase().includes(q)||(c.cnpj||'').toLowerCase().includes(q)).slice(0,6);
+    if(!matches.length){ box.hidden=true; box.innerHTML=''; return; }
+    box.hidden=false;
+    box.innerHTML=matches.map(c=>`<div class="op-busca-item" onclick="App.opSelecionarCliente('${c.id}')">
+      <b>${esc(c.nome)}</b><small>${esc(c.nomeFantasia||'—')} · ${esc(c.cnpj||'sem CNPJ')}</small></div>`).join('');
+  },
+  opSelecionarCliente(id){
+    const c=getCli(id); if(!c) return;
+    _opClienteId=id;
+    _opDraft=Object.assign({},_opDraft,{fantasia:c.nomeFantasia||'',nome:c.nome||'',cnpj:c.cnpj||'',classif:c.classificacao||'',
+      elite:!!c.elite,cidade:c.cidade||'',estado:c.estado||'',tip:c.tipologia||TIPOLOGIAS[0]});
+    _opAtivos=(c.ativos||[]).map(a=>({...a,_open:false}));
+    opDraftPersist();
+    renderNovaOperacao();
+  },
+  opLimparCliente(){ _opClienteId=''; _opAtivos=[]; opDraftPersist(); renderNovaOperacao(); },
+  opAtivoAdd(){ _opAtivos.push({id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,_open:true}); opDraftPersist(); opAtivoListRender(); },
+  opAtivoDel(i){ _opAtivos.splice(i,1); opDraftPersist(); opAtivoListRender(); },
+  opAtivoDup(i){ const a=_opAtivos[i]; if(!a) return;
+    const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', _open:true};
+    _opAtivos.splice(i+1,0,copy); opDraftPersist(); opAtivoListRender(); },
+  opAtivoToggle(i){ if(!_opAtivos[i]) return; _opAtivos[i]._open=!_opAtivos[i]._open; opDraftPersist(); opAtivoListRender(); },
+  opAtivoSet(i,campo,val){ if(!_opAtivos[i]) return;
+    const NUM=['quantidade','vgv','unidades','unidadesVendidas','posObraMeses','posOperacionalMeses'];
+    _opAtivos[i][campo]= NUM.includes(campo)? (+val||0) : val;
+    opDraftPersist();
+    if(NUM.includes(campo)||campo==='semNomeDefinido'||campo==='empresaNaoConstituida') opAtivoListRender(); },
+  opAtivoSetEstado(i,uf){ if(!_opAtivos[i]) return; _opAtivos[i].estado=uf; _opAtivos[i].regiao=regiaoDoEstado(uf); opDraftPersist(); opAtivoListRender(); },
+  salvarNovaOperacao(){
+    if(!can('createClient')){ toast('Ação não permitida para seu perfil.'); return; }
+    const nome=(_opDraft.nome||'').trim(); if(!nome){ alert('Informe a razão social do cliente.'); return; }
+    const d=DB(); const np=nowParts(); const quem=(getSession&&getSession()?getSession().nome:'')||'';
+    const ativos=_opAtivos.map(a=>({id:(a.id&&!String(a.id).startsWith('tmp'))?a.id:('at'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),
+        nome:(a.nome||'').trim(),estado:a.estado||'',cidade:(a.cidade||'').trim(),regiao:a.regiao||regiaoDoEstado(a.estado),
+        tipologia:a.tipologia||TIPOLOGIAS[0],quantidade:+a.quantidade||1,unidades:+a.unidades||0,unidadesVendidas:+a.unidadesVendidas||0,vgv:+a.vgv||0,
+        statusAtivo:a.statusAtivo||'',obs:(a.obs||'').trim(),
+        semNomeDefinido:!!a.semNomeDefinido,empresaNaoConstituida:!!a.empresaNaoConstituida,
+        razaoSocial:(a.razaoSocial||'').trim(),cnpj:(a.cnpj||'').trim(),endereco:a.endereco||'',cep:a.cep||'',
+        dataLancamento:a.dataLancamento||'',dataInicioObra:a.dataInicioObra||'',dataFimObra:a.dataFimObra||'',
+        posObraMeses:+a.posObraMeses||0,posOperacionalMeses:+a.posOperacionalMeses||0,custoObra:a.custoObra||0,obrasNaRegiao:a.obrasNaRegiao||0,distanciaMaxObras:a.distanciaMaxObras||0,
+        criadoEm:a.criadoEm||np.iso.slice(0,10),criadoPor:a.criadoPor||quem}))
+      .filter(a=>a.nome||a.estado||a.cidade||a.semNomeDefinido);
+    let c;
+    if(_opClienteId && getCli(_opClienteId)){
+      c=getCli(_opClienteId);
+      Object.assign(c,{nome,nomeFantasia:_opDraft.fantasia,cnpj:_opDraft.cnpj,classificacao:_opDraft.classif,elite:!!_opDraft.elite,
+        cidade:_opDraft.cidade,estado:_opDraft.estado,tipologia:_opDraft.tip});
+      if(_opDraft.obs) c.obs=_opDraft.obs;
+      c.ativos=ativos;
+      if(!Array.isArray(c.operacoes)) c.operacoes=[];
+    } else {
+      c={id:'c'+Date.now().toString(36),nome,nomeFantasia:_opDraft.fantasia,cnpj:_opDraft.cnpj,
+        estado:_opDraft.estado,cidade:_opDraft.cidade,tipologia:_opDraft.tip||TIPOLOGIAS[0],
+        classificacao:_opDraft.classif,elite:!!_opDraft.elite,obs:_opDraft.obs,
+        ativos,representantes:[],documentos:[],operacoes:[],
+        criadoEm:np.iso.slice(0,10),criadoPor:quem};
+      d.clientes.push(c);
+    }
+    const operacao={id:'op'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),numero:_opDraft.numero,statusNegociacao:_opDraft.estagio,
+      criadoEm:np.iso.slice(0,10),criadoPor:quem};
+    c.operacoes.push(operacao);
+    c.statusNegociacao=_opDraft.estagio;
+    addHistory({modulo:'Jornada',cliente:nome,campo:'Operação',de:'Vazio',
+      para:'Criada em '+np.iso.slice(0,10)+(quem?' por '+quem:'')+(operacao.numero?' · Nº '+operacao.numero:'')});
+    save(d);
+    opDraftClear();
+    _opDraft=opDraftBlank(); _opClienteId=''; _opAtivos=[];
+    filters.cliente=c.id;
+    this.go('jornada');
+    toast('Operação criada');
+  },
   salvarOperacao(id){
     if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const v=k=>{const e=el(k);return e?e.value.trim():'';};
