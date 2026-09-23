@@ -486,6 +486,30 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .op-hist-label{font-size:12px;color:var(--txt-3)}
 .op-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:var(--surface-2);color:var(--blue);font-size:12px;font-weight:600;text-decoration:none}
 .op-chip:hover{border-color:var(--blue)}
+.serv-block{background:var(--blue-soft);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:14px}
+.serv-block-head{display:flex;align-items:center;gap:10px;cursor:pointer}
+.serv-block-label{flex:1;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:6px}
+.serv-block-label svg{width:14px;height:14px}
+.serv-block-chev{width:16px;height:16px;color:var(--blue);flex:none;transition:transform .15s}
+.serv-block-chev svg{width:100%;height:100%}
+.serv-block-chev.open{transform:rotate(180deg)}
+.serv-block-body{margin-top:9px}
+.serv-busca-input{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:9px 11px;font-size:13.5px;box-sizing:border-box}
+.serv-busca-input:focus{outline:2px solid var(--blue-soft);border-color:var(--blue);background:var(--surface)}
+.serv-list{margin-top:8px;padding:2px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.serv-item{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;transition:.12s}
+.serv-item:hover{border-color:var(--blue);box-shadow:0 1px 4px -1px rgba(0,0,0,.12)}
+.serv-item-nome{font-size:12px;font-weight:600;line-height:1.3}
+.serv-item-ico{display:flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--blue);color:#fff;flex:none;opacity:0;transform:scale(.7);transition:.12s}
+.serv-item-ico svg{width:11px;height:11px}
+.serv-item:hover .serv-item-ico{opacity:1;transform:scale(1)}
+.serv-item.disabled{cursor:default;background:var(--surface-2);opacity:.6}
+.serv-item.disabled:hover{border-color:var(--line);box-shadow:none}
+.serv-item.disabled .serv-item-ico{opacity:1;transform:scale(1);background:var(--green)}
+.serv-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.serv-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 6px 4px 11px;border-radius:20px;border:1px solid var(--line);background:var(--surface-2);color:var(--txt);font-size:12px;font-weight:600}
+.serv-chip button{display:flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:none;background:transparent;color:var(--txt-3);cursor:pointer;padding:0;font-size:14px;line-height:1}
+.serv-chip button:hover{background:var(--line);color:var(--red)}
 /* ---- Timeline (Ficha do Cliente) ---- */
 .timeline{display:flex;flex-direction:column;gap:0}
 .tl-item{display:flex;gap:12px;padding:0 0 16px;position:relative}
@@ -1733,14 +1757,31 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
 </style>
 </head>
 <body>
+<script>
+// Carregador do Inspetor de Desenvolvimento (ferramentas-dev/) — só baixa o módulo real
+// se for ambiente local ou perfil Gestão Executiva; para os demais usuários isto não faz nada.
+window.__fdiTryLoad = function(perfil){
+  if(window.__fdiLoaded) return;
+  var isLocal = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var isAdmin = perfil==='Gestão Executiva';
+  if(!isLocal && !isAdmin) return;
+  window.__fdiLoaded = true;
+  var v=Date.now();
+  var link=document.createElement('link'); link.rel='stylesheet'; link.href='ferramentas-dev/inspector.css?v='+v;
+  document.head.appendChild(link);
+  var script=document.createElement('script'); script.src='ferramentas-dev/inspector.js?v='+v;
+  document.body.appendChild(script);
+};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__fdiTryLoad();
+</script>
 <div class="app" id="app">
   <!-- ====================== TOPBAR (de ponta a ponta) ====================== -->
   <header class="topbar">
     <div class="topbar-left">
-      <button class="icon-btn" id="menuToggle" title="Menu" onclick="document.getElementById('sidebar').classList.toggle('open')">
+      <button class="icon-btn" id="menuToggle" data-id="global.botao.abrir-menu" title="Menu" onclick="document.getElementById('sidebar').classList.toggle('open')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
       </button>
-      <div class="brand">
+      <div class="brand" data-id="global.texto.marca-app">
         <div class="brand-logo-box" id="brandBox"><div class="logo">O</div></div>
         <div class="brand-sub-wrap">
           <div class="sub">Customer Success</div>
@@ -1750,27 +1791,27 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
     <div class="topbar-center">
       <div class="gs-wrap">
         <div class="gs-input-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input class="gs-input" id="gsInput" placeholder="Buscar cliente, CNPJ, cidade…" autocomplete="off"
+          <input class="gs-input" id="gsInput" data-id="global.campo.busca-global" placeholder="Buscar cliente, CNPJ, cidade…" autocomplete="off"
             oninput="App.gsInput(this.value)" onkeydown="App.gsKey(event)"
             onfocus="App.gsInput(this.value)" onblur="setTimeout(()=>App.closeGS(),150)">
         </div>
-        <div class="gs-results" id="gsResults" hidden></div>
+        <div class="gs-results" id="gsResults" data-id="global.lista.resultados-busca-global" hidden></div>
       </div>
     </div>
     <div class="topbar-actions">
-      <button class="btn sm" id="exportBtn" onclick="App.go('relatorios')">
+      <button class="btn sm" id="exportBtn" data-id="global.botao.relatorios" onclick="App.go('relatorios')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12l-4-4m4 4l4-4M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3"/></svg>
         Relatórios
       </button>
-      <button class="icon-btn" id="themeBtn" title="Alternar tema">
+      <button class="icon-btn" id="themeBtn" data-id="global.botao.alternar-tema" title="Alternar tema">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4l1.4-1.4"/></svg>
       </button>
       <div class="notif-wrap">
-        <button class="icon-btn" id="notifBtn" title="Notificações" onclick="App.toggleNotif()">
+        <button class="icon-btn" id="notifBtn" data-id="global.botao.notificacoes" title="Notificações" onclick="App.toggleNotif()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span class="notif-dot" id="notifDot" hidden></span>
+          <span class="notif-dot" id="notifDot" data-id="global.selo.notificacoes-pendentes" hidden></span>
         </button>
-        <div class="notif-panel" id="notifPanel" hidden></div>
+        <div class="notif-panel" id="notifPanel" data-id="global.lista.notificacoes" hidden></div>
       </div>
       <div id="userChip"></div>
     </div>
@@ -1778,7 +1819,7 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
 
   <!-- ====================== SIDEBAR ====================== -->
   <aside class="sidebar" id="sidebar">
-    <nav class="nav" id="nav"><!-- itens injetados via JS --></nav>
+    <nav class="nav" id="nav" data-id="global.menu.navegacao-principal"><!-- itens injetados via JS --></nav>
     <div class="side-foot">
       <span class="sf-tag">Conexão que transforma</span>
       Onboarding B2B · v8.0
@@ -2321,7 +2362,8 @@ function migrate(db){
     if(c.criadoEm===undefined) c.criadoEm=c.dataAssinatura||''; if(c.criadoPor===undefined) c.criadoPor='';
     c.ativos.forEach(a=>{ if(!a.regiao&&a.estado) a.regiao=regiaoDoEstado(a.estado); if(a.quantidade==null) a.quantidade=1;
       if(a.vgv==null) a.vgv=0; if(a.unidades==null) a.unidades=0; if(a.statusAtivo==null) a.statusAtivo='';
-      if(a.criadoEm===undefined) a.criadoEm=c.criadoEm||''; if(a.criadoPor===undefined) a.criadoPor=''; }); });
+      if(a.criadoEm===undefined) a.criadoEm=c.criadoEm||''; if(a.criadoPor===undefined) a.criadoPor='';
+      if(!Array.isArray(a.servicos)) a.servicos=[]; }); });
   db.propostas.forEach(p=>{ const MAP={'Elaborada':'Proposta Elaborada','Enviada':'Proposta Enviada','Aprovada':'Proposta Aprovada','Assinada':'Contrato Assinado','Perdida':'Proposta Perdida'};
     if(MAP[p.status]) p.status=MAP[p.status];
     if(!Array.isArray(p.produtos)) p.produtos = p.produto? [p.produto] : [];
@@ -2388,7 +2430,8 @@ function rowToAtivo(r){ return {id:r.id,nome:r.nome,estado:nz(r.estado),cidade:n
   endereco:nz(r.endereco),cep:nz(r.cep),
   dataLancamento:nz(r.data_lancamento),dataInicioObra:nz(r.data_inicio_obra),dataFimObra:nz(r.data_fim_obra),
   posObraMeses:r.pos_obra_meses==null?0:r.pos_obra_meses,posOperacionalMeses:r.pos_operacional_meses==null?0:r.pos_operacional_meses,
-  obrasNaRegiao:r.obras_na_regiao==null?0:r.obras_na_regiao,distanciaMaxObras:r.distancia_max_obras==null?0:r.distancia_max_obras}; }
+  obrasNaRegiao:r.obras_na_regiao==null?0:r.obras_na_regiao,distanciaMaxObras:r.distancia_max_obras==null?0:r.distancia_max_obras,
+  servicos:Array.isArray(r.servicos)?r.servicos:[]}; }
 function ativoToRow(a,clienteId){ return {id:a.id,cliente_id:clienteId,nome:a.nome,estado:nn(a.estado),cidade:nn(a.cidade),
   regiao:nn(a.regiao),tipologia:nn(a.tipologia),quantidade:a.quantidade||1,unidades:a.unidades||0,vgv:a.vgv||0,
   status_ativo:nn(a.statusAtivo),criado_em:nn(a.criadoEm),criado_por:nn(a.criadoPor),obs:nn(a.obs),
@@ -2397,7 +2440,7 @@ function ativoToRow(a,clienteId){ return {id:a.id,cliente_id:clienteId,nome:a.no
   endereco:nn(a.endereco),cep:nn(a.cep),
   data_lancamento:nn(a.dataLancamento),data_inicio_obra:nn(a.dataInicioObra),data_fim_obra:nn(a.dataFimObra),
   pos_obra_meses:a.posObraMeses||0,pos_operacional_meses:a.posOperacionalMeses||0,
-  obras_na_regiao:a.obrasNaRegiao||0,distancia_max_obras:a.distanciaMaxObras||0}; }
+  obras_na_regiao:a.obrasNaRegiao||0,distancia_max_obras:a.distanciaMaxObras||0,servicos:a.servicos||[]}; }
 function rowToRepresentante(r){ return {id:r.id,nome:r.nome,cargo:nz(r.cargo),cpf:nz(r.cpf),email:nz(r.email),
   telefone:nz(r.telefone),principal:!!r.principal,criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por)}; }
 function representanteToRow(p,clienteId){ return {id:p.id,cliente_id:clienteId,nome:p.nome,cargo:nn(p.cargo),cpf:nn(p.cpf),
@@ -2846,6 +2889,60 @@ const STATUS_NEG_TONE = {'Proposta':'blue','Minuta':'violet','Aguardando Assinat
 const CLASSIFICACOES = ['1P','3P'];
 const NOVA_OP_ID = '__nova_operacao__';
 function azoProposalUrl(numero){ return `https://trinus.azo.blue/#/workflows/11/proposals/details/${encodeURIComponent(numero)}`; }
+// Catálogo de serviços comerciais Trinus (extraído da proposta comercial) — nome apenas por ora; escopo completo fica para uma página de apoio futura
+const SERVICOS_TRINUS = [
+  {cat:'Obras',nome:'Análise Orçamentária – N1'},
+  {cat:'Obras',nome:'Análise Orçamentária – N2'},
+  {cat:'Obras',nome:'Análise Orçamentária – N3'},
+  {cat:'Obras',nome:'Elaboração de Orçamento – N1'},
+  {cat:'Obras',nome:'Elaboração de Orçamento – N2'},
+  {cat:'Obras',nome:'Elaboração de Orçamento – N3'},
+  {cat:'Obras',nome:'Elaboração de Orçamento – N4'},
+  {cat:'Obras',nome:'Elaboração de Cronograma'},
+  {cat:'Obras',nome:'Monitoramento de Obras – N1'},
+  {cat:'Obras',nome:'Monitoramento de Obras – N2'},
+  {cat:'Obras',nome:'Monitoramento de Obras e Controladoria – N3'},
+  {cat:'Obras',nome:'Suprimentos Estratégicos'},
+  {cat:'Obras',nome:'Gerenciamento e Fiscalização de Obras – Incorporação, Multipropriedades e Malls'},
+  {cat:'Obras',nome:'Gerenciamento e Fiscalização de Obras – Urbanismo, Loteamento Aberto ou Condomínio Fechado'},
+  {cat:'Recebíveis',nome:'Auditoria de Recebíveis'},
+  {cat:'Recebíveis',nome:'Monitoramento de Recebíveis'},
+  {cat:'Recebíveis',nome:'Secretaria de Vendas'},
+  {cat:'Recebíveis',nome:'Gestão de Carteira'},
+  {cat:'Gestão Financeira',nome:'Explora'},
+  {cat:'Gestão Financeira',nome:'Conexão'},
+  {cat:'Gestão Financeira',nome:'Conexão Pro'},
+  {cat:'Gestão Financeira',nome:'Conexão Pro – Holding'},
+  {cat:'Gestão Financeira',nome:'Gestão 360 N2'},
+  {cat:'Gestão Financeira',nome:'Gestão 360 N3'},
+  {cat:'Gestão Financeira',nome:'Gestão 360 – Holding'},
+  {cat:'Gestão Financeira',nome:'Plano de Negócios'},
+  {cat:'Gestão Financeira',nome:'Gerente de Incorporação – N1'},
+  {cat:'Gestão Financeira',nome:'Gerente de Incorporação – N2'},
+  {cat:'Gestão Financeira',nome:'Elaboração de Viabilidade'},
+  {cat:'Gestão Financeira',nome:'Monitoramento de Fluxo Financeiro e Viabilidade'},
+  {cat:'Gestão Financeira',nome:'Monitoramento de Projetos e Produtos N1'},
+  {cat:'Gestão Financeira',nome:'Monitoramento de Projetos e Produtos N2'},
+];
+function servicosCatalogFiltrado(q){
+  const query=(q||'').trim().toLowerCase();
+  const idxs=[]; SERVICOS_TRINUS.forEach((s,idx)=>{ if(!query||s.nome.toLowerCase().includes(query)) idxs.push(idx); });
+  return idxs;
+}
+function servicoResultsMarkup(idxs,jaSelecionados,prefix,i){
+  if(!idxs.length) return '<p style="grid-column:1/-1;font-size:12.5px;color:var(--txt-3);margin:4px 0">Nenhum serviço encontrado.</p>';
+  return idxs.map(idx=>{
+    const nome=SERVICOS_TRINUS[idx].nome, already=(jaSelecionados||[]).includes(nome);
+    return `<div class="serv-item${already?' disabled':''}" data-id="ativo.selo.servico-catalogo" ${already?'':`onclick="App.${prefix}ServicoAdd(${i},${idx})"`} title="${esc(nome)}">
+      <span class="serv-item-nome">${esc(nome)}</span>
+      <span class="serv-item-ico">${already?svg(I.check,2.4):svg(I.plus,2.4)}</span>
+    </div>`;
+  }).join('');
+}
+function servicosChipsMarkup(servicos,prefix,i){
+  if(!servicos||!servicos.length) return '<p style="font-size:12px;color:var(--txt-3);margin:8px 0 0">Nenhum serviço adicionado.</p>';
+  return `<div class="serv-chips">${servicos.map((nome,i2)=>`<span class="serv-chip" data-id="ativo.selo.servico-selecionado">${esc(nome)}<button type="button" onclick="event.stopPropagation();App.${prefix}ServicoDel(${i},${i2})" title="Remover">×</button></span>`).join('')}</div>`;
+}
 // Acessores da configuração central (settings) — valores editáveis sem alterar código
 const cfgTipologias = ()=> (DB().config.tipologias&&DB().config.tipologias.length)?DB().config.tipologias:TIPOLOGIAS;
 const cfgEmpresa = ()=> DB().config.empresa||'Trinus';
@@ -2904,12 +3001,13 @@ function buildNav(){
     if(group){ pendingGroup=group; }
     if(hideNav) return;
     if(pendingGroup && pendingGroup!==lastGroup){ html+=`<div class="nav-label">${pendingGroup}</div>`; lastGroup=pendingGroup; pendingGroup=null; }
-    html+=`<button class="nav-item ${id===current?'active':''}" data-go="${id}">
-       ${svg(icon)}<span>${label}</span><span class="nav-badge" data-badge="${id}"></span>
+    const idKebab=id.replace(/([A-Z])/g,'-$1').toLowerCase();
+    html+=`<button class="nav-item ${id===current?'active':''}" data-go="${id}" data-id="global.botao.nav-${idKebab}">
+       ${svg(icon)}<span>${label}</span><span class="nav-badge" data-badge="${id}" data-id="global.selo.nav-contagem-${idKebab}"></span>
      </button>`;
   });
   el('nav').innerHTML=html;
-  el('nav').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>App.go(b.dataset.go));
+  el('nav').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>App.go(b.dataset.go,true));
   const risco=DB().clientes.filter(c=>{const h=calcHealth(c.id);return h&&h.tone==='red';}).length;
   const hb=el('nav').querySelector('[data-badge="health"]'); if(hb) hb.innerHTML = risco?`<span class="badge">${risco}</span>`:'';
   const atrasadas=DB().activities.filter(a=>farolAtividade(a).tone==='red').length;
@@ -2948,17 +3046,17 @@ function buildFilters(){
   const selCli=cs.find(c=>c.id===filters.cliente);
   el('filters').innerHTML = `
     <span class="fl-label">Filtros</span>
-    <input class="cli-search" id="fCliente" list="dlClientes" placeholder="Buscar cliente…" value="${selCli?esc(selCli.nome):''}" autocomplete="off">
+    <input class="cli-search" id="fCliente" data-id="global.filtro.buscar-cliente" list="dlClientes" placeholder="Buscar cliente…" value="${selCli?esc(selCli.nome):''}" autocomplete="off">
     <datalist id="dlClientes">${cs.map(c=>`<option value="${esc(c.nome)}"></option>`).join('')}</datalist>
-    <select data-f="ka"><option value="">Key Account</option>${KEY_ACCOUNTS.map(v=>opt(v,v,filters.ka)).join('')}</select>
-    <select data-f="onb"><option value="">Onboarding</option>${ANALISTAS.map(v=>opt(v,v,filters.onb)).join('')}</select>
-    <select data-f="produto"><option value="">Produto</option>${produtos().map(v=>opt(v,v,filters.produto)).join('')}</select>
-    <select data-f="tipologia"><option value="">Tipologia</option>${cfgTipologias().map(v=>opt(v,v,filters.tipologia)).join('')}</select>
-    <select data-f="etapa"><option value="">Etapa</option>${ETAPAS.map(e=>opt(e.key,e.label,filters.etapa)).join('')}</select>
-    <select data-f="status"><option value="">Status</option>${[...STATUS_OPCOES,'Em Atraso'].map(v=>opt(v,v,filters.status)).join('')}</select>
-    <select data-f="health"><option value="">Health Score</option>${opt('saudavel','🟢 Saudável',filters.health)}${opt('atencao','🟡 Atenção',filters.health)}${opt('risco','🔴 Risco',filters.health)}</select>
-    <button class="btn primary sm" id="applyF">${svg(I.search,1.8)} Buscar</button>
-    <button class="btn ghost sm" id="clearF">Limpar</button>`;
+    <select data-f="ka" data-id="global.filtro.key-account"><option value="">Key Account</option>${KEY_ACCOUNTS.map(v=>opt(v,v,filters.ka)).join('')}</select>
+    <select data-f="onb" data-id="global.filtro.onboarding"><option value="">Onboarding</option>${ANALISTAS.map(v=>opt(v,v,filters.onb)).join('')}</select>
+    <select data-f="produto" data-id="global.filtro.produto"><option value="">Produto</option>${produtos().map(v=>opt(v,v,filters.produto)).join('')}</select>
+    <select data-f="tipologia" data-id="global.filtro.tipologia"><option value="">Tipologia</option>${cfgTipologias().map(v=>opt(v,v,filters.tipologia)).join('')}</select>
+    <select data-f="etapa" data-id="global.filtro.etapa"><option value="">Etapa</option>${ETAPAS.map(e=>opt(e.key,e.label,filters.etapa)).join('')}</select>
+    <select data-f="status" data-id="global.filtro.status"><option value="">Status</option>${[...STATUS_OPCOES,'Em Atraso'].map(v=>opt(v,v,filters.status)).join('')}</select>
+    <select data-f="health" data-id="global.filtro.health-score"><option value="">Health Score</option>${opt('saudavel','🟢 Saudável',filters.health)}${opt('atencao','🟡 Atenção',filters.health)}${opt('risco','🔴 Risco',filters.health)}</select>
+    <button class="btn primary sm" id="applyF" data-id="global.botao.aplicar-filtros">${svg(I.search,1.8)} Buscar</button>
+    <button class="btn ghost sm" id="clearF" data-id="global.botao.limpar-filtros">Limpar</button>`;
   el('filters').querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{filters[s.dataset.f]=s.value;App.refresh();});
   const ci=el('fCliente');
   const commitCliente=()=>{ const v=ci.value.trim().toLowerCase();
@@ -2969,7 +3067,7 @@ function buildFilters(){
 }
 
 /* ============================ COMPONENTES REUTILIZÁVEIS ============================ */
-const badge=(txt,tone)=>`<span class="badge b-${tone}"><span class="d"></span>${esc(txt)}</span>`;
+const badge=(txt,tone,dataId)=>`<span class="badge b-${tone}"${dataId?` data-id="${dataId}"`:''}><span class="d"></span>${esc(txt)}</span>`;
 const semaforo=tone=>`<span class="badge b-${tone}" style="padding:3px 7px"><span class="d"></span></span>`;
 function statusBadge(c){
   const s=statusEfetivo(c);
@@ -3390,9 +3488,9 @@ const KPI_ICO=[[/pesquisa|nps|experi/i,'survey'],[/health|saúde|risco/i,'health
   [/kickoff|onboarding|implanta|operaç/i,'route'],[/atividad|pendênc|tarefa|atras/i,'bolt'],
   [/interaç|whatsapp|conversa/i,'chat'],[/usuár|equipe|respons/i,'users'],[/relat|report/i,'report']];
 function kpiIcon(lbl){ const t=String(lbl||''); for(const [re,ic] of KPI_ICO){ if(re.test(t)) return I[ic]||I.dashboard; } return I.dashboard; }
-function kpi(cls,lbl,val,unit,foot){
+function kpi(cls,lbl,val,unit,foot,dataId){
   const tip=String(lbl||'')+(foot?' — '+String(foot).replace(/<[^>]*>/g,''):'');
-  return `<div class="kpi ${cls}" title="${esc(tip)}">
+  return `<div class="kpi ${cls}" ${dataId?`data-id="${dataId}"`:''} title="${esc(tip)}">
     <div class="top"><span class="kpi-ico">${svg(kpiIcon(lbl))}</span><span class="lbl">${lbl}</span></div>
     <div class="val">${val}<span class="unit">${unit||''}</span></div><div class="foot">${foot||''}</div></div>`;
 }
@@ -3493,7 +3591,7 @@ function renderFicha(id){
     <div class="card-body"><div class="form-grid">
       <div class="field"><label>Razão Social *</label><input id="f_nome" ${ro?'disabled':''} value="${esc(c.nome||'')}" placeholder="Razão social completa"></div>
       <div class="field"><label>Nome Fantasia</label><input id="f_fantasia" ${ro?'disabled':''} value="${esc(c.nomeFantasia||'')}" placeholder="Como o cliente é conhecido"></div>
-      <div class="field"><label>CNPJ</label><input id="f_cnpj" ${ro?'disabled':''} value="${esc(c.cnpj||'')}" placeholder="00.000.000/0000-00"></div>
+      <div class="field"><label>CNPJ</label><input id="f_cnpj" data-id="cadastro.campo.cnpj-holding" ${ro?'disabled':''} value="${esc(c.cnpj||'')}" placeholder="00.000.000/0000-00"></div>
       <div class="field full"><label>Endereço</label><input id="f_endereco" ${ro?'disabled':''} value="${esc(c.endereco||'')}" placeholder="Logradouro, número, complemento"></div>
       <div class="field"><label>Estado</label><select id="f_estado" ${ro?'disabled':''}>${ufOpts(c.estado||'')}</select></div>
       <div class="field"><label>Cidade</label><input id="f_cidade" ${ro?'disabled':''} value="${esc(c.cidade||'')}"></div>
@@ -4286,47 +4384,47 @@ function renderNovaOperacao(){
   const opsExistentes = linkedCli? (linkedCli.operacoes||[]) : [];
   el('view-jornada').innerHTML=`
   <div class="section-bar" style="margin-top:0">
-    <button class="btn ghost sm" onclick="App.cancelarNovaOperacao()">${svg(I.back)} Voltar</button>
+    <button class="btn ghost sm" data-id="jornada.botao.voltar-nova-operacao" onclick="App.cancelarNovaOperacao()">${svg(I.back)} Voltar</button>
   </div>
-  <div class="card"><div class="card-head"><div class="ico">${svg(I.route)}</div><h3>Nova Operação</h3>
+  <div class="card" data-id="jornada.card.dados-nova-operacao"><div class="card-head"><div class="ico">${svg(I.route)}</div><h3>Nova Operação</h3>
     <span class="desc">dados iniciais para abrir a operação comercial</span></div>
     <div class="card-body">
       <div class="field op-busca-wrap" style="max-width:420px;margin-bottom:14px">
         <label>Buscar cliente já cadastrado</label>
-        <input id="op_busca" placeholder="CNPJ, Razão Social ou Nome Comercial…" autocomplete="off"
+        <input id="op_busca" data-id="jornada.campo.buscar-cliente" placeholder="CNPJ, Razão Social ou Nome Comercial…" autocomplete="off"
           value="${linkedCli?esc(linkedCli.nome):''}" oninput="App.opBuscarCliente(this.value)">
         <div class="op-busca-results" id="op_busca_results" hidden></div>
       </div>
-      ${linkedCli?`<div class="op-cliente-vinculado"><span class="ico-sm" style="color:var(--green)">${svg(I.check)}</span> Vinculado a <b>${esc(linkedCli.nome)}</b> — dados e ativos do cadastro foram carregados.
-        <div class="spacer"></div><button type="button" class="btn ghost sm" onclick="App.opLimparCliente()">Desvincular</button></div>`:''}
-      ${opsExistentes.length?`<div class="op-hist"><span class="op-hist-label">Operações já criadas para este cliente:</span>
+      ${linkedCli?`<div class="op-cliente-vinculado" data-id="jornada.secao.cliente-vinculado"><span class="ico-sm" style="color:var(--green)">${svg(I.check)}</span> Vinculado a <b>${esc(linkedCli.nome)}</b> — dados e ativos do cadastro foram carregados.
+        <div class="spacer"></div><button type="button" class="btn ghost sm" data-id="jornada.botao.desvincular-cliente" onclick="App.opLimparCliente()">Desvincular</button></div>`:''}
+      ${opsExistentes.length?`<div class="op-hist" data-id="jornada.secao.operacoes-existentes"><span class="op-hist-label">Operações já criadas para este cliente:</span>
         ${opsExistentes.map(o=>`<a class="op-chip" href="#cliente=${encodeURIComponent(_opClienteId)}" target="_blank" rel="noopener">Nº ${esc(o.numero||'—')} · ${esc(o.statusNegociacao||'—')}</a>`).join('')}</div>`:''}
       <div class="form-flow">
-        <div class="field f-sm"><label>Número da Operação</label><input id="op_numero" value="${esc(_opDraft.numero)}" placeholder="Ex.: nº no ASO" onchange="App.opFieldChange('numero',this)"></div>
-        <div class="field f-md"><label>Status</label><select id="op_estagio" onchange="App.opFieldChange('estagio',this)">${STATUS_NEGOCIACAO.map(s=>`<option ${_opDraft.estagio===s?'selected':''}>${s}</option>`).join('')}</select></div>
-        <div class="field f-xs"><label>Classificação</label><select id="op_classif" onchange="App.opFieldChange('classif',this)"><option value="">—</option>${CLASSIFICACOES.map(c=>`<option ${_opDraft.classif===c?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="field f-sm"><label>Número da Operação</label><input id="op_numero" data-id="jornada.campo.numero-operacao" value="${esc(_opDraft.numero)}" placeholder="Ex.: nº no ASO" onchange="App.opFieldChange('numero',this)"></div>
+        <div class="field f-md"><label>Status</label><select id="op_estagio" data-id="jornada.campo.status-operacao" onchange="App.opFieldChange('estagio',this)">${STATUS_NEGOCIACAO.map(s=>`<option ${_opDraft.estagio===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field f-xs"><label>Classificação</label><select id="op_classif" data-id="jornada.campo.classificacao" onchange="App.opFieldChange('classif',this)"><option value="">—</option>${CLASSIFICACOES.map(c=>`<option ${_opDraft.classif===c?'selected':''}>${c}</option>`).join('')}</select></div>
         <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="op_elite" ${_opDraft.elite?'checked':''} onchange="App.opFieldChange('elite',this)"> <span class="ico-sm">${svg(I.star,1.8)}</span> Cliente Elite</label></div>
-        <div class="field f-lg"><label>Nome Comercial</label><input id="op_fantasia" value="${esc(_opDraft.fantasia)}" placeholder="Como o cliente é conhecido" onchange="App.opFieldChange('fantasia',this)"></div>
-        <div class="field f-grow"><label>Razão Social *</label><input id="op_nome" value="${esc(_opDraft.nome)}" placeholder="Razão social completa" onchange="App.opFieldChange('nome',this)"></div>
-        <div class="field f-sm"><label>CNPJ</label><input id="op_cnpj" value="${esc(_opDraft.cnpj)}" placeholder="00.000.000/0000-00" onchange="App.opFieldChange('cnpj',this)"></div>
-        <div class="field f-lg"><label>Cidade</label><input id="op_cidade" value="${esc(_opDraft.cidade)}" onchange="App.opFieldChange('cidade',this)"></div>
-        <div class="field f-xs"><label>UF</label><select id="op_estado" onchange="App.opFieldChange('estado',this)">${ufOpts(_opDraft.estado)}</select></div>
-        <div class="field f-md"><label>Tipologia</label><select id="op_tip" onchange="App.opFieldChange('tip',this)">${TIPOLOGIAS.map(t=>`<option ${_opDraft.tip===t?'selected':''}>${t}</option>`).join('')}</select></div>
-        <div class="field f-full"><label>Observações</label><textarea id="op_obs" style="min-height:52px" onchange="App.opFieldChange('obs',this)">${esc(_opDraft.obs)}</textarea></div>
+          <input type="checkbox" id="op_elite" data-id="jornada.campo.cliente-elite" ${_opDraft.elite?'checked':''} onchange="App.opFieldChange('elite',this)"> <span class="ico-sm">${svg(I.star,1.8)}</span> Cliente Elite</label></div>
+        <div class="field f-lg"><label>Nome Comercial</label><input id="op_fantasia" data-id="jornada.campo.nome-comercial" value="${esc(_opDraft.fantasia)}" placeholder="Como o cliente é conhecido" onchange="App.opFieldChange('fantasia',this)"></div>
+        <div class="field f-grow"><label>Razão Social *</label><input id="op_nome" data-id="jornada.campo.razao-social" value="${esc(_opDraft.nome)}" placeholder="Razão social completa" onchange="App.opFieldChange('nome',this)"></div>
+        <div class="field f-sm"><label>CNPJ</label><input id="op_cnpj" data-id="jornada.campo.cnpj" value="${esc(_opDraft.cnpj)}" placeholder="00.000.000/0000-00" onchange="App.opFieldChange('cnpj',this)"></div>
+        <div class="field f-lg"><label>Cidade</label><input id="op_cidade" data-id="jornada.campo.cidade" value="${esc(_opDraft.cidade)}" onchange="App.opFieldChange('cidade',this)"></div>
+        <div class="field f-xs"><label>UF</label><select id="op_estado" data-id="jornada.campo.uf" onchange="App.opFieldChange('estado',this)">${ufOpts(_opDraft.estado)}</select></div>
+        <div class="field f-md"><label>Tipologia</label><select id="op_tip" data-id="jornada.campo.tipologia" onchange="App.opFieldChange('tip',this)">${TIPOLOGIAS.map(t=>`<option ${_opDraft.tip===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="field f-full"><label>Observações</label><textarea id="op_obs" data-id="jornada.campo.observacoes-operacao" style="min-height:52px" onchange="App.opFieldChange('obs',this)">${esc(_opDraft.obs)}</textarea></div>
       </div>
     </div>
   </div>
 
-  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos</h3>
+  <div class="card" style="margin-top:16px" data-id="jornada.card.ativos-nova-operacao"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos</h3>
     <span class="desc">empreendimentos vinculados a esta operação</span><span class="pill" id="op_ativos_pill">${_opAtivos.length} ativo(s)</span>
-    <div class="spacer"></div><button type="button" class="btn primary sm" onclick="App.opAtivoAdd()">${svg(I.plus)} Adicionar ativo</button></div>
+    <div class="spacer"></div><button type="button" class="btn primary sm" data-id="jornada.botao.adicionar-ativo" onclick="App.opAtivoAdd()">${svg(I.plus)} Adicionar ativo</button></div>
     <div class="card-body"><div id="op_ativos_list"></div></div>
   </div>
 
   <div class="section-bar"><div class="spacer"></div>
-    <button class="btn ghost" onclick="App.cancelarNovaOperacao()">Cancelar</button>
-    <button class="btn primary" onclick="App.salvarNovaOperacao()">${svg(I.check)} Salvar Operação</button></div>`;
+    <button class="btn ghost" data-id="jornada.botao.cancelar-nova-operacao" onclick="App.cancelarNovaOperacao()">Cancelar</button>
+    <button class="btn primary" data-id="jornada.botao.salvar-nova-operacao" onclick="App.salvarNovaOperacao()">${svg(I.check)} Salvar Operação</button></div>`;
   opAtivoListRender();
 }
 function ativoAccordionMarkup(list, prefix){
@@ -4334,43 +4432,58 @@ function ativoAccordionMarkup(list, prefix){
   const sub=(txt)=>`<div class="field full ativo-sub">${txt}</div>`;
   return list.length ? list.map((a,i)=>{
     const open=!!a._open;
+    const servOpen=a._servOpen!==false;
     const titulo = a.semNomeDefinido? 'Sem nome definido' : (a.nome||`Ativo ${i+1}`);
     const local = [a.cidade,a.estado].filter(Boolean).join('/');
-    return `<div class="op-ativo-card ${open?'open':''}">
+    return `<div class="op-ativo-card ${open?'open':''}" data-id="ativo.card.principal">
       <div class="op-ativo-head" onclick="App.${prefix}Toggle(${i})">
         <div class="op-ativo-ico">${svg(I.activation)}</div>
         <div class="op-ativo-titulo"><b>${esc(titulo)}</b><small>${local?esc(local):'—'}</small></div>
         <span class="badge b-slate">${esc(a.statusAtivo||'Etapa não definida')}</span>
-        <button type="button" class="btn ghost sm" onclick="event.stopPropagation();App.${prefix}Dup(${i})" title="Duplicar">${svg(I.copy)}</button>
-        <button type="button" class="btn ghost sm" onclick="event.stopPropagation();App.${prefix}Del(${i})" title="Remover">${svg(I.trash)}</button>
-        <span class="op-ativo-chev">${svg(I.chevronDown)}</span>
+        <button type="button" class="btn ghost sm" data-id="ativo.botao.duplicar" onclick="event.stopPropagation();App.${prefix}Dup(${i})" title="Duplicar">${svg(I.copy)}</button>
+        <button type="button" class="btn ghost sm" data-id="ativo.botao.remover" onclick="event.stopPropagation();App.${prefix}Del(${i})" title="Remover">${svg(I.trash)}</button>
+        <span class="op-ativo-chev" data-id="ativo.botao.aglutinar">${svg(I.chevronDown)}</span>
       </div>
-      ${open?`<div class="op-ativo-body"><div class="ativo-grid">
+      ${open?`<div class="op-ativo-body">
+        <div class="serv-block" data-id="ativo.card.servicos-contratados">
+          <div class="serv-block-head" onclick="App.${prefix}ServicoToggle(${i})">
+            <span class="serv-block-label">${svg(I.activation)} Serviços Contratados</span>
+            <span class="badge b-slate">${(a.servicos&&a.servicos.length)||0} serviço(s)</span>
+            <span class="serv-block-chev${servOpen?' open':''}" data-id="ativo.botao.aglutinar-servicos" title="${servOpen?'Aglutinar':'Expandir'}">${svg(I.chevronDown)}</span>
+          </div>
+          ${servOpen?`<div class="serv-block-body">
+            <input class="serv-busca-input" data-id="ativo.campo.buscar-servico" placeholder="Buscar ou clicar num serviço abaixo…" autocomplete="off" oninput="event.stopPropagation();App.${prefix}ServicoBusca(${i},this.value)" onclick="event.stopPropagation()" style="width:100%">
+            <div class="serv-list" id="${prefix}_serv_res_${i}" data-id="ativo.lista.servicos-catalogo" onclick="event.stopPropagation()">${servicoResultsMarkup(servicosCatalogFiltrado(''),a.servicos,prefix,i)}</div>
+            ${servicosChipsMarkup(a.servicos,prefix,i)}
+          </div>`:''}
+        </div>
+        <div class="ativo-grid">
         ${sub('Identificação')}
-        <div class="field"><label>Nome do Empreendimento</label><input ${a.semNomeDefinido?'disabled':''} value="${esc(a.nome||'')}" onchange="App.${prefix}Set(${i},'nome',this.value)" placeholder="Ex.: SPE Jardim Aurora"></div>
+        <div class="field"><label>Nome do Empreendimento</label><input data-id="ativo.campo.nome-empreendimento" ${a.semNomeDefinido?'disabled':''} value="${esc(a.nome||'')}" onchange="App.${prefix}Set(${i},'nome',this.value)" placeholder="Ex.: SPE Jardim Aurora"></div>
         <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" ${a.semNomeDefinido?'checked':''} onchange="App.${prefix}Set(${i},'semNomeDefinido',this.checked)"> Sem nome definido</label></div>
+          <input type="checkbox" data-id="ativo.campo.sem-nome-definido" ${a.semNomeDefinido?'checked':''} onchange="App.${prefix}Set(${i},'semNomeDefinido',this.checked)"> Sem nome definido</label></div>
         <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" ${a.empresaNaoConstituida?'checked':''} onchange="App.${prefix}Set(${i},'empresaNaoConstituida',this.checked)"> Empresa não constituída</label></div>
-        <div class="field"><label>Razão Social</label><input ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.razaoSocial||'')}" onchange="App.${prefix}Set(${i},'razaoSocial',this.value)" placeholder="Razão social da SPE"></div>
-        <div class="field"><label>CNPJ</label><input ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.cnpj||'')}" onchange="App.${prefix}Set(${i},'cnpj',this.value)" placeholder="00.000.000/0000-00"></div>
-        <div class="field"><label>Tipo do Ativo</label><select onchange="App.${prefix}Set(${i},'tipologia',this.value)">${TIPOLOGIAS.map(t=>`<option ${a.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
+          <input type="checkbox" data-id="ativo.campo.empresa-nao-constituida" ${a.empresaNaoConstituida?'checked':''} onchange="App.${prefix}Set(${i},'empresaNaoConstituida',this.checked)"> Empresa não constituída</label></div>
+        <div class="field"><label>Razão Social</label><input data-id="ativo.campo.razao-social" ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.razaoSocial||'')}" onchange="App.${prefix}Set(${i},'razaoSocial',this.value)" placeholder="Razão social da SPE"></div>
+        <div class="field"><label>CNPJ</label><input data-id="ativo.campo.cnpj" ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.cnpj||'')}" onchange="App.${prefix}Set(${i},'cnpj',this.value)" placeholder="00.000.000/0000-00"></div>
+        <div class="field"><label>Tipo do Ativo</label><select data-id="ativo.campo.tipo-ativo" onchange="App.${prefix}Set(${i},'tipologia',this.value)">${TIPOLOGIAS.map(t=>`<option ${a.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
         ${sub('Localização')}
-        <div class="field"><label>Estado</label><select onchange="App.${prefix}SetEstado(${i},this.value)">${ufOpt(a.estado||'')}</select></div>
-        <div class="field"><label>Cidade</label><input value="${esc(a.cidade||'')}" onchange="App.${prefix}Set(${i},'cidade',this.value)"></div>
+        <div class="field"><label>Estado</label><select data-id="ativo.campo.estado" onchange="App.${prefix}SetEstado(${i},this.value)">${ufOpt(a.estado||'')}</select></div>
+        <div class="field"><label>Cidade</label><input data-id="ativo.campo.cidade" value="${esc(a.cidade||'')}" onchange="App.${prefix}Set(${i},'cidade',this.value)"></div>
         ${sub('Números do Empreendimento')}
-        <div class="field"><label>Status do Ativo</label><select onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
-        <div class="field"><label>Total de Unidades</label><input type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.${prefix}Set(${i},'unidades',this.value)"></div>
-        <div class="field"><label>Unidades Vendidas</label><input type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.${prefix}Set(${i},'unidadesVendidas',this.value)"></div>
-        <div class="field"><label>VGV (R$)</label><input type="number" min="0" step="1000" value="${a.vgv!=null?a.vgv:0}" onchange="App.${prefix}Set(${i},'vgv',this.value)"></div>
+        <div class="field"><label>Status do Ativo</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Total de Unidades</label><input data-id="ativo.campo.total-unidades" type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.${prefix}Set(${i},'unidades',this.value)"></div>
+        <div class="field"><label>Unidades Vendidas</label><input data-id="ativo.campo.unidades-vendidas" type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.${prefix}Set(${i},'unidadesVendidas',this.value)"></div>
+        <div class="field"><label>VGV (R$)</label><input data-id="ativo.campo.vgv" type="number" min="0" step="1000" value="${a.vgv!=null?a.vgv:0}" onchange="App.${prefix}Set(${i},'vgv',this.value)"></div>
         ${sub('Cronograma da Obra')}
-        <div class="field"><label>Lançamento</label><input type="date" value="${a.dataLancamento||''}" onchange="App.${prefix}Set(${i},'dataLancamento',this.value)"></div>
-        <div class="field"><label>Início da Obra</label><input type="date" value="${a.dataInicioObra||''}" onchange="App.${prefix}Set(${i},'dataInicioObra',this.value)"></div>
-        <div class="field"><label>Fim da Obra</label><input type="date" value="${a.dataFimObra||''}" onchange="App.${prefix}Set(${i},'dataFimObra',this.value)"></div>
-        <div class="field"><label>Pós-obra (meses)</label><input type="number" min="0" value="${a.posObraMeses!=null?a.posObraMeses:0}" onchange="App.${prefix}Set(${i},'posObraMeses',this.value)"></div>
-        <div class="field"><label>Pós-operacional (meses)</label><input type="number" min="0" value="${a.posOperacionalMeses!=null?a.posOperacionalMeses:0}" onchange="App.${prefix}Set(${i},'posOperacionalMeses',this.value)"></div>
-        <div class="field full"><label>Observações</label><input value="${esc(a.obs||'')}" onchange="App.${prefix}Set(${i},'obs',this.value)"></div>
-      </div></div>`:''}
+        <div class="field"><label>Lançamento</label><input data-id="ativo.campo.data-lancamento" type="date" value="${a.dataLancamento||''}" onchange="App.${prefix}Set(${i},'dataLancamento',this.value)"></div>
+        <div class="field"><label>Início da Obra</label><input data-id="ativo.campo.data-inicio-obra" type="date" value="${a.dataInicioObra||''}" onchange="App.${prefix}Set(${i},'dataInicioObra',this.value)"></div>
+        <div class="field"><label>Fim da Obra</label><input data-id="ativo.campo.data-fim-obra" type="date" value="${a.dataFimObra||''}" onchange="App.${prefix}Set(${i},'dataFimObra',this.value)"></div>
+        <div class="field"><label>Pós-obra (meses)</label><input data-id="ativo.campo.pos-obra-meses" type="number" min="0" value="${a.posObraMeses!=null?a.posObraMeses:0}" onchange="App.${prefix}Set(${i},'posObraMeses',this.value)"></div>
+        <div class="field"><label>Pós-operacional (meses)</label><input data-id="ativo.campo.pos-operacional-meses" type="number" min="0" value="${a.posOperacionalMeses!=null?a.posOperacionalMeses:0}" onchange="App.${prefix}Set(${i},'posOperacionalMeses',this.value)"></div>
+        <div class="field full"><label>Observações</label><input data-id="ativo.campo.observacoes" value="${esc(a.obs||'')}" onchange="App.${prefix}Set(${i},'obs',this.value)"></div>
+        </div>
+      </div>`:''}
     </div>`;
   }).join('') : '<p style="font-size:12.5px;color:var(--txt-3);margin:4px 0 0">Nenhum ativo adicionado ainda.</p>';
 }
@@ -4387,25 +4500,25 @@ function cadAtivoListRender(){
 function jcliKCard(c){
   const h=calcHealth(c.id), e=etapaInfo(c.etapa);
   const ab=DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status)).length;
-  return `<div class="kcard" draggable="true" onclick="App.abrirCliente('${c.id}')"
+  return `<div class="kcard" data-id="jornada.card.cliente-negociacao" draggable="true" onclick="App.abrirCliente('${c.id}')"
       ondragstart="App.dragStartN(event,'${c.id}')" ondragend="App.dragEndN()">
-    <div class="knm">${esc(c.nome)}</div>
-    <div class="kmeta">${esc(c.tipologia||'—')} · KA ${esc((c.keyAccount||'—').split(' ')[0])}</div>
-    <div class="krow">${badge(e.label,e.tone)} ${h?badge(num(h.total)+' · '+h.cls,h.tone):''}</div>
-    <div class="jcli-foot">${ab} atividade(s) aberta(s)</div>
+    <div class="knm" data-id="jornada.texto.nome-cliente-kanban">${esc(c.nome)}</div>
+    <div class="kmeta" data-id="jornada.texto.info-cliente-kanban">${esc(c.tipologia||'—')} · KA ${esc((c.keyAccount||'—').split(' ')[0])}</div>
+    <div class="krow">${badge(e.label,e.tone,'jornada.selo.etapa-cliente-kanban')} ${h?badge(num(h.total)+' · '+h.cls,h.tone,'jornada.selo.health-score-kanban'):''}</div>
+    <div class="jcli-foot" data-id="jornada.indicador.atividades-abertas-kanban">${ab} atividade(s) aberta(s)</div>
   </div>`;
 }
 function kanbanNegociacao(cs){
   const semEstagio=cs.filter(c=>!c.statusNegociacao);
-  const colSemEstagio = semEstagio.length? `<div class="kcol" data-st="" ondragover="App.allowDropN(event,this)" ondragleave="App.endDropN(this)" ondrop="App.dropN(event,'',this)">
-    <div class="kcol-head"><span class="acc" style="background:var(--slate)"></span><h4>Sem estágio</h4><span class="cnt">${semEstagio.length}</span></div>
+  const colSemEstagio = semEstagio.length? `<div class="kcol" data-st="" data-id="jornada.lista.coluna-kanban" ondragover="App.allowDropN(event,this)" ondragleave="App.endDropN(this)" ondrop="App.dropN(event,'',this)">
+    <div class="kcol-head"><span class="acc" style="background:var(--slate)"></span><h4 data-id="jornada.texto.titulo-coluna-kanban">Sem estágio</h4><span class="cnt" data-id="jornada.indicador.contagem-coluna-kanban">${semEstagio.length}</span></div>
     <div class="kcol-body">${semEstagio.map(jcliKCard).join('')}</div>
   </div>` : '';
-  return `<div class="kanban">${colSemEstagio}${STATUS_NEGOCIACAO.map(st=>{
+  return `<div class="kanban" data-id="jornada.secao.kanban-negociacao">${colSemEstagio}${STATUS_NEGOCIACAO.map(st=>{
     const items=cs.filter(c=>c.statusNegociacao===st);
-    return `<div class="kcol" data-st="${esc(st)}" ondragover="App.allowDropN(event,this)" ondragleave="App.endDropN(this)" ondrop="App.dropN(event,'${esc(st)}',this)">
-      <div class="kcol-head"><span class="acc" style="background:${toneVar(STATUS_NEG_TONE[st])}"></span><h4>${esc(st)}</h4><span class="cnt">${items.length}</span></div>
-      <div class="kcol-body">${items.length? items.map(jcliKCard).join('') : '<div class="kcol-empty">—</div>'}</div>
+    return `<div class="kcol" data-st="${esc(st)}" data-id="jornada.lista.coluna-kanban" ondragover="App.allowDropN(event,this)" ondragleave="App.endDropN(this)" ondrop="App.dropN(event,'${esc(st)}',this)">
+      <div class="kcol-head"><span class="acc" style="background:${toneVar(STATUS_NEG_TONE[st])}"></span><h4 data-id="jornada.texto.titulo-coluna-kanban">${esc(st)}</h4><span class="cnt" data-id="jornada.indicador.contagem-coluna-kanban">${items.length}</span></div>
+      <div class="kcol-body">${items.length? items.map(jcliKCard).join('') : '<div class="kcol-empty" data-id="jornada.texto.coluna-vazia-kanban">—</div>'}</div>
     </div>`;}).join('')}</div>`;
 }
 function renderJornada(){
@@ -4414,19 +4527,19 @@ function renderJornada(){
   const sel=filters.cliente && getCli(filters.cliente);
   if(!sel){
     el('view-jornada').innerHTML=`
-    <div class="section-bar"><h2>Jornada do Cliente</h2><div class="line"></div>
-      ${gate('createClient',`<button class="btn primary sm" onclick="App.novaOperacao()">${svg(I.plus)} Adicionar Operação</button>`)}</div>
+    <div class="section-bar" data-id="jornada.secao.cabecalho-kanban"><h2 data-id="jornada.texto.titulo-cabecalho-kanban">Jornada do Cliente</h2><div class="line"></div>
+      ${gate('createClient',`<button class="btn primary sm" data-id="jornada.botao.adicionar-operacao" onclick="App.novaOperacao()">${svg(I.plus)} Adicionar Operação</button>`)}</div>
     ${cs.length? kanbanNegociacao(cs) : '<p style="color:var(--txt-3)">Nenhum cliente corresponde aos filtros.</p>'}`;
     return;
   }
   const c=sel, h=calcHealth(c.id), e=etapaInfo(c.etapa), sv=calcSurvey(c.id), tv=calcTTFV(c.id), at=calcAtivacao(c.id);
-  const tabs=[['geral','Visão Geral'],['operacao','Dados da Operação'],['ativos','Ativos'],['atividades','Atividades'],['pendencias','Pendências'],['whats','Interações'],['alteracoes','Alterações'],['docs','Documentos']];
+  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['operacao','Dados da Operação','jornada.aba.dados-da-operacao'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Atividades','jornada.aba.atividades'],['pendencias','Pendências','jornada.aba.pendencias'],['whats','Interações','jornada.aba.interacoes'],['alteracoes','Alterações','jornada.aba.alteracoes'],['docs','Documentos','jornada.aba.documentos']];
   el('view-jornada').innerHTML=`
-  <div class="section-bar"><button class="btn ghost sm" onclick="App.fecharCliente()">${svg('<path d="M19 12H5M12 19l-7-7 7-7"/>')} Voltar</button>
-    <h2 style="margin-left:8px">${esc(c.nome)}</h2><div class="line"></div>
-    ${h?badge(num(h.total)+' · '+h.cls,h.tone):''} <span class="badge b-${e.tone}"><span class="d"></span>${esc(e.label)}</span></div>
+  <div class="section-bar"><button class="btn ghost sm" data-id="jornada.botao.voltar-cliente" onclick="App.fecharCliente()">${svg('<path d="M19 12H5M12 19l-7-7 7-7"/>')} Voltar</button>
+    <h2 style="margin-left:8px" data-id="jornada.texto.nome-cliente-detalhe">${esc(c.nome)}</h2><div class="line"></div>
+    ${h?badge(num(h.total)+' · '+h.cls,h.tone,'jornada.selo.health-score-detalhe'):''} <span class="badge b-${e.tone}" data-id="jornada.selo.etapa-cliente-detalhe"><span class="d"></span>${esc(e.label)}</span></div>
   ${jEstagioBar(c)}
-  <div class="jtabs">${tabs.map(([k,l])=>`<button class="jtab ${jTab===k?'active':''}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
+  <div class="jtabs">${tabs.map(([k,l,idd])=>`<button class="jtab ${jTab===k?'active':''}" data-id="${idd}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
   <div class="jpanel">${ jPanel(c,{h,e,sv,tv,at}) }</div>`;
   el('view-jornada').querySelectorAll('[data-p]').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
 }
@@ -4434,11 +4547,11 @@ function jEstagioBar(c){
   const cur=c.statusNegociacao||'';
   const idx=STATUS_NEGOCIACAO.indexOf(cur);
   const ro=!can('editClient');
-  return `<div class="jstage-bar">${STATUS_NEGOCIACAO.map((s,i)=>{
+  return `<div class="jstage-bar" data-id="jornada.secao.estagio-negociacao">${STATUS_NEGOCIACAO.map((s,i)=>{
     const isPerdido = s==='Perdido';
     const active = s===cur;
     const passed = !isPerdido && cur!=='Perdido' && idx>-1 && i<idx;
-    return `<button type="button" ${ro?'disabled':''} class="jstage ${active?'active':''} ${passed?'passed':''} ${isPerdido?'danger':''}"
+    return `<button type="button" ${ro?'disabled':''} class="jstage ${active?'active':''} ${passed?'passed':''} ${isPerdido?'danger':''}" data-id="jornada.botao.estagio-negociacao"
       style="--stage-color:${toneVar(STATUS_NEG_TONE[s])}" onclick="App.setStatusNegociacao('${c.id}','${s}')" title="${cur?'Estágio atual: '+esc(cur):'Estágio ainda não definido'}">
       <span class="jstage-dot"></span>${esc(s)}</button>`;
   }).join('')}</div>`;
@@ -4447,23 +4560,23 @@ function jAtivos(c){
   const ativos=c.ativos||[]; const tot=ativosTotalCliente(c); const vgv=vgvTotalCliente(c); const unid=unidadesTotalCliente(c);
   const porEstado={},porTip={},porStatus={}; ativos.forEach(a=>{ const q=+a.quantidade||0;
     if(a.estado)porEstado[a.estado]=(porEstado[a.estado]||0)+q; if(a.tipologia)porTip[a.tipologia]=(porTip[a.tipologia]||0)+q; if(a.statusAtivo)porStatus[a.statusAtivo]=(porStatus[a.statusAtivo]||0)+q; });
-  return `<div class="section-bar" style="margin-top:0"><h3 style="font-size:15px">Ativos do Cliente</h3><div class="line"></div>
-      ${canAtivos()?`<button class="btn primary sm" onclick="App.editCliente('${c.id}')">${svg(I.edit)} Gerenciar no cadastro</button>`:''}</div>
+  return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.ativos-cliente"><h3 style="font-size:15px" data-id="jornada.texto.titulo-ativos-cliente">Ativos do Cliente</h3><div class="line"></div>
+      ${canAtivos()?`<button class="btn primary sm" data-id="jornada.botao.gerenciar-cadastro" onclick="App.editCliente('${c.id}')">${svg(I.edit)} Gerenciar no cadastro</button>`:''}</div>
     <div class="kpi-grid" style="margin-bottom:14px">
-      ${kpi('k-blue','Quantidade de Ativos',tot,'',ativos.length+' registro(s)')}
-      ${kpi('k-amber','Total de Unidades',num(unid),'','')}
-      ${kpi('k-green','VGV Total do Cliente',money(vgv),'','')}
-      ${kpi('k-slate','Localização',c.estado||'—','',esc(c.cidade||'—'))}
+      ${kpi('k-blue','Quantidade de Ativos',tot,'',ativos.length+' registro(s)','jornada.indicador.qtd-ativos')}
+      ${kpi('k-amber','Total de Unidades',num(unid),'','','jornada.indicador.total-unidades')}
+      ${kpi('k-green','VGV Total do Cliente',money(vgv),'','','jornada.indicador.vgv-total-cliente')}
+      ${kpi('k-slate','Localização',c.estado||'—','',esc(c.cidade||'—'),'jornada.indicador.localizacao-cliente')}
     </div>
-    ${ativos.length? `<div class="card"><div class="tbl-wrap"><table class="data"><thead><tr><th>Ativo</th><th>Tipologia</th><th>Status</th><th>Estado</th><th>Cidade</th><th>Região</th><th>Qtd</th><th>Unidades</th><th>VGV</th><th>Observações</th></tr></thead>
-      <tbody>${ativos.map(a=>`<tr><td><b>${esc(a.nome||'—')}</b></td><td>${badge(a.tipologia||'—','slate')}</td>
+    ${ativos.length? `<div class="card" data-id="jornada.tabela.ativos-cliente"><div class="tbl-wrap"><table class="data"><thead><tr><th>Ativo</th><th>Tipologia</th><th>Status</th><th>Estado</th><th>Cidade</th><th>Região</th><th>Qtd</th><th>Unidades</th><th>VGV</th><th>Observações</th></tr></thead>
+      <tbody>${ativos.map(a=>`<tr data-id="jornada.tabela.linha-ativo"><td><b>${esc(a.nome||'—')}</b></td><td>${badge(a.tipologia||'—','slate')}</td>
         <td>${a.statusAtivo?badge(a.statusAtivo,ATIVO_STATUS_TONE[a.statusAtivo]||'slate'):'—'}</td>
         <td>${a.estado?badge(a.estado,REGIAO_TONE[regiaoDoEstado(a.estado)]||'slate'):'—'}</td><td>${esc(a.cidade||'—')}</td>
         <td>${esc(a.regiao||regiaoDoEstado(a.estado)||'—')}</td><td class="num">${+a.quantidade||0}</td><td class="num">${num(+a.unidades||0)}</td><td class="num">${money(+a.vgv||0)}</td><td>${esc(a.obs||'—')}</td></tr>`).join('')}</tbody></table></div></div>
       <div class="cfg-grid" style="margin-top:14px">
-        <div class="card"><div class="card-head"><h3>Distribuição por Estado</h3></div><div class="card-body">${geoBars(porEstado,uf=>REGIAO_TONE[regiaoDoEstado(uf)]||'blue',null,uf=>UF_NOME[uf]||uf)}</div></div>
-        <div class="card"><div class="card-head"><h3>Distribuição por Tipologia</h3></div><div class="card-body">${geoBars(porTip)}</div></div>
-        <div class="card"><div class="card-head"><h3>Status dos Ativos</h3></div><div class="card-body">${geoBars(porStatus,s=>ATIVO_STATUS_TONE[s]||'slate')}</div></div>
+        <div class="card" data-id="jornada.grafico.distribuicao-estado"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-estado">Distribuição por Estado</h3></div><div class="card-body">${geoBars(porEstado,uf=>REGIAO_TONE[regiaoDoEstado(uf)]||'blue',null,uf=>UF_NOME[uf]||uf)}</div></div>
+        <div class="card" data-id="jornada.grafico.distribuicao-tipologia"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-tipologia">Distribuição por Tipologia</h3></div><div class="card-body">${geoBars(porTip)}</div></div>
+        <div class="card" data-id="jornada.grafico.status-ativos"><div class="card-head"><h3 data-id="jornada.texto.titulo-status-ativos">Status dos Ativos</h3></div><div class="card-body">${geoBars(porStatus,s=>ATIVO_STATUS_TONE[s]||'slate')}</div></div>
       </div>`
     : '<div class="card"><div class="card-body"><p style="color:var(--txt-3);text-align:center;padding:20px">Nenhum ativo cadastrado para este cliente.'+(canAtivos()?' Use “Gerenciar no cadastro”.':'')+'</p></div></div>'}`;
 }
@@ -4471,15 +4584,15 @@ function jPanel(c,m){
   if(jTab==='geral') return jGeral(c,m);
   if(jTab==='operacao') return jOperacao(c);
   if(jTab==='ativos') return jAtivos(c);
-  if(jTab==='atividades') return `<div class="section-bar" style="margin-top:0"><h3 style="font-size:15px">Kanban de Atividades</h3><div class="line"></div>
-    ${gate('createActivity',`<button class="btn primary sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova atividade</button>`)}</div>`+kanbanAtividades(c.id);
+  if(jTab==='atividades') return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.kanban-atividades-tab"><h3 style="font-size:15px" data-id="jornada.texto.titulo-kanban-atividades-tab">Kanban de Atividades</h3><div class="line"></div>
+    ${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-tab" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova atividade</button>`)}</div>`+kanbanAtividades(c.id);
   if(jTab==='pendencias') return jPendencias(c.id);
   if(jTab==='whats') return whatsTimeline(c.id);
   if(jTab==='alteracoes') return histTable(DB().history.filter(x=>x.cliente===c.nome),false);
   if(jTab==='docs') return jDocs(c.id);
   return '';
 }
-function jInfo(label,val){ return `<div class="jinfo"><span>${label}</span><b>${val||'—'}</b></div>`; }
+function jInfo(label,val,dataId){ return `<div class="jinfo"><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${val||'—'}</b></div>`; }
 function crmPanel(cid){
   const d=DB();
   const ints=d.interactions.filter(i=>i.cliente===cid).sort((a,b)=>(b.data+(b.hora||'')).localeCompare(a.data+(a.hora||''))).slice(0,3);
@@ -4489,118 +4602,118 @@ function crmPanel(cid){
   const prazos=abertas.filter(a=>a.prazo).sort((a,b)=>a.prazo.localeCompare(b.prazo)).slice(0,4);
   const mini=(rows)=> rows.length? `<ul class="crm-list">${rows.join('')}</ul>` : '<p class="crm-empty">Nada registrado.</p>';
   return `<div class="crm-grid">
-    <div class="card crm-card"><div class="crm-h">${svg(I.chat)} Últimas Interações</div>
+    <div class="card crm-card" data-id="jornada.card.ultimas-interacoes"><div class="crm-h" data-id="jornada.texto.titulo-ultimas-interacoes">${svg(I.chat)} Últimas Interações</div>
       ${mini(ints.map(i=>`<li><span class="crm-dot" style="background:${toneVar(INT_STATUS_TONE[i.status])}"></span>
-        <span class="crm-main">${esc(i.resumo||i.tipo||'—')}<small>${fmtD(i.data)} · ${esc(i.tipo||'')}</small></span></li>`))}</div>
-    <div class="card crm-card"><div class="crm-h">${svg(I.clock)} Últimas Atividades</div>
+        <span class="crm-main" data-id="jornada.texto.item-ultima-interacao">${esc(i.resumo||i.tipo||'—')}<small>${fmtD(i.data)} · ${esc(i.tipo||'')}</small></span></li>`))}</div>
+    <div class="card crm-card" data-id="jornada.card.ultimas-atividades"><div class="crm-h" data-id="jornada.texto.titulo-ultimas-atividades">${svg(I.clock)} Últimas Atividades</div>
       ${mini(ultAtiv.map(a=>`<li><span class="crm-dot" style="background:${toneVar(PRIOR_TONE[a.prioridade])}"></span>
-        <span class="crm-main">${esc(a.titulo)}<small>${esc(a.status)}${a.origem==='Interação do Cliente'?' · via interação':''}</small></span></li>`))}</div>
-    <div class="card crm-card"><div class="crm-h">${svg(I.cal)} Próximos Prazos</div>
+        <span class="crm-main" data-id="jornada.texto.item-ultima-atividade">${esc(a.titulo)}<small>${esc(a.status)}${a.origem==='Interação do Cliente'?' · via interação':''}</small></span></li>`))}</div>
+    <div class="card crm-card" data-id="jornada.card.proximos-prazos"><div class="crm-h" data-id="jornada.texto.titulo-proximos-prazos">${svg(I.cal)} Próximos Prazos</div>
       ${mini(prazos.map(a=>{const f=farolAtividade(a);return `<li><span class="crm-dot" style="background:${toneVar(f.tone)}"></span>
-        <span class="crm-main">${esc(a.titulo)}<small>${fmtD(a.prazo)} · ${f.label}</small></span></li>`;}))}</div>
-    <div class="card crm-card"><div class="crm-h">${svg(I.alert)} Pendências em Aberto <span class="crm-count">${abertas.length}</span></div>
+        <span class="crm-main" data-id="jornada.texto.item-proximo-prazo">${esc(a.titulo)}<small>${fmtD(a.prazo)} · ${f.label}</small></span></li>`;}))}</div>
+    <div class="card crm-card" data-id="jornada.card.pendencias-abertas"><div class="crm-h" data-id="jornada.texto.titulo-pendencias-abertas">${svg(I.alert)} Pendências em Aberto <span class="crm-count" data-id="jornada.indicador.qtd-pendencias-abertas">${abertas.length}</span></div>
       ${mini(abertas.slice(0,4).map(a=>{const f=farolAtividade(a);return `<li><span class="crm-dot" style="background:${toneVar(f.tone)}"></span>
-        <span class="crm-main">${esc(a.titulo)}<small>${esc(a.responsavel||'—')} · ${esc(a.status)}</small></span></li>`;}))}</div>
+        <span class="crm-main" data-id="jornada.texto.item-pendencia-aberta">${esc(a.titulo)}<small>${esc(a.responsavel||'—')} · ${esc(a.status)}</small></span></li>`;}))}</div>
   </div>`;
 }
 function jGeral(c,m){
   const {h,sv,tv,at}=m;
   return crmPanel(c.id) + `<div class="jgrid">
-    <div class="card"><div class="card-head"><div class="ico">${svg(I.user)}</div><h3>Informações do Cliente</h3>
-      <div class="spacer"></div>${gate('editClient',`<button class="btn ghost sm" onclick="App.jTab('operacao')">${svg(I.edit)} Editar</button>`)}</div>
+    <div class="card" data-id="jornada.card.info-cliente"><div class="card-head"><div class="ico">${svg(I.user)}</div><h3 data-id="jornada.texto.titulo-info-cliente">Informações do Cliente</h3>
+      <div class="spacer"></div>${gate('editClient',`<button class="btn ghost sm" data-id="jornada.botao.editar-info-cliente" onclick="App.jTab('operacao')">${svg(I.edit)} Editar</button>`)}</div>
       <div class="card-body jinfos">
-        ${jInfo('Tipologia',esc(c.tipologia))}
-        ${jInfo('Status',esc(statusEfetivo(c)))}
-        ${jInfo('Etapa',esc(etapaInfo(c.etapa).label))}
-        ${jInfo('Produtos',(c.produtos&&c.produtos.length)?esc(c.produtos.join(', ')):'—')}
-        ${jInfo('Key Account',esc(c.keyAccount))}
-        ${jInfo('Booked Value',c.bookedValue?money(c.bookedValue):'—')}
+        ${jInfo('Tipologia',esc(c.tipologia),'jornada.texto.tipologia-cliente')}
+        ${jInfo('Status',esc(statusEfetivo(c)),'jornada.texto.status-cliente')}
+        ${jInfo('Etapa',esc(etapaInfo(c.etapa).label),'jornada.texto.etapa-cliente')}
+        ${jInfo('Produtos',(c.produtos&&c.produtos.length)?esc(c.produtos.join(', ')):'—','jornada.texto.produtos-cliente')}
+        ${jInfo('Key Account',esc(c.keyAccount),'jornada.texto.key-account-cliente')}
+        ${jInfo('Booked Value',c.bookedValue?money(c.bookedValue):'—','jornada.indicador.booked-value-cliente')}
       </div></div>
-    <div class="card"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3>Ciclo de Negociação</h3></div>
+    <div class="card" data-id="jornada.card.ciclo-negociacao-resumo"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-ciclo-negociacao-resumo">Ciclo de Negociação</h3></div>
       <div class="card-body jinfos">
-        ${jInfo('Solicitação Proposta',fmtD(c.dataSolicitacaoProposta))}
-        ${jInfo('1º Envio da Proposta',fmtD(c.dataEnvioProposta))}
-        ${jInfo('Solicitação Minuta',fmtD(c.dataSolicitacaoMinuta))}
-        ${jInfo('Envio da Minuta',fmtD(c.dataEnvioMinuta))}
-        ${jInfo('Envio Contrato p/ Assinatura',fmtD(c.dataEnvioContrato))}
-        ${jInfo('Assinatura do Contrato',fmtD(c.dataAssinatura))}
-        ${jInfo('Assinatura Aditivo/Distrato',fmtD(c.dataAssinaturaAditivo))}
-        ${jInfo('Resp. pela Proposta',esc(c.respComercial))}
+        ${jInfo('Solicitação Proposta',fmtD(c.dataSolicitacaoProposta),'jornada.texto.data-solicitacao-proposta-resumo')}
+        ${jInfo('1º Envio da Proposta',fmtD(c.dataEnvioProposta),'jornada.texto.data-envio-proposta-resumo')}
+        ${jInfo('Solicitação Minuta',fmtD(c.dataSolicitacaoMinuta),'jornada.texto.data-solicitacao-minuta-resumo')}
+        ${jInfo('Envio da Minuta',fmtD(c.dataEnvioMinuta),'jornada.texto.data-envio-minuta-resumo')}
+        ${jInfo('Envio Contrato p/ Assinatura',fmtD(c.dataEnvioContrato),'jornada.texto.data-envio-contrato-resumo')}
+        ${jInfo('Assinatura do Contrato',fmtD(c.dataAssinatura),'jornada.texto.data-assinatura-contrato-resumo')}
+        ${jInfo('Assinatura Aditivo/Distrato',fmtD(c.dataAssinaturaAditivo),'jornada.texto.data-assinatura-aditivo-resumo')}
+        ${jInfo('Resp. pela Proposta',esc(c.respComercial),'jornada.texto.resp-proposta-resumo')}
       </div></div>
-    <div class="card"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ciclo de Implantação</h3></div>
+    <div class="card" data-id="jornada.card.ciclo-implantacao-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-ciclo-implantacao-resumo">Ciclo de Implantação</h3></div>
       <div class="card-body jinfos">
-        ${jInfo('Handoff',fmtD(c.dataHandoff))}
-        ${jInfo('Kickoff',fmtD(c.dataKickoff))}
-        ${jInfo('Go Live Previsto',fmtD(c.goLivePrevisto))}
-        ${jInfo('Go Live Real',fmtD(c.goLiveReal))}
-        ${jInfo('Resp. Onboarding',esc(c.respOnboarding))}
+        ${jInfo('Handoff',fmtD(c.dataHandoff),'jornada.texto.data-handoff-resumo')}
+        ${jInfo('Kickoff',fmtD(c.dataKickoff),'jornada.texto.data-kickoff-resumo')}
+        ${jInfo('Go Live Previsto',fmtD(c.goLivePrevisto),'jornada.texto.go-live-previsto-resumo')}
+        ${jInfo('Go Live Real',fmtD(c.goLiveReal),'jornada.texto.go-live-real-resumo')}
+        ${jInfo('Resp. Onboarding',esc(c.respOnboarding),'jornada.texto.resp-onboarding-resumo')}
       </div></div>
-    <div class="card"><div class="card-head"><div class="ico">${svg(I.health)}</div><h3>Indicadores</h3></div>
+    <div class="card" data-id="jornada.card.indicadores-cliente"><div class="card-head"><div class="ico">${svg(I.health)}</div><h3 data-id="jornada.texto.titulo-indicadores-cliente">Indicadores</h3></div>
       <div class="card-body jinfos">
-        ${jInfo('Health Score',h?('<b style="color:'+toneVar(h.tone)+'">'+num(h.total)+' · '+h.cls+'</b>'):'aguardando kickoff')}
-        ${jInfo('% Ativação',at+'%')}
-        ${jInfo('Pesquisa',sv?num(sv.media,1)+' ('+sv.cls+')':'—')}
-        ${jInfo('TTFV',tv?(tv.dias+' dias · '+tv.cls):'—')}
+        ${jInfo('Health Score',h?('<b style="color:'+toneVar(h.tone)+'">'+num(h.total)+' · '+h.cls+'</b>'):'aguardando kickoff','jornada.indicador.health-score-cliente')}
+        ${jInfo('% Ativação',at+'%','jornada.indicador.pct-ativacao-cliente')}
+        ${jInfo('Pesquisa',sv?num(sv.media,1)+' ('+sv.cls+')':'—','jornada.indicador.pesquisa-cliente')}
+        ${jInfo('TTFV',tv?(tv.dias+' dias · '+tv.cls):'—','jornada.indicador.ttfv-cliente')}
       </div></div>
   </div>
-  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.clock)}</div><h3>Atividades Abertas</h3>
-    <div class="spacer"></div>${gate('createActivity',`<button class="btn primary sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova</button>`)}</div>
+  <div class="card" style="margin-top:16px" data-id="jornada.card.atividades-abertas"><div class="card-head"><div class="ico">${svg(I.clock)}</div><h3 data-id="jornada.texto.titulo-atividades-abertas">Atividades Abertas</h3>
+    <div class="spacer"></div>${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-geral" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova</button>`)}</div>
     <div class="card-body">${atividadeList(DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status)))}</div></div>`;
 }
 function jOperacao(c){
   const ro=!can('editClient');
-  return `<div class="card"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3>Ciclo de Negociação</h3>
+  return `<div class="card" data-id="jornada.card.form-ciclo-negociacao"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-form-ciclo-negociacao">Ciclo de Negociação</h3>
     <span class="desc">do primeiro contato até a assinatura do contrato</span></div>
     <div class="card-body"><div class="form-grid">
-      <div class="field"><label>Data Solicitação da Proposta</label><input id="op_dsp" ${ro?'disabled':''} type="date" value="${c.dataSolicitacaoProposta||''}"></div>
-      <div class="field"><label>Data 1º Envio da Proposta</label><input id="op_dep" ${ro?'disabled':''} type="date" value="${c.dataEnvioProposta||''}"></div>
-      <div class="field"><label>Data Solicitação da Minuta</label><input id="op_dsm" ${ro?'disabled':''} type="date" value="${c.dataSolicitacaoMinuta||''}"></div>
-      <div class="field"><label>Data Envio da Minuta p/ Validação</label><input id="op_dem" ${ro?'disabled':''} type="date" value="${c.dataEnvioMinuta||''}"></div>
-      <div class="field"><label>Data Envio do Contrato p/ Assinatura</label><input id="op_dec" ${ro?'disabled':''} type="date" value="${c.dataEnvioContrato||''}"></div>
-      <div class="field"><label>Data Assinatura do Contrato</label><input id="op_assin" ${ro?'disabled':''} type="date" value="${c.dataAssinatura||''}"></div>
-      <div class="field"><label>Data Assinatura Aditivo/Distrato</label><input id="op_adit" ${ro?'disabled':''} type="date" value="${c.dataAssinaturaAditivo||''}"></div>
-      <div class="field"><label>Booked Value (R$)</label><input id="op_bv" ${ro?'disabled':''} type="number" min="0" step="1000" value="${c.bookedValue||0}"></div>
-      <div class="field"><label>Resp. pela Proposta</label><input id="op_com" ${ro?'disabled':''} value="${esc(c.respComercial||'')}"></div>
+      <div class="field"><label>Data Solicitação da Proposta</label><input id="op_dsp" data-id="jornada.campo.data-solicitacao-proposta" ${ro?'disabled':''} type="date" value="${c.dataSolicitacaoProposta||''}"></div>
+      <div class="field"><label>Data 1º Envio da Proposta</label><input id="op_dep" data-id="jornada.campo.data-envio-proposta" ${ro?'disabled':''} type="date" value="${c.dataEnvioProposta||''}"></div>
+      <div class="field"><label>Data Solicitação da Minuta</label><input id="op_dsm" data-id="jornada.campo.data-solicitacao-minuta" ${ro?'disabled':''} type="date" value="${c.dataSolicitacaoMinuta||''}"></div>
+      <div class="field"><label>Data Envio da Minuta p/ Validação</label><input id="op_dem" data-id="jornada.campo.data-envio-minuta" ${ro?'disabled':''} type="date" value="${c.dataEnvioMinuta||''}"></div>
+      <div class="field"><label>Data Envio do Contrato p/ Assinatura</label><input id="op_dec" data-id="jornada.campo.data-envio-contrato" ${ro?'disabled':''} type="date" value="${c.dataEnvioContrato||''}"></div>
+      <div class="field"><label>Data Assinatura do Contrato</label><input id="op_assin" data-id="jornada.campo.data-assinatura-contrato" ${ro?'disabled':''} type="date" value="${c.dataAssinatura||''}"></div>
+      <div class="field"><label>Data Assinatura Aditivo/Distrato</label><input id="op_adit" data-id="jornada.campo.data-assinatura-aditivo" ${ro?'disabled':''} type="date" value="${c.dataAssinaturaAditivo||''}"></div>
+      <div class="field"><label>Booked Value (R$)</label><input id="op_bv" data-id="jornada.campo.booked-value" ${ro?'disabled':''} type="number" min="0" step="1000" value="${c.bookedValue||0}"></div>
+      <div class="field"><label>Resp. pela Proposta</label><input id="op_com" data-id="jornada.campo.resp-proposta" ${ro?'disabled':''} value="${esc(c.respComercial||'')}"></div>
     </div></div>
   </div>
 
-  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ciclo de Implantação</h3>
+  <div class="card" style="margin-top:16px" data-id="jornada.card.form-ciclo-implantacao"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-form-ciclo-implantacao">Ciclo de Implantação</h3>
     <span class="desc">do handoff comercial até a operação ativa</span></div>
     <div class="card-body"><div class="form-grid">
-      <div class="field"><label>Data Handoff</label><input id="op_handoff" ${ro?'disabled':''} type="date" value="${c.dataHandoff||''}"></div>
-      <div class="field"><label>Data Kickoff</label><input id="op_kick" ${ro?'disabled':''} type="date" value="${c.dataKickoff||''}"></div>
-      <div class="field"><label>Go Live Previsto</label><input id="op_glp" ${ro?'disabled':''} type="date" value="${c.goLivePrevisto||''}"></div>
-      <div class="field"><label>Go Live Real</label><input id="op_glr" ${ro?'disabled':''} type="date" value="${c.goLiveReal||''}"></div>
-      <div class="field"><label>Resp. Onboarding</label><select id="op_onb" ${ro?'disabled':''}><option value="">—</option>${ANALISTAS.map(a=>`<option ${c.respOnboarding===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
+      <div class="field"><label>Data Handoff</label><input id="op_handoff" data-id="jornada.campo.data-handoff" ${ro?'disabled':''} type="date" value="${c.dataHandoff||''}"></div>
+      <div class="field"><label>Data Kickoff</label><input id="op_kick" data-id="jornada.campo.data-kickoff" ${ro?'disabled':''} type="date" value="${c.dataKickoff||''}"></div>
+      <div class="field"><label>Go Live Previsto</label><input id="op_glp" data-id="jornada.campo.go-live-previsto" ${ro?'disabled':''} type="date" value="${c.goLivePrevisto||''}"></div>
+      <div class="field"><label>Go Live Real</label><input id="op_glr" data-id="jornada.campo.go-live-real" ${ro?'disabled':''} type="date" value="${c.goLiveReal||''}"></div>
+      <div class="field"><label>Resp. Onboarding</label><select id="op_onb" data-id="jornada.campo.resp-onboarding" ${ro?'disabled':''}><option value="">—</option>${ANALISTAS.map(a=>`<option ${c.respOnboarding===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
     </div></div>
   </div>
 
-  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.clients)}</div><h3>Classificação & Responsáveis</h3></div>
+  <div class="card" style="margin-top:16px" data-id="jornada.card.form-classificacao-responsaveis"><div class="card-head"><div class="ico">${svg(I.clients)}</div><h3 data-id="jornada.texto.titulo-form-classificacao-responsaveis">Classificação & Responsáveis</h3></div>
     <div class="card-body"><div class="form-grid">
-      <div class="field"><label>Etapa da Jornada</label><select id="op_etapa" ${ro?'disabled':''}>${ETAPAS.map(e=>`<option value="${e.key}" ${c.etapa===e.key?'selected':''}>${e.label}</option>`).join('')}</select></div>
-      <div class="field"><label>Status Operacional</label><select id="op_status" ${ro?'disabled':''}>${STATUS_OPCOES.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div class="field"><label>Tipologia</label><select id="op_tip" ${ro?'disabled':''}>${cfgTipologias().map(t=>`<option ${c.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
-      <div class="field"><label>Key Account</label><select id="op_ka" ${ro?'disabled':''}><option value="">—</option>${KEY_ACCOUNTS.map(a=>`<option ${c.keyAccount===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
-      <div class="field"><label>Resp. Kickoff</label><select id="op_rk" ${ro?'disabled':''}><option value="">—</option>${ANALISTAS.map(a=>`<option ${c.respKickoff===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
-      <div class="field full"><label>Produtos Contratados</label><div class="prod-tags" id="op_prod">
-        ${produtos().map(p=>`<span class="prod-toggle ${(c.produtos||[]).includes(p)?'on':''}" data-p="${esc(p)}">${esc(p)}</span>`).join('')}</div></div>
-      <div class="field full"><label>Observações</label><textarea id="op_obs" ${ro?'disabled':''}>${esc(c.obs||'')}</textarea></div>
+      <div class="field"><label>Etapa da Jornada</label><select id="op_etapa" data-id="jornada.campo.etapa-jornada" ${ro?'disabled':''}>${ETAPAS.map(e=>`<option value="${e.key}" ${c.etapa===e.key?'selected':''}>${e.label}</option>`).join('')}</select></div>
+      <div class="field"><label>Status Operacional</label><select id="op_status" data-id="jornada.campo.status-operacional" ${ro?'disabled':''}>${STATUS_OPCOES.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label>Tipologia</label><select id="op_tip" data-id="jornada.campo.tipologia-cliente" ${ro?'disabled':''}>${cfgTipologias().map(t=>`<option ${c.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>Key Account</label><select id="op_ka" data-id="jornada.campo.key-account" ${ro?'disabled':''}><option value="">—</option>${KEY_ACCOUNTS.map(a=>`<option ${c.keyAccount===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
+      <div class="field"><label>Resp. Kickoff</label><select id="op_rk" data-id="jornada.campo.resp-kickoff" ${ro?'disabled':''}><option value="">—</option>${ANALISTAS.map(a=>`<option ${c.respKickoff===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
+      <div class="field full"><label>Produtos Contratados</label><div class="prod-tags" id="op_prod" data-id="jornada.campo.produtos-contratados">
+        ${produtos().map(p=>`<span class="prod-toggle ${(c.produtos||[]).includes(p)?'on':''}" data-p="${esc(p)}" data-id="jornada.botao.toggle-produto">${esc(p)}</span>`).join('')}</div></div>
+      <div class="field full"><label>Observações</label><textarea id="op_obs" data-id="jornada.campo.observacoes-cliente" ${ro?'disabled':''}>${esc(c.obs||'')}</textarea></div>
     </div></div>
   </div>
 
   ${ro?'':`<div class="section-bar"><div class="spacer"></div>
-    <button class="btn primary" onclick="App.salvarOperacao('${c.id}')">${svg(I.check)} Salvar Dados da Operação</button></div>`}`;
+    <button class="btn primary" data-id="jornada.botao.salvar-dados-operacao" onclick="App.salvarOperacao('${c.id}')">${svg(I.check)} Salvar Dados da Operação</button></div>`}`;
 }
 function jPendencias(cid){
   const abertas=DB().activities.filter(a=>a.cliente===cid&&!['Concluído','Cancelado'].includes(a.status));
-  return `<div class="card"><div class="card-head"><div class="ico">${svg(I.clock)}</div><h3>Pendências do Cliente</h3>
-    <div class="spacer"></div>${gate('createActivity',`<button class="btn primary sm" onclick="App.novaAtividade('${cid}')">${svg(I.plus)} Nova atividade</button>`)}</div>
+  return `<div class="card" data-id="jornada.card.pendencias-cliente"><div class="card-head"><div class="ico">${svg(I.clock)}</div><h3 data-id="jornada.texto.titulo-pendencias-cliente">Pendências do Cliente</h3>
+    <div class="spacer"></div>${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-pendencias" onclick="App.novaAtividade('${cid}')">${svg(I.plus)} Nova atividade</button>`)}</div>
     <div class="card-body">${atividadeList(abertas)}</div></div>`;
 }
 function jDocs(cid){
   const anexos=[]; DB().interactions.filter(i=>i.cliente===cid).forEach(i=>(i.anexos||[]).forEach(a=>anexos.push({...a,data:i.data})));
-  return `<div class="card"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3>Documentos & Evidências</h3></div>
-    <div class="card-body">${anexos.length? anexos.map(a=>`<div class="doc-row">${svg(I.doc)} ${esc(a.nome||'arquivo')} <small>${fmtD(a.data)}</small></div>`).join('')
+  return `<div class="card" data-id="jornada.card.documentos"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3 data-id="jornada.texto.titulo-documentos">Documentos & Evidências</h3></div>
+    <div class="card-body">${anexos.length? anexos.map(a=>`<div class="doc-row" data-id="jornada.texto.item-documento">${svg(I.doc)} ${esc(a.nome||'arquivo')} <small>${fmtD(a.data)}</small></div>`).join('')
       : '<p style="color:var(--txt-3)">Nenhum documento anexado. Anexos podem ser adicionados nos registros de WhatsApp.</p>'}</div></div>`;
 }
 
@@ -4609,30 +4722,30 @@ let _dragAct=null;
 function atividadeList(list){
   if(!list.length) return '<p style="color:var(--txt-3)">Nenhuma atividade.</p>';
   return `<div class="ativ-list">${list.map(a=>{const f=farolAtividade(a);
-    return `<div class="ativ-row">
+    return `<div class="ativ-row" data-id="atividade.lista.item">
       <span class="fdot" style="background:${toneVar(f.tone)}" title="${f.label}"></span>
-      <div class="ativ-main"><b>${esc(a.titulo)}</b><small>${esc(nomeCliente(a.cliente))} · ${esc(a.responsavel||'—')} · prazo ${fmtD(a.prazo)}</small></div>
-      ${a.origem?badge(a.origem,ORIGEM_TONE[a.origem]||'slate'):''}${badge(a.prioridade,PRIOR_TONE[a.prioridade])}${badge(a.status,ATIV_STATUS_TONE[a.status])}
-      ${gate('editActivity',`<button class="btn ghost sm" onclick="App.editAtividade('${a.id}')">${svg(I.edit)}</button>`)}
+      <div class="ativ-main"><b data-id="atividade.texto.titulo-lista">${esc(a.titulo)}</b><small data-id="atividade.texto.info-lista">${esc(nomeCliente(a.cliente))} · ${esc(a.responsavel||'—')} · prazo ${fmtD(a.prazo)}</small></div>
+      ${a.origem?badge(a.origem,ORIGEM_TONE[a.origem]||'slate','atividade.selo.origem-lista'):''}${badge(a.prioridade,PRIOR_TONE[a.prioridade],'atividade.selo.prioridade-lista')}${badge(a.status,ATIV_STATUS_TONE[a.status],'atividade.selo.status-lista')}
+      ${gate('editActivity',`<button class="btn ghost sm" data-id="atividade.botao.editar-lista" onclick="App.editAtividade('${a.id}')">${svg(I.edit)}</button>`)}
     </div>`;}).join('')}</div>`;
 }
 function kanbanAtividades(cid,override){
   const list=override||DB().activities.filter(a=>cid?a.cliente===cid:true);
-  return `<div class="kanban">${ATIV_STATUS.map(st=>{
+  return `<div class="kanban" data-id="atividade.lista.status">${ATIV_STATUS.map(st=>{
     const items=list.filter(a=>a.status===st);
-    return `<div class="kcol" data-st="${esc(st)}" ondragover="App.allowDropA(event,this)" ondragleave="App.endDropA(this)" ondrop="App.dropA(event,'${esc(st)}',this)">
-      <div class="kcol-head"><span class="acc" style="background:${toneVar(ATIV_STATUS_TONE[st])}"></span><h4>${esc(st)}</h4><span class="cnt">${items.length}</span></div>
-      <div class="kcol-body">${items.length? items.map(a=>atividadeCard(a)).join('') : '<div class="kcol-empty">—</div>'}</div>
+    return `<div class="kcol" data-st="${esc(st)}" data-id="atividade.lista.coluna-kanban" ondragover="App.allowDropA(event,this)" ondragleave="App.endDropA(this)" ondrop="App.dropA(event,'${esc(st)}',this)">
+      <div class="kcol-head"><span class="acc" style="background:${toneVar(ATIV_STATUS_TONE[st])}"></span><h4 data-id="atividade.texto.titulo-coluna-kanban">${esc(st)}</h4><span class="cnt" data-id="atividade.indicador.contagem-coluna-kanban">${items.length}</span></div>
+      <div class="kcol-body">${items.length? items.map(a=>atividadeCard(a)).join('') : '<div class="kcol-empty" data-id="atividade.texto.coluna-vazia-kanban">—</div>'}</div>
     </div>`;}).join('')}</div>`;
 }
 function atividadeCard(a){
   const f=farolAtividade(a);
-  return `<div class="kcard" draggable="true" style="border-left-color:${toneVar(f.tone)}"
+  return `<div class="kcard" data-id="atividade.card.principal" draggable="true" style="border-left-color:${toneVar(f.tone)}"
       ondragstart="App.dragStartA(event,'${a.id}')" ondragend="App.dragEndA()" ondblclick="App.editAtividade('${a.id}')">
-    <div class="knm">${esc(a.titulo)}</div>
-    <div class="kmeta">${esc(nomeCliente(a.cliente))} · ${esc(a.responsavel||'—')}</div>
-    <div class="krow">${badge(a.prioridade,PRIOR_TONE[a.prioridade])} ${a.origem?badge(a.origem,ORIGEM_TONE[a.origem]||'slate'):''} ${farolDot(f.tone,f.label)}</div>
-    ${gate('editActivity',`<select class="kmove" onchange="App.moverAtividade('${a.id}',this.value)" onclick="event.stopPropagation()">
+    <div class="knm" data-id="atividade.texto.titulo">${esc(a.titulo)}</div>
+    <div class="kmeta" data-id="atividade.texto.info-card">${esc(nomeCliente(a.cliente))} · ${esc(a.responsavel||'—')}</div>
+    <div class="krow">${badge(a.prioridade,PRIOR_TONE[a.prioridade],'atividade.selo.prioridade')} ${a.origem?badge(a.origem,ORIGEM_TONE[a.origem]||'slate','atividade.selo.origem'):''} ${farolDot(f.tone,f.label)}</div>
+    ${gate('editActivity',`<select class="kmove" data-id="atividade.campo.mover-status" onchange="App.moverAtividade('${a.id}',this.value)" onclick="event.stopPropagation()">
       ${ATIV_STATUS.map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select>`)}
   </div>`;
 }
@@ -4827,11 +4940,11 @@ function renderInteracoes(){
 function whatsTimeline(cid){
   const all=DB().interactions.filter(i=>i.cliente===cid).sort((a,b)=>(b.data+(b.hora||'')).localeCompare(a.data+(a.hora||'')));
   const evt=all.filter(i=>(i.kind||'evento')==='evento'); const dia=all.filter(i=>i.kind==='diario');
-  return `<div class="card"><div class="card-head"><div class="ico">${svg(I.chat)}</div><h3>Eventos Pontuais</h3>
-    <div class="spacer"></div>${gate('whatsAdd',`<button class="btn ghost sm" onclick="App.novaInteracao('${cid}','evento')">${svg(I.plus)} Novo evento</button>`)}</div>
+  return `<div class="card" data-id="jornada.card.eventos-pontuais"><div class="card-head"><div class="ico">${svg(I.chat)}</div><h3 data-id="jornada.texto.titulo-eventos-pontuais">Eventos Pontuais</h3>
+    <div class="spacer"></div>${gate('whatsAdd',`<button class="btn ghost sm" data-id="jornada.botao.novo-evento" onclick="App.novaInteracao('${cid}','evento')">${svg(I.plus)} Novo evento</button>`)}</div>
     <div class="card-body">${evt.length?intTimeline(evt,false):'<p style="color:var(--txt-3)">Nenhum evento pontual registrado.</p>'}</div></div>
-  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3>Históricos Diários da Conversa</h3>
-    <div class="spacer"></div>${gate('whatsAdd',`<button class="btn ghost sm" onclick="App.novaInteracao('${cid}','diario')">${svg(I.plus)} Novo histórico</button>`)}</div>
+  <div class="card" style="margin-top:16px" data-id="jornada.card.historicos-diarios"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3 data-id="jornada.texto.titulo-historicos-diarios">Históricos Diários da Conversa</h3>
+    <div class="spacer"></div>${gate('whatsAdd',`<button class="btn ghost sm" data-id="jornada.botao.novo-historico-diario" onclick="App.novaInteracao('${cid}','diario')">${svg(I.plus)} Novo histórico</button>`)}</div>
     <div class="card-body">${dia.length?intTimeline(dia,false):'<p style="color:var(--txt-3)">Nenhum histórico diário registrado.</p>'}</div></div>`;
 }
 let _intAnexos=[];
@@ -4856,14 +4969,14 @@ function intTimeline(list,showCli){
   return `<div class="int-timeline">${list.map(i=>{
     const linked = i.atividadeId && DB().activities.find(a=>a.id===i.atividadeId);
     const isDia=(i.kind==='diario');
-    const kindBadge = isDia ? badge('Histórico Diário','blue') : badge('Evento Pontual','violet');
-    return `<div class="int-item ${isDia?'int-diario':''}">
-    <div class="int-meta"><b>${fmtD(i.data)} ${esc(i.hora||'')}</b> · ${esc(i.responsavel||'—')} · ${esc(i.canal||'WhatsApp')}
+    const kindBadge = isDia ? badge('Histórico Diário','blue','interacao.selo.tipo-registro') : badge('Evento Pontual','violet','interacao.selo.tipo-registro');
+    return `<div class="int-item ${isDia?'int-diario':''}" data-id="interacao.lista.item">
+    <div class="int-meta" data-id="interacao.texto.meta"><b>${fmtD(i.data)} ${esc(i.hora||'')}</b> · ${esc(i.responsavel||'—')} · ${esc(i.canal||'WhatsApp')}
       ${showCli?'· '+esc(nomeCliente(i.cliente)):''}</div>
     <div class="int-badges">${kindBadge}${(i.tipo&&!isDia)?badge(i.tipo,'slate'):''}${i.status?badge(i.status,INT_STATUS_TONE[i.status]||'slate'):''}
       ${i.ativoId&&ativoNome(i.cliente,i.ativoId)?`<span class="badge b-violet"><span class="d"></span>${esc(ativoNome(i.cliente,i.ativoId))}</span>`:''}
       ${(i.tags||[]).map(t=>`<span class="tag-chip">${esc(t)}</span>`).join('')}</div>
-    <div class="int-resumo">${esc(i.resumo||'')}</div>
+    <div class="int-resumo" data-id="interacao.texto.resumo">${esc(i.resumo||'')}</div>
     ${isDia?intDiarioBlocos(i):''}
     ${i.texto?`<details class="int-full"><summary>${isDia?'Ver conversa integral do dia':'Ver conversa completa'}</summary><pre>${esc(i.texto)}</pre></details>`:''}
     ${i.proximaAcao?`<div class="int-next">→ Próxima ação: <b>${esc(i.proximaAcao)}</b>${i.prazoAcao?' · prazo '+fmtD(i.prazoAcao):''}</div>`:''}
@@ -4874,8 +4987,8 @@ function intTimeline(list,showCli){
           <button class="btn ghost sm" onclick="App.irParaAtividade('${linked.id}')">Ver atividade</button></div>`
       : gate('createActivity',`<div class="int-actions"><button class="btn sm" onclick="App.interacaoViraAtividade('${i.id}')">${svg(I.plus)} Gerar atividade vinculada</button></div>`) }
     <div class="int-actions">
-      ${(can('whatsEditAny')||can('whatsAdd'))?`<button class="btn ghost sm" onclick="App.editInteracao('${i.id}')">${svg(I.edit)} Editar</button>`:''}
-      ${can('whatsDelete')?`<button class="btn ghost sm" onclick="App.delInteracao('${i.id}')">${svg(I.trash)}</button>`:''}
+      ${(can('whatsEditAny')||can('whatsAdd'))?`<button class="btn ghost sm" data-id="interacao.botao.editar" onclick="App.editInteracao('${i.id}')">${svg(I.edit)} Editar</button>`:''}
+      ${can('whatsDelete')?`<button class="btn ghost sm" data-id="interacao.botao.excluir" onclick="App.delInteracao('${i.id}')">${svg(I.trash)}</button>`:''}
     </div>
   </div>`;}).join('')}</div>`;
 }
@@ -4891,9 +5004,9 @@ function renderHistorico(){
 }
 function histTable(list,canDel){
   if(!list.length) return '<p style="color:var(--txt-3)">Nenhuma alteração registrada.</p>';
-  return `<div class="tbl-wrap"><table class="data"><thead><tr>
+  return `<div class="tbl-wrap" data-id="alteracao.tabela.principal"><table class="data"><thead><tr>
     <th>Data</th><th>Hora</th><th>Usuário</th><th>Módulo</th><th>Cliente</th><th>Campo</th><th>De</th><th>Para</th>${canDel?'<th></th>':''}
-  </tr></thead><tbody>${list.map(x=>`<tr>
+  </tr></thead><tbody>${list.map(x=>`<tr data-id="alteracao.tabela.linha">
     <td class="num">${esc(x.data)}</td><td class="num">${esc(x.hora)}</td><td>${esc(x.usuario)}</td><td>${esc(x.modulo||'—')}</td>
     <td>${esc(x.cliente||'—')}</td><td>${esc(x.campo||'—')}</td><td>${esc(x.de||'—')}</td><td><b>${esc(x.para||'—')}</b></td>
     ${canDel?`<td><button class="btn ghost sm" onclick="App.delHistorico('${x.id}')">${svg(I.trash)}</button></td>`:''}
@@ -5507,17 +5620,17 @@ function buildUserChip(){ const u=getSession(); const c=el('userChip'); if(!c) r
   const ro = u.perfil==='Área Parceira';
   const podeConfig = navAllowed('usuarios');
   c.innerHTML=`
-    <button class="uchip-mini${ro?' uchip-mini-ro':''}" id="uchipBtn" onclick="App.toggleUserMenu()" title="${esc(u.nome)}">
+    <button class="uchip-mini${ro?' uchip-mini-ro':''}" id="uchipBtn" data-id="global.botao.abrir-menu-usuario" onclick="App.toggleUserMenu()" title="${esc(u.nome)}">
       <div class="uavatar">${esc((u.nome[0]||'?'))}</div>
     </button>
-    <div class="user-menu" id="userMenu" hidden>
-      <div class="um-head"><div class="uavatar">${esc((u.nome[0]||'?'))}</div>
+    <div class="user-menu" id="userMenu" data-id="global.menu.usuario" hidden>
+      <div class="um-head" data-id="global.texto.identificacao-usuario"><div class="uavatar">${esc((u.nome[0]||'?'))}</div>
         <div class="uinfo"><b>${esc(u.nome)}</b><small>${esc(u.email)}</small><small>${esc(u.perfil)}${ro?' (Somente Leitura)':''}</small></div></div>
       <div class="um-div"></div>
-      ${podeConfig?`<button class="um-item" onmousedown="App.go('usuarios');App.closeUserMenu()">${svg(I.settings)}Configurações</button>`:''}
-      <button class="um-item" onmousedown="App.toggleTheme();App.closeUserMenu()">${svg(I.theme)}Alternar tema</button>
+      ${podeConfig?`<button class="um-item" data-id="global.botao.configuracoes" onmousedown="App.go('usuarios');App.closeUserMenu()">${svg(I.settings)}Configurações</button>`:''}
+      <button class="um-item" data-id="global.botao.alternar-tema-menu" onmousedown="App.toggleTheme();App.closeUserMenu()">${svg(I.theme)}Alternar tema</button>
       <div class="um-div"></div>
-      <button class="um-item um-danger" onmousedown="App.logout()">${svg(I.logout)}Sair</button>
+      <button class="um-item um-danger" data-id="global.botao.sair" onmousedown="App.logout()">${svg(I.logout)}Sair</button>
     </div>`;
 }
 let _authMode='login';   // 'login' | 'create' | 'reset' | 'force'
@@ -5583,6 +5696,7 @@ function renderAuth(){
 function authErr(msg){ const e=el('loginErr'); if(e){ e.textContent=msg; e.style.display='block'; } }
 async function entrarComUsuario(u,opts){
   setSession(u);
+  if(window.__fdiTryLoad) window.__fdiTryLoad(u.perfil);
   const g=el('authGate');
   g.innerHTML='<div class="login-card" style="text-align:center;padding:60px 34px"><div class="login-sub">Carregando dados…</div></div>';
   try{ setDB(await loadFromSupabase()); }
@@ -5614,9 +5728,10 @@ function logAtivosDiff(clienteNome,antes,depois){
   Object.keys(A).forEach(id=>{ if(!D[id]) addHistory({modulo:'Ativos',cliente:clienteNome,campo:'Ativo · '+(A[id].nome||id),de:'Existente',para:'Excluído'}); });
 }
 window.App = {
-  go(id){
+  go(id,resetHome){
     if(id==='slides'){ renderSlides(); current='relatorios'; window.scrollTo(0,0); return; }
     if(!navAllowed(id)){ toast('Ação não permitida para seu perfil.'); id='dashboard'; }
+    if(resetHome){ filters.cliente=''; jTab='geral'; }
     current=id;
     const meta=NAV.find(n=>n[0]===id);
     el('pageTitle').textContent=DASH_TABS.some(t=>t[0]===id)?'Dashboards':meta[1];
@@ -5745,6 +5860,7 @@ window.App = {
         endereco:a.endereco||'',cep:a.cep||'',
         dataLancamento:a.dataLancamento||'',dataInicioObra:a.dataInicioObra||'',dataFimObra:a.dataFimObra||'',
         posObraMeses:+a.posObraMeses||0,posOperacionalMeses:+a.posOperacionalMeses||0,obrasNaRegiao:+a.obrasNaRegiao||0,distanciaMaxObras:+a.distanciaMaxObras||0,
+        servicos:Array.isArray(a.servicos)?a.servicos.slice():[],
         criadoEm:(prev&&prev.criadoEm)||a.criadoEm||np.iso.slice(0,10),criadoPor:(prev&&prev.criadoPor)||a.criadoPor||quem};})
       .filter(a=>a.nome||a.estado||a.cidade||a.semNomeDefinido);
     c.ativos=ativosDepois;
@@ -5756,10 +5872,10 @@ window.App = {
   },
   cadAtivoAdd(){ if(!canAtivos()){ toast('Ação não permitida.'); return; }
     _cadAtivos.push({id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
-      nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,_open:true}); cadAtivoListRender(); },
+      nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,servicos:[],_open:true}); cadAtivoListRender(); },
   cadAtivoDel(i){ if(!canAtivos()){ toast('Ação não permitida.'); return; } _cadAtivos.splice(i,1); cadAtivoListRender(); },
   cadAtivoDup(i){ if(!canAtivos()){ toast('Ação não permitida.'); return; } const a=_cadAtivos[i]; if(!a) return;
-    const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', _open:true};
+    const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', servicos:(a.servicos||[]).slice(), _open:true};
     _cadAtivos.splice(i+1,0,copy); cadAtivoListRender(); },
   cadAtivoToggle(i){ if(!_cadAtivos[i]) return; _cadAtivos[i]._open=!_cadAtivos[i]._open; cadAtivoListRender(); },
   cadAtivoSet(i,campo,val){ if(!_cadAtivos[i]) return;
@@ -5767,6 +5883,14 @@ window.App = {
     _cadAtivos[i][campo]= NUM.includes(campo)? (+val||0) : val;
     if(NUM.includes(campo)||campo==='semNomeDefinido'||campo==='empresaNaoConstituida') cadAtivoListRender(); },
   cadAtivoSetEstado(i,uf){ if(!_cadAtivos[i]) return; _cadAtivos[i].estado=uf; _cadAtivos[i].regiao=regiaoDoEstado(uf); cadAtivoListRender(); },
+  cadAtivoServicoToggle(i){ const a=_cadAtivos[i]; if(!a) return; const open=a._servOpen!==false; a._servOpen=!open; cadAtivoListRender(); },
+  cadAtivoServicoBusca(i,v){ const box=el('cadAtivo_serv_res_'+i); if(!box||!_cadAtivos[i]) return;
+    box.innerHTML=servicoResultsMarkup(servicosCatalogFiltrado(v),_cadAtivos[i].servicos,'cadAtivo',i); },
+  cadAtivoServicoAdd(i,idx){ if(!_cadAtivos[i]) return; const nome=SERVICOS_TRINUS[idx]&&SERVICOS_TRINUS[idx].nome; if(!nome) return;
+    if(!Array.isArray(_cadAtivos[i].servicos)) _cadAtivos[i].servicos=[];
+    if(!_cadAtivos[i].servicos.includes(nome)) _cadAtivos[i].servicos.push(nome);
+    cadAtivoListRender(); },
+  cadAtivoServicoDel(i,i2){ if(!_cadAtivos[i]||!Array.isArray(_cadAtivos[i].servicos)) return; _cadAtivos[i].servicos.splice(i2,1); cadAtivoListRender(); },
   // ativos do cliente (edição no modal)
   ativoAdd(){ if(!canAtivos()){ toast('Ação não permitida.'); return; }
     _cliAtivos.push({id:'at'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,obs:''}); ativoListRender(); },
@@ -6005,10 +6129,10 @@ window.App = {
   },
   opLimparCliente(){ _opClienteId=''; _opAtivos=[]; opDraftPersist(); renderNovaOperacao(); },
   opAtivoAdd(){ _opAtivos.push({id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
-    nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,_open:true}); opDraftPersist(); opAtivoListRender(); },
+    nome:'',estado:'',cidade:'',regiao:'',tipologia:TIPOLOGIAS[0],quantidade:1,servicos:[],_open:true}); opDraftPersist(); opAtivoListRender(); },
   opAtivoDel(i){ _opAtivos.splice(i,1); opDraftPersist(); opAtivoListRender(); },
   opAtivoDup(i){ const a=_opAtivos[i]; if(!a) return;
-    const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', _open:true};
+    const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', servicos:(a.servicos||[]).slice(), _open:true};
     _opAtivos.splice(i+1,0,copy); opDraftPersist(); opAtivoListRender(); },
   opAtivoToggle(i){ if(!_opAtivos[i]) return; _opAtivos[i]._open=!_opAtivos[i]._open; opDraftPersist(); opAtivoListRender(); },
   opAtivoSet(i,campo,val){ if(!_opAtivos[i]) return;
@@ -6017,6 +6141,14 @@ window.App = {
     opDraftPersist();
     if(NUM.includes(campo)||campo==='semNomeDefinido'||campo==='empresaNaoConstituida') opAtivoListRender(); },
   opAtivoSetEstado(i,uf){ if(!_opAtivos[i]) return; _opAtivos[i].estado=uf; _opAtivos[i].regiao=regiaoDoEstado(uf); opDraftPersist(); opAtivoListRender(); },
+  opAtivoServicoToggle(i){ const a=_opAtivos[i]; if(!a) return; const open=a._servOpen!==false; a._servOpen=!open; opDraftPersist(); opAtivoListRender(); },
+  opAtivoServicoBusca(i,v){ const box=el('opAtivo_serv_res_'+i); if(!box||!_opAtivos[i]) return;
+    box.innerHTML=servicoResultsMarkup(servicosCatalogFiltrado(v),_opAtivos[i].servicos,'opAtivo',i); },
+  opAtivoServicoAdd(i,idx){ if(!_opAtivos[i]) return; const nome=SERVICOS_TRINUS[idx]&&SERVICOS_TRINUS[idx].nome; if(!nome) return;
+    if(!Array.isArray(_opAtivos[i].servicos)) _opAtivos[i].servicos=[];
+    if(!_opAtivos[i].servicos.includes(nome)) _opAtivos[i].servicos.push(nome);
+    opDraftPersist(); opAtivoListRender(); },
+  opAtivoServicoDel(i,i2){ if(!_opAtivos[i]||!Array.isArray(_opAtivos[i].servicos)) return; _opAtivos[i].servicos.splice(i2,1); opDraftPersist(); opAtivoListRender(); },
   salvarNovaOperacao(){
     if(!can('createClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const nome=(_opDraft.nome||'').trim(); if(!nome){ alert('Informe a razão social do cliente.'); return; }
@@ -6029,6 +6161,7 @@ window.App = {
         razaoSocial:(a.razaoSocial||'').trim(),cnpj:(a.cnpj||'').trim(),endereco:a.endereco||'',cep:a.cep||'',
         dataLancamento:a.dataLancamento||'',dataInicioObra:a.dataInicioObra||'',dataFimObra:a.dataFimObra||'',
         posObraMeses:+a.posObraMeses||0,posOperacionalMeses:+a.posOperacionalMeses||0,custoObra:a.custoObra||0,obrasNaRegiao:a.obrasNaRegiao||0,distanciaMaxObras:a.distanciaMaxObras||0,
+        servicos:Array.isArray(a.servicos)?a.servicos.slice():[],
         criadoEm:a.criadoEm||np.iso.slice(0,10),criadoPor:a.criadoPor||quem}))
       .filter(a=>a.nome||a.estado||a.cidade||a.semNomeDefinido);
     let c;
