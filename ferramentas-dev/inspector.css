@@ -1,0 +1,25 @@
+.fdi-bar{position:fixed;top:0;left:0;right:0;height:34px;background:#111827;color:#E5E7EB;display:flex;align-items:center;gap:14px;padding:0 12px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;z-index:999995;box-shadow:0 2px 8px rgba(0,0,0,.35);white-space:nowrap;overflow-x:auto}
+.fdi-bar b{color:#fff;font-weight:600}
+.fdi-bar .fdi-lbl{color:#9CA3AF}
+.fdi-bar .fdi-swatch{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.35);vertical-align:-1px;margin-right:4px}
+.fdi-bar .fdi-spacer{flex:1}
+.fdi-bar button{background:#1F2937;color:#E5E7EB;border:1px solid #374151;border-radius:5px;padding:4px 10px;font:inherit;cursor:pointer;flex:none}
+.fdi-bar button:hover{background:#374151}
+.fdi-bar button.fdi-on{background:#2563EB;border-color:#2563EB}
+
+.fdi-grid{position:fixed;inset:0;pointer-events:none;z-index:999990}
+
+.fdi-highlight{position:fixed;pointer-events:none;z-index:999998;border:2px solid rgba(234,179,8,.9);background:rgba(234,179,8,.12);border-radius:3px;box-sizing:border-box}
+
+.fdi-panel{position:fixed;z-index:999999;background:#111827;color:#E5E7EB;border:1px solid #374151;border-radius:10px;padding:12px 14px;width:280px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.fdi-panel .fdi-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
+.fdi-panel .fdi-row:last-child{margin-bottom:0}
+.fdi-panel .fdi-k{color:#9CA3AF;flex:none}
+.fdi-panel .fdi-v{color:#fff;text-align:right;word-break:break-word;display:flex;align-items:center}
+.fdi-panel .fdi-id{color:#60A5FA;font-weight:600;word-break:break-word}
+.fdi-panel .fdi-copy{background:#1F2937;color:#E5E7EB;border:1px solid #374151;border-radius:5px;padding:2px 7px;cursor:pointer;font:11px inherit;margin-left:6px;flex:none}
+.fdi-panel .fdi-copy:hover{background:#374151}
+.fdi-panel .fdi-desc{color:#D1D5DB;font-size:11.5px;margin-top:2px}
+.fdi-panel .fdi-warn{color:#FBBF24;font-weight:700;font-size:13px;text-align:center;padding:4px 0 10px}
+.fdi-panel .fdi-swatch{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.35);vertical-align:-1px;margin-right:5px}
+.fdi-panel .fdi-en{color:#9CA3AF;font-weight:400;font-size:10.5px;margin-left:5px}
