@@ -485,6 +485,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jctx-indic-item{display:flex;flex-direction:column;gap:2px}
 .jctx-indic-item span{font-size:10.5px;color:var(--txt-3)}
 .jctx-indic-item b{font-size:12.5px;font-weight:600;color:var(--txt-2)}
+.jctx-bv b{color:var(--green);font-weight:700}
 @media(max-width:900px){ .jmain,.jbody.jctx-closed .jmain{margin-right:0} .jctx,.jbody.jctx-closed .jctx{position:static;height:auto;width:auto;top:auto;right:auto;bottom:auto} }
 .jgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:stretch}
 .jgrid .card-head{flex-wrap:nowrap}
@@ -745,8 +746,14 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jpend-alert .jpend-head .ico{background:var(--surface);color:var(--red)}
 
 /* Jornada — Serviços por ativo (Visão Geral), com rolagem quando tem muito conteúdo */
-.jgrid .jserv-card{display:flex;flex-direction:column}
+.jgrid .jserv-card{display:flex;flex-direction:column;height:0;min-height:100%;overflow:hidden}
 .jgrid .jserv-card .card-body{display:flex;flex-direction:column;flex:1;min-height:0}
+.jciclo-group{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--txt-3)}
+.jciclo-group:not(:first-child){margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.jinfo-click{cursor:pointer}
+.jinfo-click:hover{background:var(--surface-2)}
+.jinfo-click:hover span{color:var(--txt-2)}
+.jinfo-editing input{border:1px solid var(--blue);border-radius:6px;padding:3px 8px;font-size:12px;font-family:inherit;color:var(--txt);background:var(--surface)}
 .jserv-bv{font-size:14px;font-weight:700;color:var(--green);background:var(--green-bg);padding:4px 12px;border-radius:20px;white-space:nowrap}
 .jserv-bv small{font-size:10.5px;font-weight:700;letter-spacing:.03em;opacity:.75;margin-right:2px}
 .jserv-resumo{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:4px}
@@ -4712,7 +4719,7 @@ function renderJornada(){
     return;
   }
   const c=sel, h=calcHealth(c.id), e=etapaInfo(c.etapa), sv=calcSurvey(c.id), tv=calcTTFV(c.id), at=calcAtivacao(c.id);
-  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['operacao','Ciclos da Operação','jornada.aba.dados-da-operacao'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Tarefas','jornada.aba.atividades'],['docs','Documentos','jornada.aba.documentos']];
+  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Tarefas','jornada.aba.atividades'],['docs','Documentos','jornada.aba.documentos']];
   const ultimaAlt=DB().history.find(x=>x.cliente===c.nome);
   const ph=el('pageHead'); if(ph) ph.classList.add('jhead-hidden');
   const mc=el('mainContent'); if(mc) mc.classList.add('jhead-hidden');
@@ -4772,7 +4779,7 @@ function diasNaEtapa(c){
   if(n==null) return '—';
   return n<=0?'Hoje':(n+(n===1?' dia':' dias'));
 }
-let jCtxOpen=true, jStageMenuOpen=false, jCtxEditField=null, jPendOpen=false, jTlTab='geral';
+let jCtxOpen=true, jStageMenuOpen=false, jCtxEditField=null, jPendOpen=false, jTlTab='geral', jCicloEditField=null;
 // regional do responsável — mock temporário até o cadastro de usuários ser enriquecido (regional, e-mail etc.)
 const MOCK_REGIONAIS=['Regional Sudeste','Regional Sul','Regional Nordeste','Regional Centro-Oeste','Regional Norte'];
 function mockRegional(nome){
@@ -4835,6 +4842,14 @@ function jContexto(c,m){
         </div>
       </div>
       <div class="jctx-block jctx-indic">
+        <span class="jctx-lbl">Consolidado</span>
+        <div class="jctx-indic-grid">
+          <div class="jctx-indic-item jctx-bv"><span>BV</span><b data-id="jornada.indicador.bv-consolidado">${money(mockBookedValue(c.id))}</b></div>
+          <div class="jctx-indic-item"><span>Total de Ativos</span><b data-id="jornada.indicador.total-ativos-consolidado">${(c.ativos||[]).length}</b></div>
+          <div class="jctx-indic-item"><span>Total de Serviços</span><b data-id="jornada.indicador.total-servicos-consolidado">${(c.ativos||[]).reduce((s,a)=>s+(a.servicos||[]).length,0)}</b></div>
+        </div>
+      </div>
+      <div class="jctx-block">
         <span class="jctx-lbl">Indicadores</span>
         <div class="jctx-indic-grid">
           <div class="jctx-indic-item"><span>Health Score</span><b>${h?num(h.total)+' · '+h.cls:'—'}</b></div>
@@ -4885,7 +4900,6 @@ function jAtivos(c){
 }
 function jPanel(c,m){
   if(jTab==='geral') return jGeral(c,m);
-  if(jTab==='operacao') return jOperacao(c);
   if(jTab==='ativos') return jAtivos(c);
   if(jTab==='atividades') return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.kanban-atividades-tab"><h3 style="font-size:15px" data-id="jornada.texto.titulo-kanban-atividades-tab">Kanban de Atividades</h3><div class="line"></div>
     ${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-tab" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova atividade</button>`)}</div>`+kanbanAtividades(c.id);
@@ -4938,10 +4952,21 @@ function jServicosResumo(c){
       <ul class="jserv-resumo-list">${(a.servicos||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
     </div>`).join('')}</div>`;
 }
+function jCicloDate(c,campo,label,dataId){
+  const ro=!can('editClient');
+  if(jCicloEditField===campo){
+    return `<div class="jinfo jinfo-editing"><span>${label}</span>
+      <input type="date" autofocus value="${c[campo]||''}"
+        onchange="App.jCicloDateSave('${c.id}','${campo}',this.value)"
+        onkeydown="if(event.key==='Escape'){App.jCicloEditToggle(null);}"
+        onblur="App.jCicloDateSave('${c.id}','${campo}',this.value)"></div>`;
+  }
+  return `<div class="jinfo${ro?'':' jinfo-click'}"${ro?'':` onclick="App.jCicloEditToggle('${campo}')" title="Clique para editar"`}><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${fmtD(c[campo])||'—'}</b></div>`;
+}
 function jGeral(c,m){
   return jPendResumo(c) + `<div class="jgrid" style="margin-top:16px">
     <div class="card" data-id="jornada.card.info-cliente"><div class="card-head"><div class="ico">${svg(I.user)}</div><h3 data-id="jornada.texto.titulo-info-cliente">Cliente</h3>
-      <div class="spacer"></div>${gate('editClient',`<button class="btn ghost sm" data-id="jornada.botao.editar-info-cliente" onclick="App.jTab('operacao')">${svg(I.edit)} Editar</button>`)}</div>
+      <div class="spacer"></div>${gate('editClient',`<button class="btn ghost sm" data-id="jornada.botao.editar-info-cliente" onclick="App.jClassifModal('${c.id}')">${svg(I.edit)} Editar</button>`)}</div>
       <div class="card-body jinfos">
         ${jInfo('Nome Comercial',esc(c.nomeFantasia),'jornada.texto.nome-comercial-cliente')}
         ${jInfo('Razão Social',esc(c.nome),'jornada.texto.razao-social-cliente')}
@@ -4953,72 +4978,39 @@ function jGeral(c,m){
         ${jInfo('UF',esc(c.estado),'jornada.texto.uf-cliente')}
         ${jInfo('Observação',esc(c.obs),'jornada.texto.observacao-cliente')}
       </div></div>
-    <div class="card jserv-card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Serviços</h3>
-      <div class="spacer"></div><span class="jserv-bv" data-id="jornada.indicador.bv-servicos-mock" title="Booked Value — ainda sem campo próprio de cadastro, valor mockado por enquanto"><small>BV</small> ${money(mockBookedValue(c.id))}</span></div>
+    <div class="card jserv-card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Serviços</h3></div>
       <div class="card-body">${jServicosResumo(c)}</div></div>
-    <div class="card" data-id="jornada.card.ciclo-negociacao-resumo"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-ciclo-negociacao-resumo">Ciclo de Negociação</h3></div>
+    <div class="card" data-id="jornada.card.ciclos-operacao-resumo"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-ciclos-operacao-resumo">Ciclos da Operação</h3></div>
       <div class="card-body jinfos">
-        ${jInfo('Solicitação Proposta',fmtD(c.dataSolicitacaoProposta),'jornada.texto.data-solicitacao-proposta-resumo')}
-        ${jInfo('1º Envio da Proposta',fmtD(c.dataEnvioProposta),'jornada.texto.data-envio-proposta-resumo')}
-        ${jInfo('Solicitação Minuta',fmtD(c.dataSolicitacaoMinuta),'jornada.texto.data-solicitacao-minuta-resumo')}
-        ${jInfo('Envio da Minuta',fmtD(c.dataEnvioMinuta),'jornada.texto.data-envio-minuta-resumo')}
-        ${jInfo('Envio Contrato p/ Assinatura',fmtD(c.dataEnvioContrato),'jornada.texto.data-envio-contrato-resumo')}
-        ${jInfo('Assinatura do Contrato',fmtD(c.dataAssinatura),'jornada.texto.data-assinatura-contrato-resumo')}
-        ${jInfo('Assinatura Aditivo/Distrato',fmtD(c.dataAssinaturaAditivo),'jornada.texto.data-assinatura-aditivo-resumo')}
-      </div></div>
-    <div class="card" data-id="jornada.card.ciclo-implantacao-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-ciclo-implantacao-resumo">Ciclo de Implantação</h3></div>
-      <div class="card-body jinfos">
-        ${jInfo('Handoff',fmtD(c.dataHandoff),'jornada.texto.data-handoff-resumo')}
-        ${jInfo('Kickoff',fmtD(c.dataKickoff),'jornada.texto.data-kickoff-resumo')}
-        ${jInfo('Go Live Previsto',fmtD(c.goLivePrevisto),'jornada.texto.go-live-previsto-resumo')}
-        ${jInfo('Go Live Real',fmtD(c.goLiveReal),'jornada.texto.go-live-real-resumo')}
+        <div class="jciclo-group">Ciclo de Negociação</div>
+        ${jCicloDate(c,'dataSolicitacaoProposta','Solicitação Proposta','jornada.texto.data-solicitacao-proposta-resumo')}
+        ${jCicloDate(c,'dataEnvioProposta','1º Envio da Proposta','jornada.texto.data-envio-proposta-resumo')}
+        ${jCicloDate(c,'dataSolicitacaoMinuta','Solicitação Minuta','jornada.texto.data-solicitacao-minuta-resumo')}
+        ${jCicloDate(c,'dataEnvioMinuta','Envio da Minuta','jornada.texto.data-envio-minuta-resumo')}
+        ${jCicloDate(c,'dataEnvioContrato','Envio Contrato p/ Assinatura','jornada.texto.data-envio-contrato-resumo')}
+        ${jCicloDate(c,'dataAssinatura','Assinatura do Contrato','jornada.texto.data-assinatura-contrato-resumo')}
+        ${jCicloDate(c,'dataAssinaturaAditivo','Assinatura Aditivo/Distrato','jornada.texto.data-assinatura-aditivo-resumo')}
+        <div class="jciclo-group">Ciclo de Implantação</div>
+        ${jCicloDate(c,'dataHandoff','Handoff','jornada.texto.data-handoff-resumo')}
+        ${jCicloDate(c,'dataKickoff','Kickoff','jornada.texto.data-kickoff-resumo')}
+        ${jCicloDate(c,'goLivePrevisto','Go Live Previsto','jornada.texto.go-live-previsto-resumo')}
+        ${jCicloDate(c,'goLiveReal','Go Live Real','jornada.texto.go-live-real-resumo')}
       </div></div>
   </div>
   ${jTimelineWidget(c)}`;
 }
-function jOperacao(c){
-  const ro=!can('editClient');
-  return `<div class="card" data-id="jornada.card.form-ciclo-negociacao"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-form-ciclo-negociacao">Ciclo de Negociação</h3>
-    <span class="desc">do primeiro contato até a assinatura do contrato</span></div>
-    <div class="card-body"><div class="form-grid">
-      <div class="field"><label>Data Solicitação da Proposta</label><input id="op_dsp" data-id="jornada.campo.data-solicitacao-proposta" ${ro?'disabled':''} type="date" value="${c.dataSolicitacaoProposta||''}"></div>
-      <div class="field"><label>Data 1º Envio da Proposta</label><input id="op_dep" data-id="jornada.campo.data-envio-proposta" ${ro?'disabled':''} type="date" value="${c.dataEnvioProposta||''}"></div>
-      <div class="field"><label>Data Solicitação da Minuta</label><input id="op_dsm" data-id="jornada.campo.data-solicitacao-minuta" ${ro?'disabled':''} type="date" value="${c.dataSolicitacaoMinuta||''}"></div>
-      <div class="field"><label>Data Envio da Minuta p/ Validação</label><input id="op_dem" data-id="jornada.campo.data-envio-minuta" ${ro?'disabled':''} type="date" value="${c.dataEnvioMinuta||''}"></div>
-      <div class="field"><label>Data Envio do Contrato p/ Assinatura</label><input id="op_dec" data-id="jornada.campo.data-envio-contrato" ${ro?'disabled':''} type="date" value="${c.dataEnvioContrato||''}"></div>
-      <div class="field"><label>Data Assinatura do Contrato</label><input id="op_assin" data-id="jornada.campo.data-assinatura-contrato" ${ro?'disabled':''} type="date" value="${c.dataAssinatura||''}"></div>
-      <div class="field"><label>Data Assinatura Aditivo/Distrato</label><input id="op_adit" data-id="jornada.campo.data-assinatura-aditivo" ${ro?'disabled':''} type="date" value="${c.dataAssinaturaAditivo||''}"></div>
-      <div class="field"><label>Booked Value (R$)</label><input id="op_bv" data-id="jornada.campo.booked-value" ${ro?'disabled':''} type="number" min="0" step="1000" value="${c.bookedValue||0}"></div>
-      <div class="field"><label>Resp. pela Proposta</label><input id="op_com" data-id="jornada.campo.resp-proposta" ${ro?'disabled':''} value="${esc(c.respComercial||'')}"></div>
-    </div></div>
-  </div>
-
-  <div class="card" style="margin-top:16px" data-id="jornada.card.form-ciclo-implantacao"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-form-ciclo-implantacao">Ciclo de Implantação</h3>
-    <span class="desc">do handoff comercial até a operação ativa</span></div>
-    <div class="card-body"><div class="form-grid">
-      <div class="field"><label>Data Handoff</label><input id="op_handoff" data-id="jornada.campo.data-handoff" ${ro?'disabled':''} type="date" value="${c.dataHandoff||''}"></div>
-      <div class="field"><label>Data Kickoff</label><input id="op_kick" data-id="jornada.campo.data-kickoff" ${ro?'disabled':''} type="date" value="${c.dataKickoff||''}"></div>
-      <div class="field"><label>Go Live Previsto</label><input id="op_glp" data-id="jornada.campo.go-live-previsto" ${ro?'disabled':''} type="date" value="${c.goLivePrevisto||''}"></div>
-      <div class="field"><label>Go Live Real</label><input id="op_glr" data-id="jornada.campo.go-live-real" ${ro?'disabled':''} type="date" value="${c.goLiveReal||''}"></div>
-      <div class="field"><label>Resp. Onboarding</label><select id="op_onb" data-id="jornada.campo.resp-onboarding" ${ro?'disabled':''}><option value="">—</option>${ANALISTAS.map(a=>`<option ${c.respOnboarding===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
-    </div></div>
-  </div>
-
-  <div class="card" style="margin-top:16px" data-id="jornada.card.form-classificacao-responsaveis"><div class="card-head"><div class="ico">${svg(I.clients)}</div><h3 data-id="jornada.texto.titulo-form-classificacao-responsaveis">Classificação & Responsáveis</h3></div>
-    <div class="card-body"><div class="form-grid">
-      <div class="field"><label>Etapa da Jornada</label><select id="op_etapa" data-id="jornada.campo.etapa-jornada" ${ro?'disabled':''}>${ETAPAS.map(e=>`<option value="${e.key}" ${c.etapa===e.key?'selected':''}>${e.label}</option>`).join('')}</select></div>
-      <div class="field"><label>Status Operacional</label><select id="op_status" data-id="jornada.campo.status-operacional" ${ro?'disabled':''}>${STATUS_OPCOES.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div class="field"><label>Tipologia</label><select id="op_tip" data-id="jornada.campo.tipologia-cliente" ${ro?'disabled':''}>${cfgTipologias().map(t=>`<option ${c.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
-      <div class="field"><label>Key Account</label><select id="op_ka" data-id="jornada.campo.key-account" ${ro?'disabled':''}><option value="">—</option>${KEY_ACCOUNTS.map(a=>`<option ${c.keyAccount===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
-      <div class="field"><label>Resp. Kickoff</label><select id="op_rk" data-id="jornada.campo.resp-kickoff" ${ro?'disabled':''}><option value="">—</option>${ANALISTAS.map(a=>`<option ${c.respKickoff===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
-      <div class="field full"><label>Produtos Contratados</label><div class="prod-tags" id="op_prod" data-id="jornada.campo.produtos-contratados">
+function jClassifModalBody(c){
+  return `<div class="form-grid">
+      <div class="field"><label>Etapa da Jornada</label><select id="cm_etapa" data-id="jornada.campo.etapa-jornada">${ETAPAS.map(e=>`<option value="${e.key}" ${c.etapa===e.key?'selected':''}>${e.label}</option>`).join('')}</select></div>
+      <div class="field"><label>Status Operacional</label><select id="cm_status" data-id="jornada.campo.status-operacional">${STATUS_OPCOES.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label>Tipologia</label><select id="cm_tip" data-id="jornada.campo.tipologia-cliente">${cfgTipologias().map(t=>`<option ${c.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>Key Account</label><select id="cm_ka" data-id="jornada.campo.key-account"><option value="">—</option>${KEY_ACCOUNTS.map(a=>`<option ${c.keyAccount===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
+      <div class="field"><label>Resp. Kickoff</label><select id="cm_rk" data-id="jornada.campo.resp-kickoff"><option value="">—</option>${ANALISTAS.map(a=>`<option ${c.respKickoff===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div>
+      <div class="field"><label>Booked Value (R$)</label><input id="cm_bv" data-id="jornada.campo.booked-value" type="number" min="0" step="1000" value="${c.bookedValue||0}"></div>
+      <div class="field full"><label>Produtos Contratados</label><div class="prod-tags" id="cm_prod" data-id="jornada.campo.produtos-contratados">
         ${produtos().map(p=>`<span class="prod-toggle ${(c.produtos||[]).includes(p)?'on':''}" data-p="${esc(p)}" data-id="jornada.botao.toggle-produto">${esc(p)}</span>`).join('')}</div></div>
-      <div class="field full"><label>Observações</label><textarea id="op_obs" data-id="jornada.campo.observacoes-cliente" ${ro?'disabled':''}>${esc(c.obs||'')}</textarea></div>
-    </div></div>
-  </div>
-
-  ${ro?'':`<div class="section-bar"><div class="spacer"></div>
-    <button class="btn primary" data-id="jornada.botao.salvar-dados-operacao" onclick="App.salvarOperacao('${c.id}')">${svg(I.check)} Salvar Dados da Operação</button></div>`}`;
+      <div class="field full"><label>Observações</label><textarea id="cm_obs" data-id="jornada.campo.observacoes-cliente">${esc(c.obs||'')}</textarea></div>
+    </div>`;
 }
 function jPendencias(cid){
   const abertas=DB().activities.filter(a=>a.cliente===cid&&!['Concluído','Cancelado'].includes(a.status));
@@ -6401,8 +6393,8 @@ window.App = {
 
   /* ---- V4: navegação da jornada ---- */
   limparContexto(){ filters.cliente=''; buildFilters(); this.refresh(); buildCrumb(el('pageTitle')?el('pageTitle').textContent:''); },
-  abrirCliente(id){ filters.cliente=id; jTab='geral'; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; this.go('jornada'); },
-  fecharCliente(){ filters.cliente=''; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; this.refresh(); },
+  abrirCliente(id){ filters.cliente=id; jTab='geral'; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; jCicloEditField=null; this.go('jornada'); },
+  fecharCliente(){ filters.cliente=''; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; jCicloEditField=null; this.refresh(); },
   setStatusNegociacao(id,valor){
     jStageMenuOpen=false;
     if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
@@ -6556,33 +6548,45 @@ window.App = {
     this.go('jornada');
     toast('Operação criada');
   },
-  salvarOperacao(id){
+  jClassifModal(id){
+    if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
+    const c=getCli(id); if(!c) return;
+    const foot=`<button class="btn ghost" onclick="App.closeModal()">Cancelar</button>
+      <button class="btn primary" data-id="jornada.botao.salvar-classificacao" onclick="App.salvarClassificacao('${c.id}')">${svg(I.check)} Salvar</button>`;
+    modalShell(I.clients,'Classificação & Responsáveis',jClassifModalBody(c),foot);
+    el('modal').querySelectorAll('[data-p]').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
+  },
+  salvarClassificacao(id){
     if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const v=k=>{const e=el(k);return e?e.value.trim():'';};
     const d=DB(); const c=getCli(id); if(!c) return;
     const before={...c};
-    const prodEl=el('op_prod');
+    const prodEl=el('cm_prod');
     const produtos=prodEl?[...prodEl.querySelectorAll('.on')].map(t=>t.dataset.p):(c.produtos||[]);
     const after={
-      etapa:el('op_etapa')?el('op_etapa').value:c.etapa, status:el('op_status')?el('op_status').value:c.status,
-      tipologia:el('op_tip')?el('op_tip').value:c.tipologia, produtos,
-      keyAccount:el('op_ka')?el('op_ka').value:c.keyAccount, respKickoff:el('op_rk')?el('op_rk').value:c.respKickoff,
-      respOnboarding:el('op_onb')?el('op_onb').value:c.respOnboarding, respComercial:v('op_com'),
-      obs:v('op_obs'), bookedValue:+v('op_bv')||0,
-      dataSolicitacaoProposta:v('op_dsp'), dataEnvioProposta:v('op_dep'),
-      dataSolicitacaoMinuta:v('op_dsm'), dataEnvioMinuta:v('op_dem'),
-      dataEnvioContrato:v('op_dec'), dataAssinatura:v('op_assin'), dataAssinaturaAditivo:v('op_adit'),
-      dataHandoff:v('op_handoff'), dataKickoff:v('op_kick'), goLivePrevisto:v('op_glp'), goLiveReal:v('op_glr')
+      etapa:el('cm_etapa')?el('cm_etapa').value:c.etapa, status:el('cm_status')?el('cm_status').value:c.status,
+      tipologia:el('cm_tip')?el('cm_tip').value:c.tipologia, produtos,
+      keyAccount:el('cm_ka')?el('cm_ka').value:c.keyAccount, respKickoff:el('cm_rk')?el('cm_rk').value:c.respKickoff,
+      obs:v('cm_obs'), bookedValue:+v('cm_bv')||0
     };
     Object.assign(c,after);
     logClienteDiff(c,before,after,{etapa:'Etapa',status:'Status',tipologia:'Tipologia',produtos:'Produtos',
-      keyAccount:'Key Account',respKickoff:'Resp. Kickoff',respOnboarding:'Resp. Onboarding',respComercial:'Resp. pela Proposta',
-      obs:'Observações',bookedValue:'Booked Value',
-      dataSolicitacaoProposta:'Data Solicitação Proposta',dataEnvioProposta:'Data 1º Envio Proposta',
+      keyAccount:'Key Account',respKickoff:'Resp. Kickoff',obs:'Observações',bookedValue:'Booked Value'});
+    save(d); this.closeModal(); this.refresh(); toast('Classificação atualizada');
+  },
+  jCicloEditToggle(campo){ jCicloEditField=jCicloEditField===campo?null:campo; this.refresh(); },
+  jCicloDateSave(id,campo,valor){
+    jCicloEditField=null;
+    if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
+    const d=DB(); const c=getCli(id); if(!c) return;
+    if((c[campo]||'')===(valor||'')){ this.refresh(); return; }
+    const LBL={dataSolicitacaoProposta:'Data Solicitação Proposta',dataEnvioProposta:'Data 1º Envio Proposta',
       dataSolicitacaoMinuta:'Data Solicitação Minuta',dataEnvioMinuta:'Data Envio Minuta',
       dataEnvioContrato:'Data Envio Contrato',dataAssinatura:'Data Assinatura Contrato',dataAssinaturaAditivo:'Data Assinatura Aditivo',
-      dataHandoff:'Data Handoff',dataKickoff:'Data Kickoff',goLivePrevisto:'Go Live Previsto',goLiveReal:'Go Live Real'});
-    save(d); this.refresh(); toast('Dados da operação salvos');
+      dataHandoff:'Data Handoff',dataKickoff:'Data Kickoff',goLivePrevisto:'Go Live Previsto',goLiveReal:'Go Live Real'};
+    addHistory({modulo:'Jornada',cliente:c.nome,campo:LBL[campo]||campo,de:fmtD(c[campo])||'—',para:fmtD(valor)||'—'});
+    c[campo]=valor;
+    save(d); this.refresh(); toast('Data atualizada');
   },
   // ---- Busca global (topbar) ----
   gsInput(v){
