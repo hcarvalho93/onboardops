@@ -413,7 +413,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 /* Jornada — abas 360, coladas no topbar (controle segmentado, estilo do print de referência) */
 #pageHead.jhead-hidden{display:none}
 #mainContent.jhead-hidden{padding-top:0}
-.jtabs-row{display:flex;align-items:center;gap:10px;padding:14px 0 16px;position:sticky;top:var(--topbar-h);z-index:12;background:var(--bg)}
+.jtabs-row{display:flex;align-items:center;gap:10px;padding:14px 0 16px;position:sticky;top:var(--topbar-h);z-index:16;background:var(--bg);width:100%}
 .jtabs{display:inline-flex;gap:3px;padding:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;width:fit-content;flex-wrap:wrap}
 .jtab{padding:8px 17px;font-size:13px;font-weight:600;color:var(--txt-3);background:none;border:none;border-radius:9px;cursor:pointer;transition:.15s}
 .jtab:hover{color:var(--txt)}
@@ -435,7 +435,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jcard-meta b{color:var(--txt-2);font-weight:600}
 .jcard-meta-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:2px;font-size:11px;color:var(--txt-3)}
 .jcard-meta-right b{color:var(--txt-2);font-weight:600}
-.jcard-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.jcard-actions{display:flex;gap:8px;flex-wrap:wrap}
 
 /* Jornada — estágio da negociação como selo único clicável (substitui a barra de pills) */
 .jstage-dd{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
@@ -449,7 +449,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jbody{position:relative}
 .jmain{min-width:0;margin-right:290px}
 .jbody.jctx-closed .jmain{margin-right:62px}
-.jctx{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;position:fixed;top:calc(var(--topbar-h) + 14px);right:28px;bottom:14px;width:272px;overflow-y:auto;z-index:15}
+.jctx{position:fixed;top:calc(var(--topbar-h) + 14px);right:28px;bottom:14px;width:272px;z-index:15;display:flex;flex-direction:column}
 .jbody.jctx-closed .jctx{width:44px}
 .jctx-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .jctx-title{font-size:12px;font-weight:700;color:var(--txt-2);text-transform:uppercase;letter-spacing:.04em}
@@ -457,8 +457,11 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jctx-chev svg{width:15px;height:15px}
 .jbody.jctx-closed .jctx-chev{transform:rotate(90deg)}
 .jbody.jctx-closed .jctx-title,.jbody.jctx-closed .jctx-body{display:none}
-.jbody.jctx-closed .jctx{padding:14px 9px}
-.jctx-body{margin-top:12px;display:flex;flex-direction:column;gap:16px}
+.jctx-body{margin-top:12px;flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--topbar-h)}
+.jctx-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.jctx-panel:first-child{flex:1;min-height:0}
+.jctx-panel:last-child{flex:none}
+.jctx-person input[type=text]{width:100%;font-size:12.5px;padding:6px 9px;border:1px solid var(--blue);border-radius:8px;background:var(--surface);color:var(--txt);font-family:inherit}
 .jctx-block .jctx-lbl{display:block;font-size:11px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
 .jctx-resp{display:flex;flex-direction:column;gap:11px}
 .jctx-person{display:flex;align-items:center;gap:9px}
@@ -492,6 +495,9 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jgrid .card-head h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .jinfos{display:flex;flex-direction:column;gap:0}
 .jinfo{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.jinfo-block{display:flex;flex-direction:column;gap:5px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.jinfo-block>span{color:var(--txt-3);font-size:12px}
+.jinfo-block>b{font-weight:400;color:var(--txt);white-space:pre-wrap;word-break:break-word;line-height:1.45}
 .jinfo:last-child{border-bottom:0}
 .jinfo span{color:var(--txt-3)}
 .jinfo b{color:var(--txt);text-align:right;font-weight:600}
@@ -734,7 +740,8 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 
 /* Jornada — resumo de Pendências e Tarefas (substitui os 4 mini-cards antigos), aglutinado por padrão */
 .jpend-head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;flex-wrap:wrap}
-.jpend-head .ico{width:30px;height:30px;border-radius:8px;background:var(--blue-soft);display:grid;place-items:center;color:var(--blue);flex:none}
+.jpend-head .ico{width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:var(--txt-3);flex:none}
+.jpend-head .ico svg{width:15px;height:15px}
 .jpend-head h3{font-size:14.5px;margin:0}
 .jpend-counts{display:flex;gap:14px;margin-left:auto;flex-wrap:wrap}
 .jpend-count{font-size:12.5px;color:var(--txt-3)}
@@ -743,7 +750,8 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jpend-chev svg{width:100%;height:100%}
 .jpend-chev.open{transform:rotate(180deg)}
 .jpend-alert{background:var(--red-bg);border-color:color-mix(in srgb,var(--red) 24%, var(--line))}
-.jpend-alert .jpend-head .ico{background:var(--surface);color:var(--red)}
+.jpend-alert .jpend-head .ico{color:var(--red)}
+.jpend-sublabel{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--txt-3);margin-bottom:8px}
 
 /* Jornada — Serviços por ativo (Visão Geral), com rolagem quando tem muito conteúdo */
 .jgrid .jserv-card{display:flex;flex-direction:column;height:0;min-height:100%;overflow:hidden}
@@ -754,6 +762,9 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jinfo-click:hover{background:var(--surface-2)}
 .jinfo-click:hover span{color:var(--txt-2)}
 .jinfo-editing input{border:1px solid var(--blue);border-radius:6px;padding:3px 8px;font-size:12px;font-family:inherit;color:var(--txt);background:var(--surface)}
+.jinfo-edit-row{display:flex;gap:6px;align-items:center}
+.jinfo-today{font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;border:1px solid var(--line);background:var(--surface-2);color:var(--txt-2);cursor:pointer;white-space:nowrap}
+.jinfo-today:hover{background:var(--blue-soft);color:var(--blue);border-color:var(--blue)}
 .jserv-bv{font-size:14px;font-weight:700;color:var(--green);background:var(--green-bg);padding:4px 12px;border-radius:20px;white-space:nowrap}
 .jserv-bv small{font-size:10.5px;font-weight:700;letter-spacing:.03em;opacity:.75;margin-right:2px}
 .jserv-resumo{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:4px}
@@ -762,6 +773,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jserv-resumo-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px}
 .jserv-resumo-head b{font-size:12.5px}
 .jserv-resumo-head span{font-size:11px;color:var(--txt-3);white-space:nowrap}
+.jserv-resumo-cidade{font-size:11px;font-weight:400;color:var(--txt-3)}
 .jserv-resumo-list{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:4px}
 .jserv-resumo-list li{font-size:12px;color:var(--txt-2);line-height:1.4}
 
@@ -4724,12 +4736,11 @@ function renderJornada(){
   const ph=el('pageHead'); if(ph) ph.classList.add('jhead-hidden');
   const mc=el('mainContent'); if(mc) mc.classList.add('jhead-hidden');
   el('view-jornada').innerHTML=`
+  <div class="jtabs-row">
+    <div class="jtabs">${tabs.map(([k,l,idd])=>`<button class="jtab ${jTab===k?'active':''}" data-id="${idd}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
+  </div>
   <div class="jbody ${jCtxOpen?'':'jctx-closed'}">
     <div class="jmain">
-      <div class="jtabs-row">
-        <button type="button" class="jtab-back" data-id="jornada.botao.voltar-cliente" onclick="App.fecharCliente()" title="Voltar à lista">${svg('<path d="M19 12H5M12 19l-7-7 7-7"/>')}</button>
-        <div class="jtabs">${tabs.map(([k,l,idd])=>`<button class="jtab ${jTab===k?'active':''}" data-id="${idd}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
-      </div>
       <div class="card jcard">
         <div class="jcard-top">
           <div class="jcard-left">
@@ -4741,6 +4752,14 @@ function renderJornada(){
               <span>Gerente: <b>${esc(c.respComercial||'—')}</b></span>
               <span>Onboarding: <b>${esc(c.respOnboarding||'—')}</b></span>
               <span>Key Account: <b>${esc(c.keyAccount||'—')}</b></span>
+            </div>
+            <div class="jcard-actions">
+              ${gate('createActivity',`<button type="button" class="btn sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Tarefa</button>`)}
+              ${gate('whatsAdd',`<button type="button" class="btn sm" onclick="App.novaInteracao('${c.id}','evento')">${svg(I.plus)} Interações</button>`)}
+              <button type="button" class="btn sm" onclick="App.jAtalho('pesquisa','${c.id}')">${svg(I.plus)} Pesquisa</button>
+              <button type="button" class="btn sm" onclick="App.jAtalho('ativacao','${c.id}')">${svg(I.plus)} Ativação</button>
+              <button type="button" class="btn sm" onclick="App.jAtalho('ttfv','${c.id}')">${svg(I.plus)} First Value</button>
+              <button type="button" class="btn sm" onclick="App.jTab('docs')">${svg(I.plus)} Documentação</button>
             </div>
           </div>
           <div class="jcard-right">
@@ -4754,14 +4773,6 @@ function renderJornada(){
               <span>Última atualização <b>${ultimaAlt?fmtD(ultimaAlt.data):(fmtD(c.criadoEm)||'—')}</b></span>
             </div>
           </div>
-        </div>
-        <div class="jcard-actions">
-          ${gate('createActivity',`<button type="button" class="btn sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Tarefa</button>`)}
-          ${gate('whatsAdd',`<button type="button" class="btn sm" onclick="App.novaInteracao('${c.id}','evento')">${svg(I.plus)} Interações</button>`)}
-          <button type="button" class="btn sm" onclick="App.jAtalho('pesquisa','${c.id}')">${svg(I.plus)} Pesquisa</button>
-          <button type="button" class="btn sm" onclick="App.jAtalho('ativacao','${c.id}')">${svg(I.plus)} Ativação</button>
-          <button type="button" class="btn sm" onclick="App.jAtalho('ttfv','${c.id}')">${svg(I.plus)} First Value</button>
-          <button type="button" class="btn sm" onclick="App.jTab('docs')">${svg(I.plus)} Documentação</button>
         </div>
       </div>
       <div class="jpanel">${ jPanel(c,{h,e,sv,tv,at}) }</div>
@@ -4799,13 +4810,10 @@ function jContexto(c,m){
   const etiquetas=c.etiquetas||[];
   const pessoa=(label,campo,valor,opcoes)=>{
     const editing=jCtxEditField===campo;
-    const editor = opcoes
-      ? `<select autofocus onchange="App.jRespSet('${c.id}','${campo}',this.value)" onblur="App.jRespEditToggle(null)">
-          <option value="">—</option>${opcoes.map(a=>`<option ${valor===a?'selected':''}>${esc(a)}</option>`).join('')}
-        </select>`
-      : `<input type="text" autofocus value="${esc(valor||'')}" placeholder="${label}"
-          onkeydown="if(event.key==='Enter'){App.jRespSet('${c.id}','${campo}',this.value);}else if(event.key==='Escape'){App.jRespEditToggle(null);}"
-          onblur="App.jRespSet('${c.id}','${campo}',this.value)">`;
+    const dlId=`jctx_dl_${campo}`;
+    const editor = `<input type="text" autofocus value="${esc(valor||'')}" placeholder="${label}"${opcoes?` list="${dlId}"`:''}
+          onkeydown="if(event.key==='Enter'){App.jRespSet('${c.id}','${campo}',this.value);}else if(event.key==='Escape'){this.dataset.cancel='1';App.jRespEditToggle(null);}"
+          onblur="if(this.dataset.cancel)return;App.jRespSet('${c.id}','${campo}',this.value)">${opcoes?`<datalist id="${dlId}">${opcoes.map(a=>`<option value="${esc(a)}">`).join('')}</datalist>`:''}`;
     return `<div class="jctx-person">
       ${editing
         ? editor
@@ -4820,42 +4828,46 @@ function jContexto(c,m){
       <button type="button" class="jctx-chev" onclick="App.jCtxToggle()" title="${jCtxOpen?'Aglutinar':'Expandir'}">${svg(I.chevronDown)}</button>
     </div>
     <div class="jctx-body">
-      <div class="jctx-block">
-        <span class="jctx-lbl">Responsáveis</span>
-        <div class="jctx-resp">
-          ${pessoa('Gerente de Contas','respComercial',c.respComercial,null)}
-          ${pessoa('Onboarding','respOnboarding',c.respOnboarding,ANALISTAS)}
-          ${pessoa('Key Account','keyAccount',c.keyAccount,KEY_ACCOUNTS)}
+      <div class="jctx-panel">
+        <div class="jctx-block">
+          <span class="jctx-lbl">Responsáveis</span>
+          <div class="jctx-resp">
+            ${pessoa('Gerente de Contas','respComercial',c.respComercial,null)}
+            ${pessoa('Onboarding','respOnboarding',c.respOnboarding,ANALISTAS)}
+            ${pessoa('Key Account','keyAccount',c.keyAccount,KEY_ACCOUNTS)}
+          </div>
+        </div>
+        <div class="jctx-block">
+          <span class="jctx-lbl">Nível de Prioridade</span>
+          <div class="jctx-row"><select ${ro?'disabled':''} onchange="App.jRespSet('${c.id}','prioridade',this.value)">
+            <option value="">—</option>${['Alto','Médio','Baixo'].map(p=>`<option ${c.prioridade===p?'selected':''}>${esc(p)}</option>`).join('')}
+          </select></div>
+        </div>
+        <div class="jctx-block">
+          <span class="jctx-lbl">Etiquetas</span>
+          <div class="jctx-tags">
+            ${etiquetas.map(t=>`<span class="jctx-tag">${esc(t)}${ro?'':`<button type="button" class="jctx-tag-del" data-tag="${esc(t)}" title="Remover">×</button>`}</span>`).join('')}
+            ${ro?'':`<input type="text" class="jctx-tag-input" placeholder="+ etiqueta" onkeydown="if(event.key==='Enter'){event.preventDefault();App.jEtiquetaAdd('${c.id}',this.value);this.value='';}">`}
+          </div>
         </div>
       </div>
-      <div class="jctx-block">
-        <span class="jctx-lbl">Nível de Prioridade</span>
-        <div class="jctx-row"><select ${ro?'disabled':''} onchange="App.jRespSet('${c.id}','prioridade',this.value)">
-          <option value="">—</option>${['Alto','Médio','Baixo'].map(p=>`<option ${c.prioridade===p?'selected':''}>${esc(p)}</option>`).join('')}
-        </select></div>
-      </div>
-      <div class="jctx-block">
-        <span class="jctx-lbl">Etiquetas</span>
-        <div class="jctx-tags">
-          ${etiquetas.map(t=>`<span class="jctx-tag">${esc(t)}${ro?'':`<button type="button" class="jctx-tag-del" data-tag="${esc(t)}" title="Remover">×</button>`}</span>`).join('')}
-          ${ro?'':`<input type="text" class="jctx-tag-input" placeholder="+ etiqueta" onkeydown="if(event.key==='Enter'){event.preventDefault();App.jEtiquetaAdd('${c.id}',this.value);this.value='';}">`}
+      <div class="jctx-panel">
+        <div class="jctx-block">
+          <span class="jctx-lbl">Consolidado</span>
+          <div class="jctx-indic-grid">
+            <div class="jctx-indic-item jctx-bv"><span>BV</span><b data-id="jornada.indicador.bv-consolidado">${money(mockBookedValue(c.id))}</b></div>
+            <div class="jctx-indic-item"><span>Total de Ativos</span><b data-id="jornada.indicador.total-ativos-consolidado">${(c.ativos||[]).length}</b></div>
+            <div class="jctx-indic-item"><span>Total de Serviços</span><b data-id="jornada.indicador.total-servicos-consolidado">${(c.ativos||[]).reduce((s,a)=>s+(a.servicos||[]).length,0)}</b></div>
+          </div>
         </div>
-      </div>
-      <div class="jctx-block jctx-indic">
-        <span class="jctx-lbl">Consolidado</span>
-        <div class="jctx-indic-grid">
-          <div class="jctx-indic-item jctx-bv"><span>BV</span><b data-id="jornada.indicador.bv-consolidado">${money(mockBookedValue(c.id))}</b></div>
-          <div class="jctx-indic-item"><span>Total de Ativos</span><b data-id="jornada.indicador.total-ativos-consolidado">${(c.ativos||[]).length}</b></div>
-          <div class="jctx-indic-item"><span>Total de Serviços</span><b data-id="jornada.indicador.total-servicos-consolidado">${(c.ativos||[]).reduce((s,a)=>s+(a.servicos||[]).length,0)}</b></div>
-        </div>
-      </div>
-      <div class="jctx-block">
-        <span class="jctx-lbl">Indicadores</span>
-        <div class="jctx-indic-grid">
-          <div class="jctx-indic-item"><span>Health Score</span><b>${h?num(h.total)+' · '+h.cls:'—'}</b></div>
-          <div class="jctx-indic-item"><span>% Ativação</span><b>${(at!=null?at:0)}%</b></div>
-          <div class="jctx-indic-item"><span>Pesquisa</span><b>${sv?num(sv.media,1)+' ('+sv.cls+')':'—'}</b></div>
-          <div class="jctx-indic-item"><span>TTFV</span><b>${tv?(tv.dias+' dias'):'—'}</b></div>
+        <div class="jctx-block">
+          <span class="jctx-lbl">Indicadores</span>
+          <div class="jctx-indic-grid">
+            <div class="jctx-indic-item"><span>Health Score</span><b>${h?num(h.total)+' · '+h.cls:'—'}</b></div>
+            <div class="jctx-indic-item"><span>% Ativação</span><b>${(at!=null?at:0)}%</b></div>
+            <div class="jctx-indic-item"><span>Pesquisa</span><b>${sv?num(sv.media,1)+' ('+sv.cls+')':'—'}</b></div>
+            <div class="jctx-indic-item"><span>TTFV</span><b>${tv?(tv.dias+' dias'):'—'}</b></div>
+          </div>
         </div>
       </div>
     </div>
@@ -4907,10 +4919,13 @@ function jPanel(c,m){
   return '';
 }
 function jInfo(label,val,dataId){ return `<div class="jinfo"><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${val||'—'}</b></div>`; }
+function jInfoBlock(label,val,dataId){ return `<div class="jinfo-block"><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${val||'—'}</b></div>`; }
 function jPendResumo(c){
   const abertas=DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status));
-  const nPend=abertas.filter(a=>a.origem==='Pendência Operacional').length;
-  const nTarefa=abertas.length-nPend;
+  const porPrazo=(a,b)=>(a.prazo||'9999-99-99').localeCompare(b.prazo||'9999-99-99');
+  const pendencias=abertas.filter(a=>a.origem==='Pendência Operacional').sort(porPrazo);
+  const tarefas=abertas.filter(a=>a.origem!=='Pendência Operacional').sort(porPrazo);
+  const nPend=pendencias.length, nTarefa=tarefas.length;
   return `<div class="card jpend${nPend?' jpend-alert':''}" data-id="jornada.card.pendencias-tarefas-resumo">
     <div class="jpend-head" onclick="App.jPendToggle()">
       <div class="ico">${svg(I.clock)}</div>
@@ -4921,7 +4936,11 @@ function jPendResumo(c){
       </div>
       <span class="jpend-chev${jPendOpen?' open':''}">${svg(I.chevronDown)}</span>
     </div>
-    ${jPendOpen?`<div class="card-body" style="padding-top:0">${atividadeList(abertas)}</div>`:''}
+    ${jPendOpen?`<div class="card-body" style="padding-top:0">
+      ${nPend?`<div class="jpend-sublabel">Pendências</div>${atividadeList(pendencias)}`:''}
+      ${nTarefa?`<div class="jpend-sublabel"${nPend?' style="margin-top:14px"':''}>Tarefas</div>${atividadeList(tarefas)}`:''}
+      ${(!nPend&&!nTarefa)?'<p style="color:var(--txt-3)">Nenhuma pendência ou tarefa em aberto.</p>':''}
+    </div>`:''}
   </div>`;
 }
 function jTimelineGeral(c){
@@ -4948,18 +4967,22 @@ function jServicosResumo(c){
   const ativos=(c.ativos||[]).filter(a=>(a.servicos||[]).length);
   if(!ativos.length) return '<p style="color:var(--txt-3);font-size:12.5px">Nenhum serviço vinculado aos ativos deste cliente.</p>';
   return `<div class="jserv-resumo">${ativos.map(a=>`<div class="jserv-resumo-ativo">
-      <div class="jserv-resumo-head"><b>${esc(a.nome||'Ativo sem nome')}</b><span>${esc(a.tipologia||'—')}</span></div>
+      <div class="jserv-resumo-head"><b>${esc(a.nome||'Ativo sem nome')}${a.cidade?` <span class="jserv-resumo-cidade">| ${esc(a.cidade)}</span>`:''}</b><span>${esc(a.tipologia||'—')}</span></div>
       <ul class="jserv-resumo-list">${(a.servicos||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
     </div>`).join('')}</div>`;
 }
 function jCicloDate(c,campo,label,dataId){
   const ro=!can('editClient');
   if(jCicloEditField===campo){
+    const hoje=today().toISOString().slice(0,10);
     return `<div class="jinfo jinfo-editing"><span>${label}</span>
-      <input type="date" autofocus value="${c[campo]||''}"
-        onchange="App.jCicloDateSave('${c.id}','${campo}',this.value)"
-        onkeydown="if(event.key==='Escape'){App.jCicloEditToggle(null);}"
-        onblur="App.jCicloDateSave('${c.id}','${campo}',this.value)"></div>`;
+      <div class="jinfo-edit-row">
+        <input type="date" autofocus value="${c[campo]||''}"
+          onchange="App.jCicloDateSave('${c.id}','${campo}',this.value)"
+          onkeydown="if(event.key==='Escape'){this.dataset.cancel='1';App.jCicloEditToggle(null);}"
+          onblur="if(this.dataset.cancel)return;App.jCicloDateSave('${c.id}','${campo}',this.value)">
+        <button type="button" class="jinfo-today" title="Usar data de hoje" onmousedown="event.preventDefault();App.jCicloDateSave('${c.id}','${campo}','${hoje}')">hoje</button>
+      </div></div>`;
   }
   return `<div class="jinfo${ro?'':' jinfo-click'}"${ro?'':` onclick="App.jCicloEditToggle('${campo}')" title="Clique para editar"`}><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${fmtD(c[campo])||'—'}</b></div>`;
 }
@@ -4976,7 +4999,7 @@ function jGeral(c,m){
         ${jInfo('Tipologia',esc(c.tipologia),'jornada.texto.tipologia-cliente')}
         ${jInfo('Cidade',esc(c.cidade),'jornada.texto.cidade-cliente')}
         ${jInfo('UF',esc(c.estado),'jornada.texto.uf-cliente')}
-        ${jInfo('Observação',esc(c.obs),'jornada.texto.observacao-cliente')}
+        ${jInfoBlock('Observação',esc(c.obs),'jornada.texto.observacao-cliente')}
       </div></div>
     <div class="card jserv-card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Serviços</h3></div>
       <div class="card-body">${jServicosResumo(c)}</div></div>
