@@ -382,3 +382,20 @@ De passagem, também corrigido o cabeçalho da tela de detalhe do cliente (`rend
 **Redesign visual (a partir de print de referência do usuário):** o controle segmentado (pill cinza com abas em caixa branca) virou texto simples em caixa alta com sublinhado azul na aba ativa — o mesmo padrão já usado em `.jtl-tab` (sub-abas da Linha do Tempo), agora espelhado em `.jtab` pra consistência visual entre os dois níveis de abas da tela. `.jtabs-row` ganhou `box-shadow:var(--shadow)` pra dar a sensação de elevação/camada por cima do conteúdo que rola por baixo, conforme pedido ("leve sombreado... pra mostrar que está acima dos outros itens").
 
 **Teste:** verificado ao vivo em BARION — sem sobreposição com o sidebar direito em nenhum dos dois estados (aberto/fechado), abas com sublinhado azul funcionando ao trocar entre Visão Geral/Ativos/Tarefas/Documentos, sombra visível. Sem erros de console.
+
+---
+
+## 2026-09-25 (6) — Revisão da rodada anterior: barra de abas volta a encostar na borda direita, usando espaçamento vertical em vez de reserva horizontal
+
+**Contexto:** o usuário pediu explicitamente pra reverter a estratégia da entrada anterior — quer a barra de abas ("topbar da operação") esticando até a borda direita física da página de novo (não mais parando 290px antes, pra "desviar" do sidebar de Contexto), e em vez disso pediu pra abaixar tanto o card de identificação (`.jcard`) quanto o sidebar de Contexto (`.jctx`) por uma distância marcada num print (uma faixa verde horizontal cobrindo a altura da barra).
+
+**Decisão — trocar reserva horizontal por separação vertical:** em vez de `.jtabs-row` "desviar" do `.jctx` encolhendo sua própria largura (abordagem da entrada anterior, `margin-right:290px`/`62px`), a barra agora ocupa 100% da largura (igual a `.jbody`, sem `margin-right`) e o que evita a sobreposição é o `.jctx` (fixed) e o `.jcard` (primeiro item de `.jmain`) começarem mais abaixo — depois do fim da barra, não ao lado dela. Como tanto `.jtabs-row` (sticky) quanto `.jctx` (fixed) ficam em posições constantes na viewport assim que a página rola, basta que a faixa Y de um não colida com a do outro — não importa mais se elas se sobrepõem em X.
+
+**Medição ao vivo (`getBoundingClientRect`) antes de calcular os valores:** `.jtabs-row` mede 44.4px de altura (`top:56` / `bottom:100.4`, com `--topbar-h:56px`); antes desta mudança `.jcard` começava exatamente onde a barra termina (`top:100.4`, sem respiro) e `.jctx` já começava ANTES disso (`top:70`) — só não aparecia por cima porque a reserva horizontal os mantinha em colunas diferentes.
+
+**Mudanças:**
+- `.jtabs-row{margin-right:290px}` e `.jtabs-row.jctx-closed{margin-right:62px}` removidos — a barra volta a ocupar a largura inteira de `.jbody` (testado: `.jtabs-row.right === .jbody.right`, exato, nos dois estados aberto/fechado do sidebar). A classe `jctx-closed` no markup do `<div class="jtabs-row">` também foi removida (não tinha mais nenhuma regra CSS associada).
+- `.jcard{margin-top:14px;...}` — antes não tinha `margin-top`; agora cria um respiro de 14px entre o fim da barra de abas e o começo do card, igual ao padrão de respiro de 14px já usado em outros pontos da tela (ex.: o próprio `.jctx` já usava `+14px` antes desta mudança).
+- `.jctx{top:calc(var(--topbar-h) + 58px)}` — antes era `+14px`. 58px = altura medida da barra de abas (~44px) + 14px de respiro, o mesmo respiro aplicado ao `.jcard`, pra manter os dois alinhados na mesma altura abaixo da barra.
+
+**Teste:** verificado ao vivo em "Ricardo De Lacerda Teodoro Ltda" — `.jtabs-row` tocando a borda direita da viewport (`right` idêntico ao de `.jbody`), `.jcard` e `.jctx` começando ~14px abaixo do fim da barra (sem sobreposição), testado nos dois estados do sidebar (aberto/recolhido) e com scroll (a barra fica fixa por cima do conteúdo que rola por baixo, sem cobrir o sidebar, que também é fixo e já começa abaixo dela). Sem erros de console.
