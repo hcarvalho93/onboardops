@@ -4,6 +4,107 @@ Registro de decisões de arquitetura e padrões adotados no projeto. Cada entrad
 
 ---
 
+## 2026-09-23 — Redesenho da tela de Operação (Jornada do Cliente), a partir de PDF de especificação
+
+**Contexto:** usuário forneceu um PDF com orientações detalhadas (prints de referência de um outro sistema — AZO/Lovable) pedindo: título de página removido site-wide (só destaque na sidebar), abas da Jornada como primeiro item da página, um card de identificação da operação (nome + nº AZO clicável + selo único de estágio, clicável, com menu de troca), renomear a aba "Atividades" para "Tarefas", botões de atalho (+Tarefa/+Interações/+Pesquisa/+Ativação/+First Value/+Documentação), e uma sidebar de Contexto à direita com altura total da operação, botão de aglutinar virado pra direita, e linhas de Responsáveis (Gerente de Contas, Onboarding, Key Account) no formato avatar+nome+subtítulo+lápis de edição, mais Nível de Prioridade e Etiquetas.
+
+**Decisões de schema:** duas colunas novas em `public.clientes` (aplicadas via SQL Editor do Supabase, confirmado com o usuário antes):
+```sql
+alter table public.clientes
+  add column if not exists etiquetas text[] not null default array[]::text[],
+  add column if not exists prioridade text;
+```
+Mapeadas em `rowToCliente`/`clienteToRow`. Testado ao vivo: upsert de cliente com esses campos retornando 200 do PostgREST.
+
+**Decisão — "Gerente de Contas" continua texto livre, não lista fixa:** a primeira versão tentou transformar `respComercial` (Gerente de Contas) num `<select>` com a mesma lista de Onboarding/Key Account (`ANALISTAS`/`KEY_ACCOUNTS`), pra manter o mesmo formato visual dos três. Bug encontrado em teste ao vivo: valores reais já existentes (ex. "Paulo Roberto") não estão nessas listas, então o select sempre caía em "—" ao abrir pra editar — silenciosamente pronto pra apagar o valor real se o usuário confirmasse sem notar. Corrigido: `respComercial` volta a ser um campo de texto livre ao clicar no lápis (igual já era no formulário de "Dados da Operação"), só Onboarding e Key Account usam `<select>` (que já são listas fechadas usadas em outros pontos do sistema). **Lição:** ao converter um campo de texto livre pra uma lista fixa, sempre conferir se os valores já cadastrados cabem na lista antes de assumir que cabe — testar com dado real, não só com o caso vazio.
+
+**Decisão — "Regional" do responsável é mock temporário:** não existe hoje nenhum campo de região vinculado a usuário/pessoa no sistema. O usuário confirmou explicitamente usar um valor mockado por enquanto ("depois vamos enriquecer o cadastro dos usuários, vinculando regionais, e-mails, etc."). Implementado como `mockRegional(nome)` — hash determinístico do nome sobre uma lista fixa de 5 regionais, só para ter uma UI plausível; **não é dado real**, deve ser substituído quando o cadastro de usuários ganhar esse campo de verdade.
+
+**Decisão — barra de estágios (pills) substituída por selo único clicável:** o design anterior (`jEstagioBar()`, uma fileira de botões Proposta/Minuta/Aguardando Assinatura/.../Perdido) foi trocado por um único selo colorido com o estágio atual, que abre um menu ao clicar (sem indicar visualmente que é um menu suspenso, por pedido explícito do usuário). `jEstagioBar()` não foi apagada do código — só deixou de ser chamada — caso sirva de referência ou seja reaproveitada depois.
+
+**Decisão — atalhos "+ Pesquisa"/"+ Ativação"/"+ First Value" navegam pra fora da Jornada:** essas três telas (Pesquisa Pós-Kickoff, Ativação Operacional, Time to First Value) ainda são módulos independentes, não abas da Jornada. Os botões de atalho setam `filters.cliente` e navegam pra tela correspondente (que já vem pré-filtrada pelo cliente, reaproveitando o filtro compartilhado). Combinado como solução provisória — o usuário já sinalizou a intenção de trazer essas telas pra dentro da operação no futuro.
+
+---
+
+## 2026-09-23 — Ajuste fino do layout da Operação (abas coladas no topbar, card real, sidebar de altura total)
+
+**Contexto:** após o primeiro round do redesenho acima, o usuário pediu 3 ajustes visuais, com prints de referência: (1) abas coladas no topbar, sem espaço morto, no estilo de controle segmentado (pill) do print; (2) os itens soltos (nome, selo, meta, botões) dentro de um card de verdade, com borda/sombra, do mesmo formato dos demais cards do sistema; (3) a sidebar de Contexto encostando no topbar e indo até o fim da tela — igual à sidebar de navegação esquerda.
+
+**Decisão — `#pageHead` escondido só na Jornada com cliente aberto:** o `.page-head` (cabeçalho de página compartilhado por todas as telas, já sem título desde o round anterior) ainda ocupava um espaço morto fixo (padding + sombra) mesmo vazio, porque filtros/título ficam ocultos quando um cliente está aberto na Jornada. Adicionado `id="pageHead"` e uma classe `.jhead-hidden` que some com ele. Como esse elemento é compartilhado, a lógica precisa ser simétrica: `App.go()` sempre REMOVE a classe no início (rede de segurança pra qualquer tela) e `renderJornada()` ADICIONA a classe só no ramo de detalhe de cliente e REMOVE no ramo de lista/kanban (cobre o caminho de `fecharCliente()`, que não passa por `go()`). Testado: navegar Jornada→Dashboards restaura o cabeçalho normalmente.
+
+**Decisão — abas viraram controle segmentado (pill), não mais abas de sublinhado:** novo estilo `.jtabs`/`.jtab`, visualmente igual ao print de referência (Executivo/Operacional/Serviços/Minutas/Perdas) — container cinza claro arredondado, aba ativa em caixa branca com sombra, inativas em texto cinza sem fundo. Distinto do `.dash-tabs`/`.dash-tab` já existente no Dashboard (que usa fundo azul na aba ativa) — não reaproveitado de propósito, porque o print pedia especificamente o visual branco/claro.
+
+**Decisão — reestruturação do grid da Operação:** `.jtabs-row`, o card (`.jcard`, agora também com `class="card"` pra herdar o visual padrão de card do sistema) e o painel da aba ativa (`.jpanel`) foram movidos pra dentro de uma nova coluna `.jmain`, junto do `.jctx` (Contexto) no mesmo grid `.jbody` — antes o card/abas ficavam FORA do grid, então o Contexto só acompanhava a altura do painel da aba, não do card+abas. Com `.jctx` usando `position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h))` — o mesmo padrão já usado pela sidebar de navegação esquerda — o Contexto agora encosta no topbar e vai até o fim da tela, independente do tamanho do conteúdo da aba ativa.
+
+---
+
+## 2026-09-23 — Segunda rodada de ajuste fino (abas 100% coladas, sidebar fixa de verdade, estágio + SLA)
+
+**Contexto:** teste ao vivo do usuário no navegador real revelou 3 problemas que o teste anterior (via `javascript_exec` no Chrome remoto) não pegou: (1) ainda sobrava um respiro visível entre o topbar e as abas — o `.page-head` já estava escondido, mas o `.content` (container compartilhado por todas as telas) mantinha seu próprio `padding-top:28px`; (2) a sidebar de Contexto (`position:sticky`) "mexia" ao rolar a página no navegador real do usuário, mesmo já reproduzindo o mesmo padrão da sidebar de navegação; (3) pediu botões com "caixa" visível nos atalhos (+ Tarefa etc.), o selo de estágio posicionado à esquerda do card, e um texto discreto de SLA ("20 dias nesta etapa").
+
+**Decisão — zero-gap via `#mainContent`:** adicionado `id="mainContent"` no `.content` e uma segunda classe `.jhead-hidden` que zera `padding-top` nele, alternada nos mesmos 3 pontos já usados pro `#pageHead` (`App.go()`, ramo de lista e ramo de detalhe do `renderJornada()`). Os dois elementos (`#pageHead` e `#mainContent`) agora sempre alternam juntos.
+
+**Decisão — sidebar de Contexto trocada de `sticky` pra `fixed`:** o usuário relatou movimento visível no navegador real, então a implementação foi trocada pra `position:fixed;top:var(--topbar-h);right:28px;bottom:0;width:272px` — garantidamente parada, nunca acompanha o scroll. Como `fixed` tira o elemento do fluxo do grid, `.jmain` reserva o espaço manualmente com `margin-right:290px` (272px + 18px de gap), e o estado "aglutinado" ajusta os dois valores (`width:44px` / `margin-right:62px`) em vez de mudar `grid-template-columns`. O alinhamento com a borda direita do conteúdo (`right:28px`) usa o mesmo padding que `.content` já tem — funciona com precisão nas larguras de tela mais comuns; em monitores muito largos (acima do `max-width:1720px` do conteúdo), pode sobrar um respiro maior entre o conteúdo centralizado e a sidebar — aceito como troca razoável pra evitar cálculo dinâmico de centralização via JS.
+
+**Decisão — botões de atalho sem `ghost`:** `.btn.ghost` no sistema é proposital sem borda (texto+ícone soltos). Bastou remover o modificador `ghost` dos 6 botões (`class="btn sm"`), reaproveitando o estilo padrão do `.btn` (borda fina, sombra sutil) já usado no resto do app — sem CSS novo.
+
+**Decisão — selo de estágio à esquerda + SLA:** o selo (`jstage-badge`) e o texto de SLA (`jstage-sla`) viraram o primeiro bloco de `.jcard-top`, antes do nome/número — nome e número viraram um sub-bloco `.jcard-title` ao lado. SLA calculado por `diasNaEtapa(c)`: busca no histórico a entrada mais recente com `campo==='Estágio da Negociação'` pra esse cliente (data da última troca de estágio) e cai pra `c.criadoEm` se nunca mudou; usa `daysBetween` já existente no projeto. **Bug pego no teste:** a primeira versão usava `h.iso` direto (timestamp completo, ex. `2026-09-23T16:58:...`) — `daysBetween`/`parseD` esperam data pura (`AAAA-MM-DD`), então sempre dava "—". Corrigido com `h.iso.slice(0,10)`.
+
+---
+
+## 2026-09-23 — Terceira rodada: alinhamento fino pós-teste no navegador real
+
+**Contexto:** o usuário testou no Chrome real (não no ambiente remoto de teste) e mandou print com anotação em verde marcando desalinhamento no topo/fim da sidebar de Contexto, além de pedir: botões com caixa visível, o selo de estágio ("status") alinhado à direita do card (revisando a decisão anterior de deixá-lo à esquerda), Criado em/Última atualização organizados abaixo do selo+SLA, e corrigir o desalinhamento entre os cards "Últimas Interações" (texto longo demais, estourando a altura do card) e "Informações do Cliente" (título quebrando em 2 linhas).
+
+- `.jctx` (fixed) ganhou respiro simétrico: `top:calc(var(--topbar-h) + 14px)` e `bottom:14px` (antes eram `top:var(--topbar-h)`/`bottom:0`, colados nas bordas), pra alinhar com o respiro natural das abas/cards ao lado.
+- `.jcard-top` virou `justify-content:space-between`: bloco esquerdo (`jcard-left` — nome, nº AZO, meta de Gerente/Onboarding/Key Account) e bloco direito (`jcard-right` — selo de estágio, SLA, Criado em/Última atualização, todos alinhados à direita). Isso **substitui** a decisão da rodada anterior (selo à esquerda) — registrado aqui como correção explícita a pedido do usuário, sem apagar a entrada anterior.
+- Botões de atalho já tinham perdido o `ghost` na rodada passada; mantido.
+- `.crm-main` (usado nos 4 mini-cards do topo — Últimas Interações/Atividades/Próximos Prazos/Pendências) ganhou uma classe `.crm-clamp` (`-webkit-line-clamp:2`) pro texto do item, aplicada por enquanto só em Últimas Interações (a única com texto livre longo o suficiente pra estourar) + um link "Ver mais..." que leva pra aba Interações. Como a classe é compartilhada pelos 4 cards, qualquer um deles fica protegido contra o mesmo problema se o texto crescer no futuro.
+- `.jgrid .card-head h3` ganhou `white-space:nowrap;overflow:hidden;text-overflow:ellipsis` — evita títulos de 2 linhas desalinhando a altura dos cards de uma fileira (caso do "Informações do Cliente", que ficou mais estreito depois da sidebar fixa tomar espaço). Título completo continua acessível via `title=""` no hover.
+
+---
+
+## 2026-09-23 — Quarta rodada + causa raiz real do desalinhamento das grades de card
+
+**Contexto:** usuário reportou, de novo com print real: abas somem ao rolar a página (pediu fixas), card de cabeçalho "largo" demais (reduzido o padding), e a fileira de mini-cards (Últimas Interações etc.) e a fileira de "Informações do Cliente" continuavam desalinhadas mesmo após a correção anterior (truncar título). Também pediu renomear a aba "Dados da Operação" para "Ciclos da Operação".
+
+- `.jtabs-row` virou `position:sticky;top:var(--topbar-h)` com `background:var(--bg)` — fica visível o tempo todo ao rolar a página, testado (posição idêntica antes/depois do scroll).
+- `.jcard` com padding reduzido (`18px 20px`→`14px 18px`), título menor (19px→17px) e gaps internos mais justos — card mais compacto.
+- **Causa raiz real do desalinhamento (achada só agora):** existe uma regra global antiga, `.card + .card,.card + .kpi-grid,.kpi-grid + .card{ margin-top:16px; }` — pensada pra dar espaçamento vertical entre cards EMPILHADOS (a maioria das telas do sistema usa isso). Ela também casava com os cards dentro de `.crm-grid`/`.jgrid` (que são `.card` irmãos lado a lado, não empilhados), empurrando o 2º/3º/4º card de cada fileira 16px pra baixo — e como o grid usa `align-items:stretch`, isso aparecia como "card mais baixo/desalinhado" em vez de um espaço vazio óbvio, o que enganou o diagnóstico anterior (a correção de truncar título ajudou a esconder o sintoma em "Informações do Cliente" mas não resolveu a causa). **As duas rodadas anteriores tentaram consertar sintoma (título, `align-items:stretch` explícito) sem achar essa regra.** Corrigido com seletor mais específico, sem tocar a regra global: `.jbody .crm-grid > .card,.jbody .jgrid > .card{margin-top:0}`. Testado: as 4 alturas de cada fileira ficaram idênticas nas duas grades.
+- Aba "Dados da Operação" renomeada para "Ciclos da Operação" (só o rótulo da aba; o botão "Salvar Dados da Operação" dentro dela não foi mexido).
+
+**Lição reforçada:** a mesma classe (`.card`) compartilhada entre contextos de empilhamento vertical e grades horizontais é a origem de bugs de alinhamento sutis — sempre que um `.card` aparecer "descolado" de seus vizinhos numa grade, verificar primeiro se uma regra de espaçamento entre irmãos (`+`/`~`) está vazando pra esse contexto antes de mexer no conteúdo interno do card.
+
+---
+
+## 2026-09-23 — Reorganização do formulário de Nova Operação, Ativo, CNPJ automático, Inspetor e Serviços
+
+**Contexto:** início do trabalho na "geração da proposta" (fluxo de Nova Operação). Pedido grande, várias frentes independentes.
+
+**Nova Operação — cabeçalho reorganizado:** campo de busca de cliente (`jornada.campo.buscar-cliente`) ganhou destaque visual (ícone de lupa, caixa com borda, cresce até 300px — `.op-busca-box`), alinhado na mesma linha com Número da Operação, Status, Classificação, Cliente Elite e Tipologia. **Cliente Elite** deixou de ser checkbox e virou `<select>` Sim/Não (mantendo `_opDraft.elite` como booleano — o `onchange` monta um objeto `{type:'checkbox',checked:...}` pra reaproveitar `opFieldChange` sem alterar a função compartilhada). Linha de baixo: Nome Comercial, Razão Social, CNPJ, Cidade, UF, Observações.
+
+**CNPJ automático:** novo utilitário `App.formatCnpj(v)` — extrai só dígitos e monta `00.000.000/0000-00` progressivamente. Aplicado via `onblur` (não `onchange`, pra evitar corrida entre os dois eventos) no CNPJ da Nova Operação e no CNPJ do Ativo (`ativoAccordionMarkup`, ambos prefixos `opAtivo`/`cadAtivo`).
+
+**Ativo — `ativoAccordionMarkup()` reestruturado:**
+- Nome do Empreendimento e Razão Social agora usam `.ativo-wide` (`grid-column:span 2` dentro do `.ativo-grid` de `minmax(150px,1fr)`) — cabem nomes longos.
+- "Sem nome definido" e "Empresa não constituída" saíram de células próprias do grid e foram pra dentro do campo Nome do Empreendimento, como uma linha discreta (`.ativo-check-row`) logo abaixo do input.
+- Localização: Cidade primeiro, Estado (UF) depois com largura reduzida (`.ativo-narrow`, ~74px, sem ficar menor que o rótulo "Estado"), e um campo `Endereço` novo ocupando o resto da linha — o campo já existia no modelo de dados (`a.endereco`, coluna `endereco` já em `ativos` no Supabase, usada em outro formulário legado) só não estava nessa tela.
+- Grupo "Cronograma da Obra" trocou de posição com "Números do Empreendimento" (cronograma agora vem antes). "Status do Ativo" saiu de Números do Empreendimento e virou o primeiro campo de Cronograma, antes de "Lançamento".
+
+**Inspetor de Desenvolvimento — painel não soma mais instantaneamente ao trocar de alvo:** antes, mover o mouse pra fora do elemento hovado chamava `removePanel()` na hora, então o caminho até o painel (que abre a ~16px do canto do cursor) quase sempre cruzava outro elemento e fechava o painel antes do clique. Agora existe um `removeTimer` de 1s de tolerância: o painel só some se, depois de 1s, o mouse não tiver entrado nele (`panelEl.contains(e.target)` cancela o timer). Testado via dispatch de `mousemove` sintético: painel confirmado ainda presente 400ms depois de mudar de alvo (antes sumia na hora).
+
+**Correção rápida (mesmo dia) — larguras do formulário de Nova Operação/Ativo:** o campo de busca (`f-search`) e a Razão Social (`f-grow`) tinham `flex:1`, então cada um sozinho numa fileira com bastante espaço sobrando virava enorme (essa é a causa do "campo de busca parece sobreposto/quebrado" reportado pelo usuário — não era sobreposição de verdade, era o campo crescendo demais e empurrando os vizinhos pra longe). Trocado por larguras fixas: busca 280px, Razão Social nova classe `f-xl` (300px), CNPJ subiu de `f-sm`(140px) pra `f-md`(200px, cabe o placeholder inteiro sem cortar). No Ativo: Cidade ganhou `ativo-md` (220px, era 1fr igual às outras), Endereço trocou `field full` (força quebra de linha) por `ativo-wide` (2 colunas, mas na mesma fileira de Cidade/Estado).
+
+**Correção — causa raiz real do "campo de busca com borda dupla":** não era largura, era especificidade CSS de novo (mesma classe de bug já documentada nesta seção). `.op-busca-box input{border:none;background:none;...}` tinha a mesma especificidade de `.field input,.field select,...{border:1px solid var(--line-strong);background:var(--surface);padding:9px 11px;...}` (a regra global de todo input dentro de `.field`) — e a global vem DEPOIS no arquivo, então vencia, devolvendo pro `<input>` a própria borda/fundo/padding *dentro* do `.op-busca-box` que já tinha os seus — duas caixas visualmente empilhadas. Corrigido escopando `.op-busca-wrap .op-busca-box input` (mais específico, não depende de ordem no arquivo).
+
+**Correção — Cidade/UF "grudados" no Ativo:** a tentativa anterior de aumentar/diminuir campos individuais dentro do `.ativo-grid` (que é `repeat(auto-fit,minmax(150px,1fr))`, colunas sempre iguais) usava `width` fixo maior que a própria coluna — o campo Cidade (220px) estourava a largura da sua faixa e invadia visualmente a faixa vizinha (Estado), sem respeitar o `gap`. Corrigido tirando Cidade/Estado/Endereço do grid de colunas iguais: viram uma fileira flex própria (`.ativo-loc`, `grid-column:1/-1`) com largura de cada campo controlada diretamente (Cidade 220px, Estado 80px, Endereço cresce pra preencher o resto) — sem risco de estourar coluna porque não são mais colunas de grid.
+
+**Serviços — ordem alfabética em colunas + "mais solicitados":** `servicoResultsMarkup` foi reescrita pra absorver a filtragem (antes em `servicosCatalogFiltrado`, removida). Com busca vazia (campo recém-clicado, antes de digitar), mostra os 5 serviços mais usados no momento — contados varrendo `servicos[]` de todos os ativos de todos os clientes já cadastrados; se ainda não há uso suficiente registrado (app novo), completa em ordem alfabética. Com busca preenchida, ordena alfabeticamente e aplica `ordemColunas()` — uma transposição que faz a leitura em 4 colunas ficar alfabética de cima pra baixo em cada coluna (A,E,I,M / B,F,J,N / ...) em vez de esquerda-pra-direita por linha, mantendo o mesmo grid CSS de 4 colunas já existente (só muda a ORDEM dos itens no HTML, não o layout).
+
+**Serviços — removidos os chips duplicados abaixo do catálogo:** `servicosChipsMarkup()` parou de ser chamada (função ficou definida mas sem uso, não apagada). O catálogo (`servicoResultsMarkup`) agora é sempre clicável — clicar num serviço selecionado **remove** (alterna), em vez de precisar do chip separado pra isso. Estado "selecionado" ficou bem mais evidente: fundo verde (`--green-bg`), borda verde, nome em verde e negrito (antes era só um leve `opacity:.6`, que ironicamente deixava o item selecionado com aparência mais apagada). Hover num item já selecionado fica vermelho, sinalizando "clique pra remover". Testado ao vivo: alternar Gestão de Carteira liga/desliga corretamente e atualiza o contador do cabeçalho.
+
+---
+
 ## 2026-09-22 — Padrão de identificadores do Inspetor de Desenvolvimento
 
 **Contexto:** construção de um inspetor visual de desenvolvimento (F9) para apontar elementos da tela por identificador único, em vez de descrição de posição/texto.
@@ -155,3 +256,20 @@ De passagem, também corrigido o cabeçalho da tela de detalhe do cliente (`rend
 **Motivo:** o custo de perseguir 100% dos elementos (incluindo casos raros, texto secundário, ícones soltos) cresce muito mais rápido que o benefício — o objetivo do Inspetor é ajudar o usuário a localizar/nomear elementos que ele *realmente* vai referenciar no dia a dia, não catalogar cada pixel da tela.
 
 **Efeito no Passo 5 (demais telas):** mesma lógica passa a valer — ao entrar numa tela nova, aplicar o padrão de granularidade já estabelecido (container + partes relevantes: título, botão, campo, indicador) nos elementos óbvios, sem perseguir cobertura perfeita; buracos remanescentes são preenchidos sob demanda.
+
+---
+
+## 2026-09-24 — Reestruturação da aba Visão Geral (Jornada do Cliente)
+
+**Contexto:** pedido do usuário, em duas mensagens com anexos, pra consolidar a Visão Geral da operação: menos abas superiores, um resumo aglutinável de pendências/tarefas no lugar dos 4 mini-cards antigos, indicadores movidos pro rodapé do sidebar de Contexto (separados dos campos editáveis), renomear "Informações do Cliente" pra "Cliente", e trocar "Ciclo de Negociação" de lugar por um novo card de "Serviços" (por ativo).
+
+**Mudanças:**
+- Abas superiores da Jornada reduzidas de 8 pra 5: `Visão Geral / Ciclos da Operação / Ativos / Tarefas / Documentos`. Pendências, Interações e Alterações saem do nível de aba — viram sub-filtros dentro do novo widget de linha do tempo da Visão Geral.
+- `crmPanel()` (cards "Últimas Interações / Últimas Atividades / Próximos Prazos / Pendências") removido por completo, sem call sites restantes. CSS antigo (`.crm-*`) deixado no lugar (regra morta inofensiva, mesmo padrão já usado antes pro `jEstagioBar`), exceto a parte de `.jbody .crm-grid > .card,.jbody .jgrid > .card{margin-top:0}` que continua valendo — ela também cobre `.jgrid`, que segue em uso.
+- Substituído por três funções novas: `jPendResumo()` (resumo aglutinado, expande/recolhe, mostra contagem de pendências vs. tarefas), `jTimelineWidget()` (linha do tempo com 4 sub-abas: Geral/Tarefas/Interações/Alterações) e `jServicosResumo()` (lista de serviços por ativo, com rolagem própria — `max-height:220px;overflow-y:auto`).
+- **Heurística de separação pendência vs. tarefa:** `activities[].origem === 'Pendência Operacional'` conta como pendência; toda outra atividade em aberto conta como tarefa. É uma leitura interpretativa sobre um campo que já existia (`origem`), não uma distinção nova no schema — se o usuário quiser outro critério no futuro, é só trocar essa condição em `jPendResumo()`.
+- Card "Indicadores" saiu do grid principal e foi pro rodapé do sidebar de Contexto (`.jctx-indic`, com separador visual acima pra marcar que dali pra baixo é só leitura, diferente dos campos editáveis de cima).
+- Grid principal da Visão Geral reordenado: Cliente (renomeado, era "Informações do Cliente") → Serviços (novo) → Ciclo de Negociação → Ciclo de Implantação.
+- `.jcard` (card de identificação no topo da operação) compactado a pedido do usuário ("de 4 blocos pra 3 blocos" — nova convenção de tamanho relativo combinada nesta conversa): `padding` 14px 18px→10px 16px, `margin-bottom` 16px→12px, título 17px→16px, gaps internos reduzidos.
+
+**Teste:** verificado ao vivo via Claude in Chrome (sessão logada real) em dois clientes reais (CALFTECH e NOVA ALIANÇA): expandir/recolher pendências, as 4 sub-abas da linha do tempo, indicadores reais no sidebar, e o card de Serviços (incluindo teste momentâneo com dados injetados só em memória — nunca gravados no Supabase — pra confirmar que a lista de chips renderiza corretamente; descartado com reload). Sem erros no console em nenhum momento.

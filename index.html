@@ -403,13 +403,92 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jstage.active{background:var(--stage-color);border-color:var(--stage-color);color:#fff}
 .jstage.active .jstage-dot{background:#fff}
 .jstage.danger{margin-left:auto}
+/* .jstage é reaproveitada pelo widget "journey" do Dashboard (funil executivo, números grandes) —
+   por isso as sobrescritas abaixo são escopadas em .jstage-bar .jstage (maior especificidade),
+   em vez de editar a regra .jstage compartilhada e arriscar quebrar o outro componente. */
+.jstage-bar{margin:8px 0 14px}
+.jstage-bar .jstage{flex:none;flex-direction:row;align-items:center;justify-content:flex-start;padding:5px 12px;border-radius:999px;font-size:11.5px;gap:6px}
+.jstage-bar .jstage .jstage-dot{width:6px;height:6px}
 
-/* Jornada — abas 360 */
-.jtabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:18px}
-.jtab{padding:9px 15px;font-size:13px;font-weight:600;color:var(--txt-3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:.12s}
+/* Jornada — abas 360, coladas no topbar (controle segmentado, estilo do print de referência) */
+#pageHead.jhead-hidden{display:none}
+#mainContent.jhead-hidden{padding-top:0}
+.jtabs-row{display:flex;align-items:center;gap:10px;padding:14px 0 16px;position:sticky;top:var(--topbar-h);z-index:12;background:var(--bg)}
+.jtabs{display:inline-flex;gap:3px;padding:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;width:fit-content;flex-wrap:wrap}
+.jtab{padding:8px 17px;font-size:13px;font-weight:600;color:var(--txt-3);background:none;border:none;border-radius:9px;cursor:pointer;transition:.15s}
 .jtab:hover{color:var(--txt)}
-.jtab.active{color:var(--blue);border-bottom-color:var(--blue)}
-.jgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.jtab.active{color:var(--txt);background:var(--surface);box-shadow:var(--shadow);font-weight:700}
+.jtab-back{width:32px;height:32px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--surface);color:var(--txt-3);cursor:pointer;border-radius:9px}
+.jtab-back:hover{background:var(--surface-2);color:var(--txt)}
+.jtab-back svg{width:16px;height:16px}
+
+/* Jornada — card de identificação da operação (nome, nº AZO, estágio, meta, atalhos) */
+.jcard{margin-bottom:12px;padding:10px 16px}
+.jcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.jcard-left{display:flex;flex-direction:column;gap:4px;min-width:0}
+.jcard-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+.jcard-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.jcard-title h2{font-size:16px;font-weight:700;margin:0}
+.jop-num{font-size:12px;font-weight:700;color:var(--blue);text-decoration:none;background:var(--blue-soft);padding:3px 10px;border-radius:20px;white-space:nowrap}
+.jop-num:hover{text-decoration:underline}
+.jcard-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--txt-3)}
+.jcard-meta b{color:var(--txt-2);font-weight:600}
+.jcard-meta-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:2px;font-size:11px;color:var(--txt-3)}
+.jcard-meta-right b{color:var(--txt-2);font-weight:600}
+.jcard-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+
+/* Jornada — estágio da negociação como selo único clicável (substitui a barra de pills) */
+.jstage-dd{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.jstage-badge{border:none;cursor:pointer;padding:4px 13px;border-radius:20px;font-size:11.5px;font-weight:700;background:var(--stage-color);color:#fff;font:inherit}
+.jstage-sla{font-size:10.5px;color:var(--txt-3);text-align:right}
+.jstage-menu{position:absolute;top:calc(100% + 5px);right:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-lg);padding:4px;z-index:50;min-width:180px;display:flex;flex-direction:column;gap:1px}
+.jstage-menu button{border:none;background:none;text-align:left;padding:7px 10px;border-radius:7px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--txt)}
+.jstage-menu button:hover{background:var(--surface-2)}
+
+/* Jornada — layout com sidebar de contexto à direita: fixa (não acompanha o scroll), do topbar até o fim da tela */
+.jbody{position:relative}
+.jmain{min-width:0;margin-right:290px}
+.jbody.jctx-closed .jmain{margin-right:62px}
+.jctx{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;position:fixed;top:calc(var(--topbar-h) + 14px);right:28px;bottom:14px;width:272px;overflow-y:auto;z-index:15}
+.jbody.jctx-closed .jctx{width:44px}
+.jctx-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.jctx-title{font-size:12px;font-weight:700;color:var(--txt-2);text-transform:uppercase;letter-spacing:.04em}
+.jctx-chev{width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--txt-3);cursor:pointer;transition:transform .15s;transform:rotate(-90deg)}
+.jctx-chev svg{width:15px;height:15px}
+.jbody.jctx-closed .jctx-chev{transform:rotate(90deg)}
+.jbody.jctx-closed .jctx-title,.jbody.jctx-closed .jctx-body{display:none}
+.jbody.jctx-closed .jctx{padding:14px 9px}
+.jctx-body{margin-top:12px;display:flex;flex-direction:column;gap:16px}
+.jctx-block .jctx-lbl{display:block;font-size:11px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.jctx-resp{display:flex;flex-direction:column;gap:11px}
+.jctx-person{display:flex;align-items:center;gap:9px}
+.jctx-avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+.jctx-person-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.jctx-person-info b{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jctx-person-info small{font-size:11px;color:var(--txt-3)}
+.jctx-pencil{width:22px;height:22px;flex:none;border:none;background:none;color:var(--txt-3);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.jctx-pencil:hover{background:var(--surface-2);color:var(--txt)}
+.jctx-pencil svg{width:13px;height:13px}
+.jctx-row{display:flex;flex-direction:column;gap:3px;font-size:12.5px}
+.jctx-row>span{color:var(--txt-3)}
+.jctx-row>b{font-weight:600}
+.jctx-row select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font:inherit;font-size:12.5px;color:var(--txt)}
+.jctx-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.jctx-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:var(--surface-2);border:1px solid var(--line);font-size:11.5px;font-weight:600;color:var(--txt-2)}
+.jctx-tag button{border:none;background:none;color:var(--txt-3);cursor:pointer;font-size:13px;line-height:1;padding:0}
+.jctx-tag button:hover{color:var(--red)}
+.jctx-tag-input{border:1px dashed var(--line);border-radius:20px;background:none;padding:4px 10px;font:inherit;font-size:11.5px;color:var(--txt);min-width:96px}
+.jctx-tag-input:focus{outline:none;border-color:var(--blue)}
+/* Indicadores: só leitura, separados dos blocos editáveis acima por uma divisória própria */
+.jctx-indic{padding-top:14px;border-top:1px solid var(--line)}
+.jctx-indic-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 8px}
+.jctx-indic-item{display:flex;flex-direction:column;gap:2px}
+.jctx-indic-item span{font-size:10.5px;color:var(--txt-3)}
+.jctx-indic-item b{font-size:12.5px;font-weight:600;color:var(--txt-2)}
+@media(max-width:900px){ .jmain,.jbody.jctx-closed .jmain{margin-right:0} .jctx,.jbody.jctx-closed .jctx{position:static;height:auto;width:auto;top:auto;right:auto;bottom:auto} }
+.jgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:stretch}
+.jgrid .card-head{flex-wrap:nowrap}
+.jgrid .card-head h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .jinfos{display:flex;flex-direction:column;gap:0}
 .jinfo{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
 .jinfo:last-child{border-bottom:0}
@@ -452,6 +531,16 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .ativos-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .ativo-card{border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin-bottom:10px;background:var(--surface-2)}
 .ativo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.ativo-grid .field.ativo-wide{grid-column:span 2}
+/* Localização foge do grid de colunas iguais (que não dá pra encolher/esticar um campo sem
+   sobrepor o vizinho) — vira uma fileira flex própria, com largura de cada campo sob controle direto. */
+.ativo-loc{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px}
+.ativo-loc .field{flex:none}
+.ativo-loc .field.ativo-cidade{width:220px}
+.ativo-loc .field.ativo-uf{width:80px}
+.ativo-loc .field.ativo-endereco{flex:1 1 260px;min-width:260px}
+.ativo-check-row{display:flex;gap:16px;margin-top:7px}
+.ativo-check{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt-3);cursor:pointer}
 .ativo-del{margin-top:8px;color:var(--red)}
 .ativo-sub{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--txt-3);margin:6px 0 -2px;padding-top:8px;border-top:1px dashed var(--line)}
 .ativo-grid>.ativo-sub:first-child{border-top:none;padding-top:0;margin-top:0}
@@ -472,9 +561,18 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .form-flow .field.f-sm{width:140px}
 .form-flow .field.f-md{width:200px}
 .form-flow .field.f-lg{width:230px}
+.form-flow .field.f-xl{width:300px}
 .form-flow .field.f-grow{flex:1 1 260px;min-width:260px}
 .form-flow .field.f-full{flex:1 1 100%;width:100%}
+.form-flow .field.f-search{width:280px}
 .op-busca-wrap{position:relative}
+.op-busca-box{display:flex;align-items:center;gap:9px;height:40px;padding:0 13px;border:1.5px solid var(--line-strong);border-radius:10px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.op-busca-box svg{width:17px;height:17px;color:var(--blue);flex:none}
+/* especificidade maior que ".field input" (regra global de inputs) de propósito — sem isso o input
+   ganhava de volta a própria borda/fundo/padding e "duplicava" a caixa por cima do .op-busca-box */
+.op-busca-wrap .op-busca-box input{border:none;background:none;flex:1;min-width:0;width:auto;font:inherit;font-size:14px;padding:0;color:var(--txt)}
+.op-busca-wrap .op-busca-box input:focus,.op-busca-wrap .op-busca-box input:hover{border:none;outline:none;box-shadow:none;background:none}
+.op-busca-box:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
 .op-busca-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-lg);z-index:30;max-height:260px;overflow-y:auto}
 .op-busca-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--line)}
 .op-busca-item:last-child{border-bottom:none}
@@ -497,14 +595,17 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .serv-busca-input{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:9px 11px;font-size:13.5px;box-sizing:border-box}
 .serv-busca-input:focus{outline:2px solid var(--blue-soft);border-color:var(--blue);background:var(--surface)}
 .serv-list{margin-top:8px;padding:2px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.serv-list-label{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--txt-3);margin:2px 0 -1px}
 .serv-item{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;transition:.12s}
 .serv-item:hover{border-color:var(--blue);box-shadow:0 1px 4px -1px rgba(0,0,0,.12)}
 .serv-item-nome{font-size:12px;font-weight:600;line-height:1.3}
 .serv-item-ico{display:flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--blue);color:#fff;flex:none;opacity:0;transform:scale(.7);transition:.12s}
 .serv-item-ico svg{width:11px;height:11px}
 .serv-item:hover .serv-item-ico{opacity:1;transform:scale(1)}
-.serv-item.disabled{cursor:default;background:var(--surface-2);opacity:.6}
-.serv-item.disabled:hover{border-color:var(--line);box-shadow:none}
+.serv-item.disabled{cursor:pointer;background:var(--green-bg);border-color:var(--green);border-width:1.5px}
+.serv-item.disabled:hover{border-color:var(--red);box-shadow:0 1px 4px -1px rgba(0,0,0,.12)}
+.serv-item.disabled:hover .serv-item-ico{background:var(--red)}
+.serv-item.disabled .serv-item-nome{color:var(--green);font-weight:700}
 .serv-item.disabled .serv-item-ico{opacity:1;transform:scale(1);background:var(--green)}
 .serv-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .serv-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 6px 4px 11px;border-radius:20px;border:1px solid var(--line);background:var(--surface-2);color:var(--txt);font-size:12px;font-weight:600}
@@ -611,8 +712,12 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .origin-chip{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--violet-bg);color:var(--violet)}
 
 /* Painel CRM consolidado (Jornada › Visão Geral) */
-.crm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:18px}
-.crm-card{padding:14px 16px}
+.crm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:18px;align-items:stretch}
+.crm-card{padding:14px 16px;display:flex;flex-direction:column}
+.crm-card .crm-list{flex:1}
+/* .card + .card{margin-top:16px} (regra global p/ cards empilhados verticalmente) também pega os cards
+   lado a lado destas grades — zera aqui com seletor mais específico em vez de editar a regra compartilhada. */
+.jbody .crm-grid > .card,.jbody .jgrid > .card{margin-top:0}
 .crm-h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--txt);text-transform:uppercase;letter-spacing:.04em;margin-bottom:11px}
 .crm-h svg{width:16px;height:16px;color:var(--blue)}
 .crm-count{margin-left:auto;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--txt-2);background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:1px 9px}
@@ -621,7 +726,38 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .crm-dot{width:8px;height:8px;border-radius:50%;flex:none;margin-top:5px}
 .crm-main{display:flex;flex-direction:column;font-size:13px;color:var(--txt);font-weight:600;line-height:1.3}
 .crm-main small{font-weight:400;color:var(--txt-3);font-size:11px;margin-top:1px}
+.crm-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.crm-more{color:var(--blue);cursor:pointer;text-decoration:none;font-weight:600}
+.crm-more:hover{text-decoration:underline}
 .crm-empty{font-size:12.5px;color:var(--txt-3)}
+
+/* Jornada — resumo de Pendências e Tarefas (substitui os 4 mini-cards antigos), aglutinado por padrão */
+.jpend-head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;flex-wrap:wrap}
+.jpend-head h3{font-size:14.5px;margin:0}
+.jpend-counts{display:flex;gap:14px;margin-left:auto;flex-wrap:wrap}
+.jpend-count{font-size:12.5px;color:var(--txt-3)}
+.jpend-count b{color:var(--txt);font-weight:700;font-size:13.5px;margin-right:3px}
+.jpend-chev{width:22px;height:22px;flex:none;color:var(--txt-3);transition:transform .15s}
+.jpend-chev svg{width:100%;height:100%}
+.jpend-chev.open{transform:rotate(180deg)}
+
+/* Jornada — Serviços por ativo (Visão Geral), com rolagem quando tem muito conteúdo */
+.jserv-resumo{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:2px}
+.jserv-resumo-ativo b{display:block;font-size:12.5px;margin-bottom:6px}
+.jserv-resumo-chips{display:flex;flex-wrap:wrap;gap:5px}
+.jserv-resumo-chip{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;background:var(--surface-2);border:1px solid var(--line);color:var(--txt-2)}
+
+/* Jornada — Linha do Tempo da Operação (Visão Geral), com sub-abas */
+.jtl-tabs{display:flex;gap:4px;flex-wrap:wrap;padding:0 18px;border-bottom:1px solid var(--line)}
+.jtl-tab{padding:9px 5px;margin-right:14px;font-size:12.5px;font-weight:600;color:var(--txt-3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:.12s}
+.jtl-tab:hover{color:var(--txt)}
+.jtl-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.jtl-list{list-style:none;display:flex;flex-direction:column;gap:11px}
+.jtl-item{display:flex;align-items:flex-start;gap:10px}
+.jtl-ico{width:26px;height:26px;flex:none;border-radius:50%;background:var(--surface-2);color:var(--blue);display:flex;align-items:center;justify-content:center}
+.jtl-ico svg{width:14px;height:14px}
+.jtl-main{display:flex;flex-direction:column;font-size:13px;color:var(--txt);font-weight:600}
+.jtl-main small{font-weight:400;color:var(--txt-3);font-size:11.5px;margin-top:1px}
 
 /* ---- Pendências: hub operacional ---- */
 .chips{display:flex;flex-wrap:wrap;gap:7px}
@@ -1555,7 +1691,7 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
   display:flex; align-items:center; gap:18px; flex-wrap:wrap; row-gap:7px;
   padding-bottom:9px;
 }
-.page-head .page-title{ min-width:0; flex:none; }
+.page-head .page-title{ display:none; }
 .page-head .mod-ico,.page-head .crumb{ display:none; }
 .page-head .mod-tile{ width:32px; height:32px; border-radius:10px; }
 .page-head .mod-tile svg{ width:16px; height:16px; }
@@ -1828,9 +1964,9 @@ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__fdiTryLoad();
 
   <!-- ====================== MAIN ====================== -->
   <main class="main">
-    <div class="content">
+    <div class="content" id="mainContent">
       <!-- Cabeçalho da página (título, caminho e módulo) -->
-      <div class="page-head">
+      <div class="page-head" id="pageHead">
         <div class="page-head-top">
           <div class="mod-ico" id="modIco"></div>
           <div class="page-title">
@@ -2358,6 +2494,8 @@ function migrate(db){
   db.clientes.forEach(c=>{ if(!Array.isArray(c.ativos)) c.ativos=[]; if(c.estado===undefined) c.estado=''; if(c.cidade===undefined) c.cidade=''; if(c.cnpj===undefined) c.cnpj='';
     if(!Array.isArray(c.representantes)) c.representantes=[]; if(!Array.isArray(c.documentos)) c.documentos=[];
     if(!Array.isArray(c.operacoes)) c.operacoes=[];
+    if(!Array.isArray(c.etiquetas)) c.etiquetas=[];
+    if(c.prioridade===undefined) c.prioridade='';
     if(c.nomeFantasia===undefined) c.nomeFantasia=''; if(c.endereco===undefined) c.endereco='';
     if(c.criadoEm===undefined) c.criadoEm=c.dataAssinatura||''; if(c.criadoPor===undefined) c.criadoPor='';
     c.ativos.forEach(a=>{ if(!a.regiao&&a.estado) a.regiao=regiaoDoEstado(a.estado); if(a.quantidade==null) a.quantidade=1;
@@ -2410,9 +2548,11 @@ function rowToCliente(r){ return {id:r.id,nome:r.nome,nomeFantasia:nz(r.nome_fan
   dataSolicitacaoMinuta:nz(r.data_solicitacao_minuta),dataEnvioMinuta:nz(r.data_envio_minuta),
   dataEnvioContrato:nz(r.data_envio_contrato),dataAssinaturaAditivo:nz(r.data_assinatura_aditivo),dataHandoff:nz(r.data_handoff),
   numeroOperacao:nz(r.numero_operacao),classificacao:nz(r.classificacao),elite:!!r.elite,
+  etiquetas:r.etiquetas||[],prioridade:nz(r.prioridade),
   criadoEm:nz(r.criado_em),criadoPor:nz(r.criado_por),ativos:[],representantes:[],operacoes:[]}; }
 function clienteToRow(c){ return {id:c.id,nome:c.nome,nome_fantasia:nn(c.nomeFantasia),cnpj:nn(c.cnpj),endereco:nn(c.endereco),
   documentos:c.documentos||[],produtos:c.produtos||[],tipologia:nn(c.tipologia),
+  etiquetas:c.etiquetas||[],prioridade:nn(c.prioridade),
   data_assinatura:nn(c.dataAssinatura),data_kickoff:nn(c.dataKickoff),go_live_previsto:nn(c.goLivePrevisto),go_live_real:nn(c.goLiveReal),
   resp_onboarding:nn(c.respOnboarding),key_account:nn(c.keyAccount),resp_comercial:nn(c.respComercial),resp_kickoff:nn(c.respKickoff),
   status:nn(c.status),etapa:nn(c.etapa),obs:nn(c.obs),estado:nn(c.estado),cidade:nn(c.cidade),
@@ -2924,16 +3064,39 @@ const SERVICOS_TRINUS = [
   {cat:'Gestão Financeira',nome:'Monitoramento de Projetos e Produtos N1'},
   {cat:'Gestão Financeira',nome:'Monitoramento de Projetos e Produtos N2'},
 ];
-function servicosCatalogFiltrado(q){
-  const query=(q||'').trim().toLowerCase();
-  const idxs=[]; SERVICOS_TRINUS.forEach((s,idx)=>{ if(!query||s.nome.toLowerCase().includes(query)) idxs.push(idx); });
+// reordena uma lista já alfabética pra ler em colunas (não em linhas) quando desenhada
+// num grid row-major de `cols` colunas — ex.: A,E,I,M / B,F,J,N / C,G,K,O / D,H,L em vez de A,B,C,D / E,F,G,H...
+function ordemColunas(arr,cols){
+  const linhas=Math.ceil(arr.length/cols), out=[];
+  for(let r=0;r<linhas;r++) for(let c=0;c<cols;c++){ const idx=c*linhas+r; if(idx<arr.length) out.push(arr[idx]); }
+  return out;
+}
+function topServicosSolicitados(n){
+  const cont={};
+  (DB().clientes||[]).forEach(c=>(c.ativos||[]).forEach(a=>(a.servicos||[]).forEach(nome=>{ cont[nome]=(cont[nome]||0)+1; })));
+  const porUso=Object.keys(cont).sort((a,b)=>cont[b]-cont[a]);
+  const idxs=[], usados=new Set();
+  porUso.forEach(nome=>{ if(idxs.length>=n) return; const idx=SERVICOS_TRINUS.findIndex(s=>s.nome===nome); if(idx>=0&&!usados.has(idx)){ idxs.push(idx); usados.add(idx); } });
+  if(idxs.length<n){ // ainda sem uso suficiente registrado — completa em ordem alfabética
+    SERVICOS_TRINUS.map((s,idx)=>idx).sort((a,b)=>SERVICOS_TRINUS[a].nome.localeCompare(SERVICOS_TRINUS[b].nome))
+      .forEach(idx=>{ if(idxs.length<n&&!usados.has(idx)){ idxs.push(idx); usados.add(idx); } });
+  }
   return idxs;
 }
-function servicoResultsMarkup(idxs,jaSelecionados,prefix,i){
+function servicoResultsMarkup(query,jaSelecionados,prefix,i){
+  const q=(query||'').trim().toLowerCase();
+  let idxs, topo=false;
+  if(!q){ idxs=topServicosSolicitados(5); topo=true; }
+  else{
+    idxs=[]; SERVICOS_TRINUS.forEach((s,idx)=>{ if(s.nome.toLowerCase().includes(q)) idxs.push(idx); });
+    idxs.sort((a,b)=>SERVICOS_TRINUS[a].nome.localeCompare(SERVICOS_TRINUS[b].nome));
+    idxs=ordemColunas(idxs,4);
+  }
   if(!idxs.length) return '<p style="grid-column:1/-1;font-size:12.5px;color:var(--txt-3);margin:4px 0">Nenhum serviço encontrado.</p>';
-  return idxs.map(idx=>{
+  const label=topo?'<div class="serv-list-label" style="grid-column:1/-1">Mais solicitados</div>':'';
+  return label+idxs.map(idx=>{
     const nome=SERVICOS_TRINUS[idx].nome, already=(jaSelecionados||[]).includes(nome);
-    return `<div class="serv-item${already?' disabled':''}" data-id="ativo.selo.servico-catalogo" ${already?'':`onclick="App.${prefix}ServicoAdd(${i},${idx})"`} title="${esc(nome)}">
+    return `<div class="serv-item${already?' disabled':''}" data-id="ativo.selo.servico-catalogo" onclick="App.${prefix}ServicoAdd(${i},${idx})" title="${already?'Clique para remover':esc(nome)}">
       <span class="serv-item-nome">${esc(nome)}</span>
       <span class="serv-item-ico">${already?svg(I.check,2.4):svg(I.plus,2.4)}</span>
     </div>`;
@@ -4389,28 +4552,28 @@ function renderNovaOperacao(){
   <div class="card" data-id="jornada.card.dados-nova-operacao"><div class="card-head"><div class="ico">${svg(I.route)}</div><h3>Nova Operação</h3>
     <span class="desc">dados iniciais para abrir a operação comercial</span></div>
     <div class="card-body">
-      <div class="field op-busca-wrap" style="max-width:420px;margin-bottom:14px">
-        <label>Buscar cliente já cadastrado</label>
-        <input id="op_busca" data-id="jornada.campo.buscar-cliente" placeholder="CNPJ, Razão Social ou Nome Comercial…" autocomplete="off"
-          value="${linkedCli?esc(linkedCli.nome):''}" oninput="App.opBuscarCliente(this.value)">
-        <div class="op-busca-results" id="op_busca_results" hidden></div>
+      <div class="form-flow">
+        <div class="field op-busca-wrap f-search"><label>Buscar cliente já cadastrado</label>
+          <div class="op-busca-box">${svg(I.search,1.8)}<input id="op_busca" data-id="jornada.campo.buscar-cliente" placeholder="CNPJ, Razão Social ou Nome Comercial…" autocomplete="off"
+            value="${linkedCli?esc(linkedCli.nome):''}" oninput="App.opBuscarCliente(this.value)"></div>
+          <div class="op-busca-results" id="op_busca_results" hidden></div>
+        </div>
+        <div class="field f-sm"><label>Número da Operação</label><input id="op_numero" data-id="jornada.campo.numero-operacao" value="${esc(_opDraft.numero)}" placeholder="Ex.: nº no ASO" onchange="App.opFieldChange('numero',this)"></div>
+        <div class="field f-md"><label>Status</label><select id="op_estagio" data-id="jornada.campo.status-operacao" onchange="App.opFieldChange('estagio',this)">${STATUS_NEGOCIACAO.map(s=>`<option ${_opDraft.estagio===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field f-xs"><label>Classificação</label><select id="op_classif" data-id="jornada.campo.classificacao" onchange="App.opFieldChange('classif',this)"><option value="">—</option>${CLASSIFICACOES.map(c=>`<option ${_opDraft.classif===c?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="field f-xs"><label>Cliente Elite</label><select id="op_elite" data-id="jornada.campo.cliente-elite" onchange="App.opFieldChange('elite',{type:'checkbox',checked:this.value==='Sim'})"><option ${!_opDraft.elite?'selected':''}>Não</option><option ${_opDraft.elite?'selected':''}>Sim</option></select></div>
+        <div class="field f-md"><label>Tipologia</label><select id="op_tip" data-id="jornada.campo.tipologia" onchange="App.opFieldChange('tip',this)">${TIPOLOGIAS.map(t=>`<option ${_opDraft.tip===t?'selected':''}>${t}</option>`).join('')}</select></div>
       </div>
       ${linkedCli?`<div class="op-cliente-vinculado" data-id="jornada.secao.cliente-vinculado"><span class="ico-sm" style="color:var(--green)">${svg(I.check)}</span> Vinculado a <b>${esc(linkedCli.nome)}</b> — dados e ativos do cadastro foram carregados.
         <div class="spacer"></div><button type="button" class="btn ghost sm" data-id="jornada.botao.desvincular-cliente" onclick="App.opLimparCliente()">Desvincular</button></div>`:''}
       ${opsExistentes.length?`<div class="op-hist" data-id="jornada.secao.operacoes-existentes"><span class="op-hist-label">Operações já criadas para este cliente:</span>
         ${opsExistentes.map(o=>`<a class="op-chip" href="#cliente=${encodeURIComponent(_opClienteId)}" target="_blank" rel="noopener">Nº ${esc(o.numero||'—')} · ${esc(o.statusNegociacao||'—')}</a>`).join('')}</div>`:''}
-      <div class="form-flow">
-        <div class="field f-sm"><label>Número da Operação</label><input id="op_numero" data-id="jornada.campo.numero-operacao" value="${esc(_opDraft.numero)}" placeholder="Ex.: nº no ASO" onchange="App.opFieldChange('numero',this)"></div>
-        <div class="field f-md"><label>Status</label><select id="op_estagio" data-id="jornada.campo.status-operacao" onchange="App.opFieldChange('estagio',this)">${STATUS_NEGOCIACAO.map(s=>`<option ${_opDraft.estagio===s?'selected':''}>${s}</option>`).join('')}</select></div>
-        <div class="field f-xs"><label>Classificação</label><select id="op_classif" data-id="jornada.campo.classificacao" onchange="App.opFieldChange('classif',this)"><option value="">—</option>${CLASSIFICACOES.map(c=>`<option ${_opDraft.classif===c?'selected':''}>${c}</option>`).join('')}</select></div>
-        <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="op_elite" data-id="jornada.campo.cliente-elite" ${_opDraft.elite?'checked':''} onchange="App.opFieldChange('elite',this)"> <span class="ico-sm">${svg(I.star,1.8)}</span> Cliente Elite</label></div>
+      <div class="form-flow" style="margin-top:14px">
         <div class="field f-lg"><label>Nome Comercial</label><input id="op_fantasia" data-id="jornada.campo.nome-comercial" value="${esc(_opDraft.fantasia)}" placeholder="Como o cliente é conhecido" onchange="App.opFieldChange('fantasia',this)"></div>
-        <div class="field f-grow"><label>Razão Social *</label><input id="op_nome" data-id="jornada.campo.razao-social" value="${esc(_opDraft.nome)}" placeholder="Razão social completa" onchange="App.opFieldChange('nome',this)"></div>
-        <div class="field f-sm"><label>CNPJ</label><input id="op_cnpj" data-id="jornada.campo.cnpj" value="${esc(_opDraft.cnpj)}" placeholder="00.000.000/0000-00" onchange="App.opFieldChange('cnpj',this)"></div>
+        <div class="field f-xl"><label>Razão Social *</label><input id="op_nome" data-id="jornada.campo.razao-social" value="${esc(_opDraft.nome)}" placeholder="Razão social completa" onchange="App.opFieldChange('nome',this)"></div>
+        <div class="field f-md"><label>CNPJ</label><input id="op_cnpj" data-id="jornada.campo.cnpj" value="${esc(_opDraft.cnpj)}" placeholder="00.000.000/0000-00" onblur="this.value=App.formatCnpj(this.value);App.opFieldChange('cnpj',this)"></div>
         <div class="field f-lg"><label>Cidade</label><input id="op_cidade" data-id="jornada.campo.cidade" value="${esc(_opDraft.cidade)}" onchange="App.opFieldChange('cidade',this)"></div>
         <div class="field f-xs"><label>UF</label><select id="op_estado" data-id="jornada.campo.uf" onchange="App.opFieldChange('estado',this)">${ufOpts(_opDraft.estado)}</select></div>
-        <div class="field f-md"><label>Tipologia</label><select id="op_tip" data-id="jornada.campo.tipologia" onchange="App.opFieldChange('tip',this)">${TIPOLOGIAS.map(t=>`<option ${_opDraft.tip===t?'selected':''}>${t}</option>`).join('')}</select></div>
         <div class="field f-full"><label>Observações</label><textarea id="op_obs" data-id="jornada.campo.observacoes-operacao" style="min-height:52px" onchange="App.opFieldChange('obs',this)">${esc(_opDraft.obs)}</textarea></div>
       </div>
     </div>
@@ -4453,34 +4616,37 @@ function ativoAccordionMarkup(list, prefix){
           </div>
           ${servOpen?`<div class="serv-block-body">
             <input class="serv-busca-input" data-id="ativo.campo.buscar-servico" placeholder="Buscar ou clicar num serviço abaixo…" autocomplete="off" oninput="event.stopPropagation();App.${prefix}ServicoBusca(${i},this.value)" onclick="event.stopPropagation()" style="width:100%">
-            <div class="serv-list" id="${prefix}_serv_res_${i}" data-id="ativo.lista.servicos-catalogo" onclick="event.stopPropagation()">${servicoResultsMarkup(servicosCatalogFiltrado(''),a.servicos,prefix,i)}</div>
-            ${servicosChipsMarkup(a.servicos,prefix,i)}
+            <div class="serv-list" id="${prefix}_serv_res_${i}" data-id="ativo.lista.servicos-catalogo" onclick="event.stopPropagation()">${servicoResultsMarkup('',a.servicos,prefix,i)}</div>
           </div>`:''}
         </div>
         <div class="ativo-grid">
         ${sub('Identificação')}
-        <div class="field"><label>Nome do Empreendimento</label><input data-id="ativo.campo.nome-empreendimento" ${a.semNomeDefinido?'disabled':''} value="${esc(a.nome||'')}" onchange="App.${prefix}Set(${i},'nome',this.value)" placeholder="Ex.: SPE Jardim Aurora"></div>
-        <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" data-id="ativo.campo.sem-nome-definido" ${a.semNomeDefinido?'checked':''} onchange="App.${prefix}Set(${i},'semNomeDefinido',this.checked)"> Sem nome definido</label></div>
-        <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" data-id="ativo.campo.empresa-nao-constituida" ${a.empresaNaoConstituida?'checked':''} onchange="App.${prefix}Set(${i},'empresaNaoConstituida',this.checked)"> Empresa não constituída</label></div>
-        <div class="field"><label>Razão Social</label><input data-id="ativo.campo.razao-social" ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.razaoSocial||'')}" onchange="App.${prefix}Set(${i},'razaoSocial',this.value)" placeholder="Razão social da SPE"></div>
-        <div class="field"><label>CNPJ</label><input data-id="ativo.campo.cnpj" ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.cnpj||'')}" onchange="App.${prefix}Set(${i},'cnpj',this.value)" placeholder="00.000.000/0000-00"></div>
+        <div class="field ativo-wide"><label>Nome do Empreendimento</label><input data-id="ativo.campo.nome-empreendimento" ${a.semNomeDefinido?'disabled':''} value="${esc(a.nome||'')}" onchange="App.${prefix}Set(${i},'nome',this.value)" placeholder="Ex.: SPE Jardim Aurora">
+          <div class="ativo-check-row">
+            <label class="ativo-check"><input type="checkbox" data-id="ativo.campo.sem-nome-definido" ${a.semNomeDefinido?'checked':''} onchange="App.${prefix}Set(${i},'semNomeDefinido',this.checked)"> Sem nome definido</label>
+            <label class="ativo-check"><input type="checkbox" data-id="ativo.campo.empresa-nao-constituida" ${a.empresaNaoConstituida?'checked':''} onchange="App.${prefix}Set(${i},'empresaNaoConstituida',this.checked)"> Empresa não constituída</label>
+          </div>
+        </div>
+        <div class="field ativo-wide"><label>Razão Social</label><input data-id="ativo.campo.razao-social" ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.razaoSocial||'')}" onchange="App.${prefix}Set(${i},'razaoSocial',this.value)" placeholder="Razão social da SPE"></div>
+        <div class="field"><label>CNPJ</label><input data-id="ativo.campo.cnpj" ${a.empresaNaoConstituida?'disabled':''} value="${esc(a.cnpj||'')}" onblur="this.value=App.formatCnpj(this.value);App.${prefix}Set(${i},'cnpj',this.value)" placeholder="00.000.000/0000-00"></div>
         <div class="field"><label>Tipo do Ativo</label><select data-id="ativo.campo.tipo-ativo" onchange="App.${prefix}Set(${i},'tipologia',this.value)">${TIPOLOGIAS.map(t=>`<option ${a.tipologia===t?'selected':''}>${t}</option>`).join('')}</select></div>
         ${sub('Localização')}
-        <div class="field"><label>Estado</label><select data-id="ativo.campo.estado" onchange="App.${prefix}SetEstado(${i},this.value)">${ufOpt(a.estado||'')}</select></div>
-        <div class="field"><label>Cidade</label><input data-id="ativo.campo.cidade" value="${esc(a.cidade||'')}" onchange="App.${prefix}Set(${i},'cidade',this.value)"></div>
-        ${sub('Números do Empreendimento')}
-        <div class="field"><label>Status do Ativo</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
-        <div class="field"><label>Total de Unidades</label><input data-id="ativo.campo.total-unidades" type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.${prefix}Set(${i},'unidades',this.value)"></div>
-        <div class="field"><label>Unidades Vendidas</label><input data-id="ativo.campo.unidades-vendidas" type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.${prefix}Set(${i},'unidadesVendidas',this.value)"></div>
-        <div class="field"><label>VGV (R$)</label><input data-id="ativo.campo.vgv" type="number" min="0" step="1000" value="${a.vgv!=null?a.vgv:0}" onchange="App.${prefix}Set(${i},'vgv',this.value)"></div>
+        <div class="ativo-loc">
+          <div class="field ativo-cidade"><label>Cidade</label><input data-id="ativo.campo.cidade" value="${esc(a.cidade||'')}" onchange="App.${prefix}Set(${i},'cidade',this.value)"></div>
+          <div class="field ativo-uf"><label>Estado</label><select data-id="ativo.campo.estado" onchange="App.${prefix}SetEstado(${i},this.value)">${ufOpt(a.estado||'')}</select></div>
+          <div class="field ativo-endereco"><label>Endereço</label><input data-id="ativo.campo.endereco" value="${esc(a.endereco||'')}" onchange="App.${prefix}Set(${i},'endereco',this.value)" placeholder="Logradouro, número, complemento"></div>
+        </div>
         ${sub('Cronograma da Obra')}
+        <div class="field"><label>Status do Ativo</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
         <div class="field"><label>Lançamento</label><input data-id="ativo.campo.data-lancamento" type="date" value="${a.dataLancamento||''}" onchange="App.${prefix}Set(${i},'dataLancamento',this.value)"></div>
         <div class="field"><label>Início da Obra</label><input data-id="ativo.campo.data-inicio-obra" type="date" value="${a.dataInicioObra||''}" onchange="App.${prefix}Set(${i},'dataInicioObra',this.value)"></div>
         <div class="field"><label>Fim da Obra</label><input data-id="ativo.campo.data-fim-obra" type="date" value="${a.dataFimObra||''}" onchange="App.${prefix}Set(${i},'dataFimObra',this.value)"></div>
         <div class="field"><label>Pós-obra (meses)</label><input data-id="ativo.campo.pos-obra-meses" type="number" min="0" value="${a.posObraMeses!=null?a.posObraMeses:0}" onchange="App.${prefix}Set(${i},'posObraMeses',this.value)"></div>
         <div class="field"><label>Pós-operacional (meses)</label><input data-id="ativo.campo.pos-operacional-meses" type="number" min="0" value="${a.posOperacionalMeses!=null?a.posOperacionalMeses:0}" onchange="App.${prefix}Set(${i},'posOperacionalMeses',this.value)"></div>
+        ${sub('Números do Empreendimento')}
+        <div class="field"><label>Total de Unidades</label><input data-id="ativo.campo.total-unidades" type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.${prefix}Set(${i},'unidades',this.value)"></div>
+        <div class="field"><label>Unidades Vendidas</label><input data-id="ativo.campo.unidades-vendidas" type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.${prefix}Set(${i},'unidadesVendidas',this.value)"></div>
+        <div class="field"><label>VGV (R$)</label><input data-id="ativo.campo.vgv" type="number" min="0" step="1000" value="${a.vgv!=null?a.vgv:0}" onchange="App.${prefix}Set(${i},'vgv',this.value)"></div>
         <div class="field full"><label>Observações</label><input data-id="ativo.campo.observacoes" value="${esc(a.obs||'')}" onchange="App.${prefix}Set(${i},'obs',this.value)"></div>
         </div>
       </div>`:''}
@@ -4526,6 +4692,8 @@ function renderJornada(){
   if(filters.cliente===NOVA_OP_ID){ renderNovaOperacao(); return; }
   const sel=filters.cliente && getCli(filters.cliente);
   if(!sel){
+    const ph0=el('pageHead'); if(ph0) ph0.classList.remove('jhead-hidden');
+    const mc0=el('mainContent'); if(mc0) mc0.classList.remove('jhead-hidden');
     el('view-jornada').innerHTML=`
     <div class="section-bar" data-id="jornada.secao.cabecalho-kanban"><h2 data-id="jornada.texto.titulo-cabecalho-kanban">Jornada do Cliente</h2><div class="line"></div>
       ${gate('createClient',`<button class="btn primary sm" data-id="jornada.botao.adicionar-operacao" onclick="App.novaOperacao()">${svg(I.plus)} Adicionar Operação</button>`)}</div>
@@ -4533,15 +4701,133 @@ function renderJornada(){
     return;
   }
   const c=sel, h=calcHealth(c.id), e=etapaInfo(c.etapa), sv=calcSurvey(c.id), tv=calcTTFV(c.id), at=calcAtivacao(c.id);
-  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['operacao','Dados da Operação','jornada.aba.dados-da-operacao'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Atividades','jornada.aba.atividades'],['pendencias','Pendências','jornada.aba.pendencias'],['whats','Interações','jornada.aba.interacoes'],['alteracoes','Alterações','jornada.aba.alteracoes'],['docs','Documentos','jornada.aba.documentos']];
+  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['operacao','Ciclos da Operação','jornada.aba.dados-da-operacao'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Tarefas','jornada.aba.atividades'],['docs','Documentos','jornada.aba.documentos']];
+  const ultimaAlt=DB().history.find(x=>x.cliente===c.nome);
+  const ph=el('pageHead'); if(ph) ph.classList.add('jhead-hidden');
+  const mc=el('mainContent'); if(mc) mc.classList.add('jhead-hidden');
   el('view-jornada').innerHTML=`
-  <div class="section-bar"><button class="btn ghost sm" data-id="jornada.botao.voltar-cliente" onclick="App.fecharCliente()">${svg('<path d="M19 12H5M12 19l-7-7 7-7"/>')} Voltar</button>
-    <h2 style="margin-left:8px" data-id="jornada.texto.nome-cliente-detalhe">${esc(c.nome)}</h2><div class="line"></div>
-    ${h?badge(num(h.total)+' · '+h.cls,h.tone,'jornada.selo.health-score-detalhe'):''} <span class="badge b-${e.tone}" data-id="jornada.selo.etapa-cliente-detalhe"><span class="d"></span>${esc(e.label)}</span></div>
-  ${jEstagioBar(c)}
-  <div class="jtabs">${tabs.map(([k,l,idd])=>`<button class="jtab ${jTab===k?'active':''}" data-id="${idd}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
-  <div class="jpanel">${ jPanel(c,{h,e,sv,tv,at}) }</div>`;
+  <div class="jbody ${jCtxOpen?'':'jctx-closed'}">
+    <div class="jmain">
+      <div class="jtabs-row">
+        <button type="button" class="jtab-back" data-id="jornada.botao.voltar-cliente" onclick="App.fecharCliente()" title="Voltar à lista">${svg('<path d="M19 12H5M12 19l-7-7 7-7"/>')}</button>
+        <div class="jtabs">${tabs.map(([k,l,idd])=>`<button class="jtab ${jTab===k?'active':''}" data-id="${idd}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
+      </div>
+      <div class="card jcard">
+        <div class="jcard-top">
+          <div class="jcard-left">
+            <div class="jcard-title">
+              <h2 data-id="jornada.texto.nome-cliente-detalhe">${esc(c.nome)}</h2>
+              ${c.numeroOperacao?`<a class="jop-num" href="${azoProposalUrl(c.numeroOperacao)}" target="_blank" rel="noopener noreferrer" title="Ver operação no AZO">#${esc(c.numeroOperacao)}</a>`:''}
+            </div>
+            <div class="jcard-meta">
+              <span>Gerente: <b>${esc(c.respComercial||'—')}</b></span>
+              <span>Onboarding: <b>${esc(c.respOnboarding||'—')}</b></span>
+              <span>Key Account: <b>${esc(c.keyAccount||'—')}</b></span>
+            </div>
+          </div>
+          <div class="jcard-right">
+            <div class="jstage-dd">
+              <button type="button" class="jstage-badge" data-id="jornada.selo.estagio-negociacao" style="--stage-color:${toneVar(STATUS_NEG_TONE[c.statusNegociacao]||'slate')}" onclick="App.jStageMenuToggle()">${esc(c.statusNegociacao||'Sem estágio')}</button>
+              ${jStageMenuOpen?`<div class="jstage-menu">${STATUS_NEGOCIACAO.map(s=>`<button type="button" onclick="App.setStatusNegociacao('${c.id}','${s}')">${esc(s)}</button>`).join('')}</div>`:''}
+            </div>
+            <div class="jstage-sla">${diasNaEtapa(c)} nesta etapa</div>
+            <div class="jcard-meta-right">
+              <span>Criado em <b>${fmtD(c.criadoEm)||'—'}</b></span>
+              <span>Última atualização <b>${ultimaAlt?fmtD(ultimaAlt.data):(fmtD(c.criadoEm)||'—')}</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="jcard-actions">
+          ${gate('createActivity',`<button type="button" class="btn sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Tarefa</button>`)}
+          ${gate('whatsAdd',`<button type="button" class="btn sm" onclick="App.novaInteracao('${c.id}','evento')">${svg(I.plus)} Interações</button>`)}
+          <button type="button" class="btn sm" onclick="App.jAtalho('pesquisa','${c.id}')">${svg(I.plus)} Pesquisa</button>
+          <button type="button" class="btn sm" onclick="App.jAtalho('ativacao','${c.id}')">${svg(I.plus)} Ativação</button>
+          <button type="button" class="btn sm" onclick="App.jAtalho('ttfv','${c.id}')">${svg(I.plus)} First Value</button>
+          <button type="button" class="btn sm" onclick="App.jTab('docs')">${svg(I.plus)} Documentação</button>
+        </div>
+      </div>
+      <div class="jpanel">${ jPanel(c,{h,e,sv,tv,at}) }</div>
+    </div>
+    ${jContexto(c,{h,sv,tv,at})}
+  </div>`;
   el('view-jornada').querySelectorAll('[data-p]').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
+  el('view-jornada').querySelectorAll('.jctx-tag-del').forEach(b=>b.onclick=()=>App.jEtiquetaDel(c.id,b.dataset.tag));
+}
+function diasNaEtapa(c){
+  const h=DB().history.find(x=>x.cliente===c.nome&&x.campo==='Estágio da Negociação');
+  const desde=h?(h.iso||'').slice(0,10):c.criadoEm;
+  if(!desde) return '—';
+  const n=daysBetween(desde,today().toISOString().slice(0,10));
+  if(n==null) return '—';
+  return n<=0?'Hoje':(n+(n===1?' dia':' dias'));
+}
+let jCtxOpen=true, jStageMenuOpen=false, jCtxEditField=null, jPendOpen=false, jTlTab='geral';
+// regional do responsável — mock temporário até o cadastro de usuários ser enriquecido (regional, e-mail etc.)
+const MOCK_REGIONAIS=['Regional Sudeste','Regional Sul','Regional Nordeste','Regional Centro-Oeste','Regional Norte'];
+function mockRegional(nome){
+  if(!nome) return '—';
+  let h=0; for(let i=0;i<nome.length;i++) h=(h*31+nome.charCodeAt(i))>>>0;
+  return MOCK_REGIONAIS[h%MOCK_REGIONAIS.length];
+}
+function jContexto(c,m){
+  const ro=!can('editClient');
+  const {h,sv,tv,at}=m||{};
+  const etiquetas=c.etiquetas||[];
+  const pessoa=(label,campo,valor,opcoes)=>{
+    const editing=jCtxEditField===campo;
+    const editor = opcoes
+      ? `<select autofocus onchange="App.jRespSet('${c.id}','${campo}',this.value)" onblur="App.jRespEditToggle(null)">
+          <option value="">—</option>${opcoes.map(a=>`<option ${valor===a?'selected':''}>${esc(a)}</option>`).join('')}
+        </select>`
+      : `<input type="text" autofocus value="${esc(valor||'')}" placeholder="${label}"
+          onkeydown="if(event.key==='Enter'){App.jRespSet('${c.id}','${campo}',this.value);}else if(event.key==='Escape'){App.jRespEditToggle(null);}"
+          onblur="App.jRespSet('${c.id}','${campo}',this.value)">`;
+    return `<div class="jctx-person">
+      ${editing
+        ? editor
+        : `<div class="jctx-avatar">${esc((valor||'?')[0])}</div>
+          <div class="jctx-person-info"><b>${esc(valor||'—')}</b><small>${label} · ${esc(mockRegional(valor))}</small></div>
+          ${ro?'':`<button type="button" class="jctx-pencil" title="Editar ${label}" onclick="App.jRespEditToggle('${campo}')">${svg(I.edit)}</button>`}`}
+    </div>`;
+  };
+  return `<aside class="jctx">
+    <div class="jctx-head">
+      <span class="jctx-title">Contexto</span>
+      <button type="button" class="jctx-chev" onclick="App.jCtxToggle()" title="${jCtxOpen?'Aglutinar':'Expandir'}">${svg(I.chevronDown)}</button>
+    </div>
+    <div class="jctx-body">
+      <div class="jctx-block">
+        <span class="jctx-lbl">Responsáveis</span>
+        <div class="jctx-resp">
+          ${pessoa('Gerente de Contas','respComercial',c.respComercial,null)}
+          ${pessoa('Onboarding','respOnboarding',c.respOnboarding,ANALISTAS)}
+          ${pessoa('Key Account','keyAccount',c.keyAccount,KEY_ACCOUNTS)}
+        </div>
+      </div>
+      <div class="jctx-block">
+        <span class="jctx-lbl">Nível de Prioridade</span>
+        <div class="jctx-row"><select ${ro?'disabled':''} onchange="App.jRespSet('${c.id}','prioridade',this.value)">
+          <option value="">—</option>${['Alto','Médio','Baixo'].map(p=>`<option ${c.prioridade===p?'selected':''}>${esc(p)}</option>`).join('')}
+        </select></div>
+      </div>
+      <div class="jctx-block">
+        <span class="jctx-lbl">Etiquetas</span>
+        <div class="jctx-tags">
+          ${etiquetas.map(t=>`<span class="jctx-tag">${esc(t)}${ro?'':`<button type="button" class="jctx-tag-del" data-tag="${esc(t)}" title="Remover">×</button>`}</span>`).join('')}
+          ${ro?'':`<input type="text" class="jctx-tag-input" placeholder="+ etiqueta" onkeydown="if(event.key==='Enter'){event.preventDefault();App.jEtiquetaAdd('${c.id}',this.value);this.value='';}">`}
+        </div>
+      </div>
+      <div class="jctx-block jctx-indic">
+        <span class="jctx-lbl">Indicadores</span>
+        <div class="jctx-indic-grid">
+          <div class="jctx-indic-item"><span>Health Score</span><b>${h?num(h.total)+' · '+h.cls:'—'}</b></div>
+          <div class="jctx-indic-item"><span>% Ativação</span><b>${(at!=null?at:0)}%</b></div>
+          <div class="jctx-indic-item"><span>Pesquisa</span><b>${sv?num(sv.media,1)+' ('+sv.cls+')':'—'}</b></div>
+          <div class="jctx-indic-item"><span>TTFV</span><b>${tv?(tv.dias+' dias'):'—'}</b></div>
+        </div>
+      </div>
+    </div>
+  </aside>`;
 }
 function jEstagioBar(c){
   const cur=c.statusNegociacao||'';
@@ -4586,40 +4872,58 @@ function jPanel(c,m){
   if(jTab==='ativos') return jAtivos(c);
   if(jTab==='atividades') return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.kanban-atividades-tab"><h3 style="font-size:15px" data-id="jornada.texto.titulo-kanban-atividades-tab">Kanban de Atividades</h3><div class="line"></div>
     ${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-tab" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova atividade</button>`)}</div>`+kanbanAtividades(c.id);
-  if(jTab==='pendencias') return jPendencias(c.id);
-  if(jTab==='whats') return whatsTimeline(c.id);
-  if(jTab==='alteracoes') return histTable(DB().history.filter(x=>x.cliente===c.nome),false);
   if(jTab==='docs') return jDocs(c.id);
   return '';
 }
 function jInfo(label,val,dataId){ return `<div class="jinfo"><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${val||'—'}</b></div>`; }
-function crmPanel(cid){
-  const d=DB();
-  const ints=d.interactions.filter(i=>i.cliente===cid).sort((a,b)=>(b.data+(b.hora||'')).localeCompare(a.data+(a.hora||''))).slice(0,3);
-  const acts=d.activities.filter(a=>a.cliente===cid);
-  const ultAtiv=acts.slice().sort((a,b)=>String(b.criacao||'').localeCompare(String(a.criacao||''))).slice(0,3);
-  const abertas=acts.filter(a=>!['Concluído','Cancelado'].includes(a.status));
-  const prazos=abertas.filter(a=>a.prazo).sort((a,b)=>a.prazo.localeCompare(b.prazo)).slice(0,4);
-  const mini=(rows)=> rows.length? `<ul class="crm-list">${rows.join('')}</ul>` : '<p class="crm-empty">Nada registrado.</p>';
-  return `<div class="crm-grid">
-    <div class="card crm-card" data-id="jornada.card.ultimas-interacoes"><div class="crm-h" data-id="jornada.texto.titulo-ultimas-interacoes">${svg(I.chat)} Últimas Interações</div>
-      ${mini(ints.map(i=>`<li><span class="crm-dot" style="background:${toneVar(INT_STATUS_TONE[i.status])}"></span>
-        <span class="crm-main" data-id="jornada.texto.item-ultima-interacao">${esc(i.resumo||i.tipo||'—')}<small>${fmtD(i.data)} · ${esc(i.tipo||'')}</small></span></li>`))}</div>
-    <div class="card crm-card" data-id="jornada.card.ultimas-atividades"><div class="crm-h" data-id="jornada.texto.titulo-ultimas-atividades">${svg(I.clock)} Últimas Atividades</div>
-      ${mini(ultAtiv.map(a=>`<li><span class="crm-dot" style="background:${toneVar(PRIOR_TONE[a.prioridade])}"></span>
-        <span class="crm-main" data-id="jornada.texto.item-ultima-atividade">${esc(a.titulo)}<small>${esc(a.status)}${a.origem==='Interação do Cliente'?' · via interação':''}</small></span></li>`))}</div>
-    <div class="card crm-card" data-id="jornada.card.proximos-prazos"><div class="crm-h" data-id="jornada.texto.titulo-proximos-prazos">${svg(I.cal)} Próximos Prazos</div>
-      ${mini(prazos.map(a=>{const f=farolAtividade(a);return `<li><span class="crm-dot" style="background:${toneVar(f.tone)}"></span>
-        <span class="crm-main" data-id="jornada.texto.item-proximo-prazo">${esc(a.titulo)}<small>${fmtD(a.prazo)} · ${f.label}</small></span></li>`;}))}</div>
-    <div class="card crm-card" data-id="jornada.card.pendencias-abertas"><div class="crm-h" data-id="jornada.texto.titulo-pendencias-abertas">${svg(I.alert)} Pendências em Aberto <span class="crm-count" data-id="jornada.indicador.qtd-pendencias-abertas">${abertas.length}</span></div>
-      ${mini(abertas.slice(0,4).map(a=>{const f=farolAtividade(a);return `<li><span class="crm-dot" style="background:${toneVar(f.tone)}"></span>
-        <span class="crm-main" data-id="jornada.texto.item-pendencia-aberta">${esc(a.titulo)}<small>${esc(a.responsavel||'—')} · ${esc(a.status)}</small></span></li>`;}))}</div>
+function jPendResumo(c){
+  const abertas=DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status));
+  const nPend=abertas.filter(a=>a.origem==='Pendência Operacional').length;
+  const nTarefa=abertas.length-nPend;
+  return `<div class="card jpend" data-id="jornada.card.pendencias-tarefas-resumo">
+    <div class="jpend-head" onclick="App.jPendToggle()">
+      <div class="ico">${svg(I.clock)}</div>
+      <h3 data-id="jornada.texto.titulo-pendencias-tarefas-resumo">Pendências e Tarefas</h3>
+      <div class="jpend-counts">
+        <span class="jpend-count" data-id="jornada.indicador.qtd-pendencias-resumo"><b>${nPend}</b> pendência${nPend===1?'':'s'}</span>
+        <span class="jpend-count" data-id="jornada.indicador.qtd-tarefas-resumo"><b>${nTarefa}</b> tarefa${nTarefa===1?'':'s'}</span>
+      </div>
+      <span class="jpend-chev${jPendOpen?' open':''}">${svg(I.chevronDown)}</span>
+    </div>
+    ${jPendOpen?`<div class="card-body" style="padding-top:0">${atividadeList(abertas)}</div>`:''}
   </div>`;
 }
+function jTimelineGeral(c){
+  const acts=DB().activities.filter(a=>a.cliente===c.id).map(a=>({data:a.criacao||a.prazo||'',icone:I.clock,titulo:a.titulo,sub:esc(a.status)}));
+  const ints=DB().interactions.filter(i=>i.cliente===c.id).map(i=>({data:i.data||'',icone:I.chat,titulo:i.resumo||i.tipo||'Interação',sub:esc(i.tipo||'Interação')}));
+  const hist=DB().history.filter(h=>h.cliente===c.nome).map(h=>({data:(h.iso||'').slice(0,10),icone:I.history,titulo:(h.campo||'')+': '+(h.para||'—'),sub:esc(h.usuario||'')}));
+  const all=[...acts,...ints,...hist].filter(x=>x.data).sort((a,b)=>String(b.data).localeCompare(String(a.data)));
+  if(!all.length) return '<p style="color:var(--txt-3)">Nada registrado ainda nesta operação.</p>';
+  return `<ul class="jtl-list">${all.map(x=>`<li class="jtl-item"><span class="jtl-ico">${svg(x.icone,1.7)}</span>
+    <div class="jtl-main"><b>${esc(x.titulo)}</b><small>${fmtD(x.data)} · ${x.sub}</small></div></li>`).join('')}</ul>`;
+}
+function jTimelineWidget(c){
+  const subtabs=[['geral','Geral'],['tarefas','Tarefas'],['interacoes','Interações'],['alteracoes','Alterações']];
+  let body='';
+  if(jTlTab==='tarefas') body=atividadeList(DB().activities.filter(a=>a.cliente===c.id));
+  else if(jTlTab==='interacoes'){ const ints=DB().interactions.filter(i=>i.cliente===c.id); body=ints.length?intTimeline(ints,false):'<p style="color:var(--txt-3)">Nenhuma interação registrada.</p>'; }
+  else if(jTlTab==='alteracoes') body=histTable(DB().history.filter(x=>x.cliente===c.nome),false);
+  else body=jTimelineGeral(c);
+  return `<div class="card" style="margin-top:16px" data-id="jornada.card.timeline-operacao"><div class="card-head"><div class="ico">${svg(I.route)}</div><h3 data-id="jornada.texto.titulo-timeline-operacao">Linha do Tempo da Operação</h3></div>
+    <div class="jtl-tabs">${subtabs.map(([k,l])=>`<button class="jtl-tab ${jTlTab===k?'active':''}" onclick="App.jTlSet('${k}')">${l}</button>`).join('')}</div>
+    <div class="card-body">${body}</div></div>`;
+}
+function jServicosResumo(c){
+  const ativos=(c.ativos||[]).filter(a=>(a.servicos||[]).length);
+  if(!ativos.length) return '<p style="color:var(--txt-3);font-size:12.5px">Nenhum serviço vinculado aos ativos deste cliente.</p>';
+  return `<div class="jserv-resumo">${ativos.map(a=>`<div class="jserv-resumo-ativo">
+      <b>${esc(a.nome||'Ativo sem nome')}</b>
+      <div class="jserv-resumo-chips">${(a.servicos||[]).map(s=>`<span class="jserv-resumo-chip">${esc(s)}</span>`).join('')}</div>
+    </div>`).join('')}</div>`;
+}
 function jGeral(c,m){
-  const {h,sv,tv,at}=m;
-  return crmPanel(c.id) + `<div class="jgrid">
-    <div class="card" data-id="jornada.card.info-cliente"><div class="card-head"><div class="ico">${svg(I.user)}</div><h3 data-id="jornada.texto.titulo-info-cliente">Informações do Cliente</h3>
+  return jPendResumo(c) + `<div class="jgrid" style="margin-top:16px">
+    <div class="card" data-id="jornada.card.info-cliente"><div class="card-head"><div class="ico">${svg(I.user)}</div><h3 data-id="jornada.texto.titulo-info-cliente">Cliente</h3>
       <div class="spacer"></div>${gate('editClient',`<button class="btn ghost sm" data-id="jornada.botao.editar-info-cliente" onclick="App.jTab('operacao')">${svg(I.edit)} Editar</button>`)}</div>
       <div class="card-body jinfos">
         ${jInfo('Tipologia',esc(c.tipologia),'jornada.texto.tipologia-cliente')}
@@ -4629,6 +4933,8 @@ function jGeral(c,m){
         ${jInfo('Key Account',esc(c.keyAccount),'jornada.texto.key-account-cliente')}
         ${jInfo('Booked Value',c.bookedValue?money(c.bookedValue):'—','jornada.indicador.booked-value-cliente')}
       </div></div>
+    <div class="card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Serviços</h3></div>
+      <div class="card-body">${jServicosResumo(c)}</div></div>
     <div class="card" data-id="jornada.card.ciclo-negociacao-resumo"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-ciclo-negociacao-resumo">Ciclo de Negociação</h3></div>
       <div class="card-body jinfos">
         ${jInfo('Solicitação Proposta',fmtD(c.dataSolicitacaoProposta),'jornada.texto.data-solicitacao-proposta-resumo')}
@@ -4648,17 +4954,8 @@ function jGeral(c,m){
         ${jInfo('Go Live Real',fmtD(c.goLiveReal),'jornada.texto.go-live-real-resumo')}
         ${jInfo('Resp. Onboarding',esc(c.respOnboarding),'jornada.texto.resp-onboarding-resumo')}
       </div></div>
-    <div class="card" data-id="jornada.card.indicadores-cliente"><div class="card-head"><div class="ico">${svg(I.health)}</div><h3 data-id="jornada.texto.titulo-indicadores-cliente">Indicadores</h3></div>
-      <div class="card-body jinfos">
-        ${jInfo('Health Score',h?('<b style="color:'+toneVar(h.tone)+'">'+num(h.total)+' · '+h.cls+'</b>'):'aguardando kickoff','jornada.indicador.health-score-cliente')}
-        ${jInfo('% Ativação',at+'%','jornada.indicador.pct-ativacao-cliente')}
-        ${jInfo('Pesquisa',sv?num(sv.media,1)+' ('+sv.cls+')':'—','jornada.indicador.pesquisa-cliente')}
-        ${jInfo('TTFV',tv?(tv.dias+' dias · '+tv.cls):'—','jornada.indicador.ttfv-cliente')}
-      </div></div>
   </div>
-  <div class="card" style="margin-top:16px" data-id="jornada.card.atividades-abertas"><div class="card-head"><div class="ico">${svg(I.clock)}</div><h3 data-id="jornada.texto.titulo-atividades-abertas">Atividades Abertas</h3>
-    <div class="spacer"></div>${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-geral" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova</button>`)}</div>
-    <div class="card-body">${atividadeList(DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status)))}</div></div>`;
+  ${jTimelineWidget(c)}`;
 }
 function jOperacao(c){
   const ro=!can('editClient');
@@ -5732,6 +6029,8 @@ window.App = {
     if(id==='slides'){ renderSlides(); current='relatorios'; window.scrollTo(0,0); return; }
     if(!navAllowed(id)){ toast('Ação não permitida para seu perfil.'); id='dashboard'; }
     if(resetHome){ filters.cliente=''; jTab='geral'; }
+    const ph=el('pageHead'); if(ph) ph.classList.remove('jhead-hidden');
+    const mc=el('mainContent'); if(mc) mc.classList.remove('jhead-hidden');
     current=id;
     const meta=NAV.find(n=>n[0]===id);
     el('pageTitle').textContent=DASH_TABS.some(t=>t[0]===id)?'Dashboards':meta[1];
@@ -5834,7 +6133,7 @@ window.App = {
       classificacao:(el('f_classif')?el('f_classif').value:''),elite:!!(el('f_elite')&&el('f_elite').checked),
       representantes:repsDepois,documentos:_fichaDocumentos.slice()};
     Object.assign(c,after);
-    if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; if(!Array.isArray(c.operacoes)) c.operacoes=[]; d.clientes.push(c);
+    if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; if(!Array.isArray(c.operacoes)) c.operacoes=[]; if(!Array.isArray(c.etiquetas)) c.etiquetas=[]; d.clientes.push(c);
       addHistory({modulo:'Cadastro',cliente:nome,campo:'Cliente',de:'Vazio',para:'Cadastrado em '+np.iso.slice(0,10)+(quem?' por '+quem:'')}); }
     else logClienteDiff(c,before,after,{nome:'Razão Social',nomeFantasia:'Nome Fantasia',cnpj:'CNPJ',endereco:'Endereço',
       estado:'Estado do Cliente',cidade:'Cidade do Cliente',classificacao:'Classificação',elite:'Cliente Elite'});
@@ -5885,10 +6184,11 @@ window.App = {
   cadAtivoSetEstado(i,uf){ if(!_cadAtivos[i]) return; _cadAtivos[i].estado=uf; _cadAtivos[i].regiao=regiaoDoEstado(uf); cadAtivoListRender(); },
   cadAtivoServicoToggle(i){ const a=_cadAtivos[i]; if(!a) return; const open=a._servOpen!==false; a._servOpen=!open; cadAtivoListRender(); },
   cadAtivoServicoBusca(i,v){ const box=el('cadAtivo_serv_res_'+i); if(!box||!_cadAtivos[i]) return;
-    box.innerHTML=servicoResultsMarkup(servicosCatalogFiltrado(v),_cadAtivos[i].servicos,'cadAtivo',i); },
+    box.innerHTML=servicoResultsMarkup(v,_cadAtivos[i].servicos,'cadAtivo',i); },
   cadAtivoServicoAdd(i,idx){ if(!_cadAtivos[i]) return; const nome=SERVICOS_TRINUS[idx]&&SERVICOS_TRINUS[idx].nome; if(!nome) return;
     if(!Array.isArray(_cadAtivos[i].servicos)) _cadAtivos[i].servicos=[];
-    if(!_cadAtivos[i].servicos.includes(nome)) _cadAtivos[i].servicos.push(nome);
+    const pos=_cadAtivos[i].servicos.indexOf(nome);
+    if(pos===-1) _cadAtivos[i].servicos.push(nome); else _cadAtivos[i].servicos.splice(pos,1);
     cadAtivoListRender(); },
   cadAtivoServicoDel(i,i2){ if(!_cadAtivos[i]||!Array.isArray(_cadAtivos[i].servicos)) return; _cadAtivos[i].servicos.splice(i2,1); cadAtivoListRender(); },
   // ativos do cliente (edição no modal)
@@ -6082,16 +6382,58 @@ window.App = {
 
   /* ---- V4: navegação da jornada ---- */
   limparContexto(){ filters.cliente=''; buildFilters(); this.refresh(); buildCrumb(el('pageTitle')?el('pageTitle').textContent:''); },
-  abrirCliente(id){ filters.cliente=id; jTab='geral'; this.go('jornada'); },
-  fecharCliente(){ filters.cliente=''; this.refresh(); },
+  abrirCliente(id){ filters.cliente=id; jTab='geral'; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; this.go('jornada'); },
+  fecharCliente(){ filters.cliente=''; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; this.refresh(); },
   setStatusNegociacao(id,valor){
+    jStageMenuOpen=false;
     if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const d=DB(); const c=getCli(id); if(!c) return;
-    if(c.statusNegociacao===valor) return;
+    if(c.statusNegociacao===valor){ this.refresh(); return; }
     const antes=c.statusNegociacao||'—';
     c.statusNegociacao=valor;
     addHistory({modulo:'Jornada',cliente:c.nome,campo:'Estágio da Negociação',de:antes,para:valor||'Sem estágio'});
     save(d); this.refresh(); toast('Estágio atualizado');
+  },
+  formatCnpj(v){
+    const d=(v||'').replace(/\D/g,'').slice(0,14);
+    if(d.length<=2) return d;
+    if(d.length<=5) return d.slice(0,2)+'.'+d.slice(2);
+    if(d.length<=8) return d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5);
+    if(d.length<=12) return d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8);
+    return d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8,12)+'-'+d.slice(12);
+  },
+  jCtxToggle(){ jCtxOpen=!jCtxOpen; this.refresh(); },
+  jPendToggle(){ jPendOpen=!jPendOpen; this.refresh(); },
+  jTlSet(tab){ jTlTab=tab; this.refresh(); },
+  jRespEditToggle(campo){ jCtxEditField=jCtxEditField===campo?null:campo; this.refresh(); },
+  jStageMenuToggle(){ jStageMenuOpen=!jStageMenuOpen; this.refresh(); },
+  jAtalho(tela,id){ filters.cliente=id; this.go(tela); },
+  jRespSet(id,campo,valor){
+    jCtxEditField=null;
+    if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
+    const d=DB(); const c=getCli(id); if(!c) return;
+    if(c[campo]===valor){ this.refresh(); return; }
+    const LBL={respOnboarding:'Resp. Onboarding',keyAccount:'Key Account',respComercial:'Gerente de Contas',prioridade:'Nível de Prioridade'};
+    addHistory({modulo:'Jornada',cliente:c.nome,campo:LBL[campo]||campo,de:c[campo]||'—',para:valor||'—'});
+    c[campo]=valor;
+    save(d); this.refresh(); toast('Atualizado');
+  },
+  jEtiquetaAdd(id,valor){
+    if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
+    valor=(valor||'').trim(); if(!valor) return;
+    const d=DB(); const c=getCli(id); if(!c) return;
+    if(!Array.isArray(c.etiquetas)) c.etiquetas=[];
+    if(c.etiquetas.some(t=>t.toLowerCase()===valor.toLowerCase())){ toast('Etiqueta já adicionada'); return; }
+    c.etiquetas.push(valor);
+    addHistory({modulo:'Jornada',cliente:c.nome,campo:'Etiquetas',de:'—',para:'+ '+valor});
+    save(d); this.refresh();
+  },
+  jEtiquetaDel(id,valor){
+    if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
+    const d=DB(); const c=getCli(id); if(!c) return;
+    c.etiquetas=(c.etiquetas||[]).filter(t=>t!==valor);
+    addHistory({modulo:'Jornada',cliente:c.nome,campo:'Etiquetas',de:valor,para:'Removida'});
+    save(d); this.refresh();
   },
   dragStartN(e,id){ _dragCli=id; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',id);}catch(_){} },
   dragEndN(){ _dragCli=null; document.querySelectorAll('.kcol.drag-over').forEach(k=>k.classList.remove('drag-over')); },
@@ -6143,10 +6485,11 @@ window.App = {
   opAtivoSetEstado(i,uf){ if(!_opAtivos[i]) return; _opAtivos[i].estado=uf; _opAtivos[i].regiao=regiaoDoEstado(uf); opDraftPersist(); opAtivoListRender(); },
   opAtivoServicoToggle(i){ const a=_opAtivos[i]; if(!a) return; const open=a._servOpen!==false; a._servOpen=!open; opDraftPersist(); opAtivoListRender(); },
   opAtivoServicoBusca(i,v){ const box=el('opAtivo_serv_res_'+i); if(!box||!_opAtivos[i]) return;
-    box.innerHTML=servicoResultsMarkup(servicosCatalogFiltrado(v),_opAtivos[i].servicos,'opAtivo',i); },
+    box.innerHTML=servicoResultsMarkup(v,_opAtivos[i].servicos,'opAtivo',i); },
   opAtivoServicoAdd(i,idx){ if(!_opAtivos[i]) return; const nome=SERVICOS_TRINUS[idx]&&SERVICOS_TRINUS[idx].nome; if(!nome) return;
     if(!Array.isArray(_opAtivos[i].servicos)) _opAtivos[i].servicos=[];
-    if(!_opAtivos[i].servicos.includes(nome)) _opAtivos[i].servicos.push(nome);
+    const pos=_opAtivos[i].servicos.indexOf(nome);
+    if(pos===-1) _opAtivos[i].servicos.push(nome); else _opAtivos[i].servicos.splice(pos,1);
     opDraftPersist(); opAtivoListRender(); },
   opAtivoServicoDel(i,i2){ if(!_opAtivos[i]||!Array.isArray(_opAtivos[i].servicos)) return; _opAtivos[i].servicos.splice(i2,1); opDraftPersist(); opAtivoListRender(); },
   salvarNovaOperacao(){
@@ -6172,11 +6515,12 @@ window.App = {
       if(_opDraft.obs) c.obs=_opDraft.obs;
       c.ativos=ativos;
       if(!Array.isArray(c.operacoes)) c.operacoes=[];
+      if(!Array.isArray(c.etiquetas)) c.etiquetas=[];
     } else {
       c={id:'c'+Date.now().toString(36),nome,nomeFantasia:_opDraft.fantasia,cnpj:_opDraft.cnpj,
         estado:_opDraft.estado,cidade:_opDraft.cidade,tipologia:_opDraft.tip||TIPOLOGIAS[0],
         classificacao:_opDraft.classif,elite:!!_opDraft.elite,obs:_opDraft.obs,
-        ativos,representantes:[],documentos:[],operacoes:[],
+        ativos,representantes:[],documentos:[],operacoes:[],etiquetas:[],
         criadoEm:np.iso.slice(0,10),criadoPor:quem};
       d.clientes.push(c);
     }

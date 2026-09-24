@@ -29,7 +29,7 @@
 
   var active=false, gridOn=false;
   var barEl=null, gridEl=null, panelEl=null, highlightEl=null;
-  var hoverTimer=null, lastTarget=null;
+  var hoverTimer=null, removeTimer=null, lastTarget=null;
   var BAR_H=34;
   var pushedEl=null, pushedPrevTop='';
 
@@ -172,7 +172,7 @@
 
   function onMouseMove(e){
     if(barEl && e.clientY<=barEl.offsetHeight) return;
-    if(panelEl && panelEl.contains(e.target)) return;
+    if(panelEl && panelEl.contains(e.target)){ clearTimeout(removeTimer); return; }
     var el=document.elementFromPoint(e.clientX,e.clientY);
     if(!el) return;
     var tagged=elementoMarcado(el);
@@ -191,10 +191,13 @@
     var target=tagged||el;
     if(target!==lastTarget){
       lastTarget=target;
-      removePanel();
       clearTimeout(hoverTimer);
+      clearTimeout(removeTimer);
       var mx=e.clientX, my=e.clientY, refEl=el, boxTarget=target;
-      hoverTimer=setTimeout(function(){ buildPanel(id, refEl, boxTarget, mx, my); }, 2000);
+      // painel já aberto: espera 1s antes de fechar (tolerância pra dar tempo
+      // de mover o mouse até ele e clicar em "copiar"), em vez de sumir na hora.
+      if(panelEl) removeTimer=setTimeout(removePanel, 1000);
+      hoverTimer=setTimeout(function(){ clearTimeout(removeTimer); removePanel(); buildPanel(id, refEl, boxTarget, mx, my); }, 2000);
     }
   }
 
@@ -232,6 +235,7 @@
     document.removeEventListener('mousemove', onMouseMove);
     window.removeEventListener('resize', onResize);
     clearTimeout(hoverTimer);
+    clearTimeout(removeTimer);
     lastTarget=null;
     removePanel();
     unpushSiteDown();
