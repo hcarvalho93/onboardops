@@ -15,7 +15,7 @@ Nome do produto: **OnboardOps** — Portal interno de Customer Success & Onboard
 
 ## Sistemas externos conectados
 - Supabase (banco + auth) — ver acima.
-- GitHub — repositório `hcarvalho93/onboardops` (privado). Sem git local instalado; todo o fluxo de PR é feito pelo navegador (upload de arquivo + compare + merge). GitHub Pages ativo, publica a `main` em `https://hcarvalho93.github.io/onboardops/`.
+- GitHub — repositório `hcarvalho93/onboardops` (privado). Git local instalado e configurado desde 2026-09-25 (`C:\Users\henrique.beserra\AppData\Local\Programs\Git`, ainda não no PATH desta sessão — usar caminho completo do `git.exe` até o app reiniciar). Fluxo de PR agora é `git add`/`commit`/`push` + criação/merge do PR pelo navegador (upload de arquivo pelo site não é mais necessário). GitHub Pages ativo, publica a `main` em `https://hcarvalho93.github.io/onboardops/`.
 - (adicionar aqui outros sistemas conforme forem conectados, ex.: ASO)
 
 ## Convenções deste projeto
