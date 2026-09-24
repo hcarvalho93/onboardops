@@ -410,14 +410,15 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jstage-bar .jstage{flex:none;flex-direction:row;align-items:center;justify-content:flex-start;padding:5px 12px;border-radius:999px;font-size:11.5px;gap:6px}
 .jstage-bar .jstage .jstage-dot{width:6px;height:6px}
 
-/* Jornada — abas 360, coladas no topbar (controle segmentado, estilo do print de referência) */
+/* Jornada — abas 360, coladas no topbar (barra reta com texto sublinhado, estilo do print de referência) */
 #pageHead.jhead-hidden{display:none}
 #mainContent.jhead-hidden{padding-top:0}
-.jtabs-row{display:flex;align-items:center;gap:10px;padding:14px 28px 16px;margin:0 -28px;position:sticky;top:var(--topbar-h);z-index:16;background:#E6E9F0;border-bottom:1px solid var(--line);width:calc(100% + 56px)}
-.jtabs{display:inline-flex;gap:3px;padding:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;width:fit-content;flex-wrap:wrap}
-.jtab{padding:8px 17px;font-size:13px;font-weight:600;color:var(--txt-3);background:none;border:none;border-radius:9px;cursor:pointer;transition:.15s}
+.jtabs-row{display:flex;align-items:center;gap:10px;padding:0 28px;margin-left:-28px;margin-right:290px;position:sticky;top:var(--topbar-h);z-index:16;background:#E6E9F0;box-shadow:var(--shadow)}
+.jtabs-row.jctx-closed{margin-right:62px}
+.jtabs{display:flex;gap:26px;flex-wrap:wrap}
+.jtab{padding:14px 0;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:.15s}
 .jtab:hover{color:var(--txt)}
-.jtab.active{color:var(--txt);background:var(--surface);box-shadow:var(--shadow);font-weight:700}
+.jtab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .jtab-back{width:32px;height:32px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--surface);color:var(--txt-3);cursor:pointer;border-radius:9px}
 .jtab-back:hover{background:var(--surface-2);color:var(--txt)}
 .jtab-back svg{width:16px;height:16px}
@@ -4737,7 +4738,7 @@ function renderJornada(){
   const ph=el('pageHead'); if(ph) ph.classList.add('jhead-hidden');
   const mc=el('mainContent'); if(mc) mc.classList.add('jhead-hidden');
   el('view-jornada').innerHTML=`
-  <div class="jtabs-row">
+  <div class="jtabs-row${jCtxOpen?'':' jctx-closed'}">
     <div class="jtabs">${tabs.map(([k,l,idd])=>`<button class="jtab ${jTab===k?'active':''}" data-id="${idd}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
   </div>
   <div class="jbody ${jCtxOpen?'':'jctx-closed'}">
