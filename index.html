@@ -435,7 +435,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jcard-meta b{color:var(--txt-2);font-weight:600}
 .jcard-meta-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:2px;font-size:11px;color:var(--txt-3)}
 .jcard-meta-right b{color:var(--txt-2);font-weight:600}
-.jcard-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.jcard-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
 
 /* Jornada — estágio da negociação como selo único clicável (substitui a barra de pills) */
 .jstage-dd{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
@@ -733,6 +733,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 
 /* Jornada — resumo de Pendências e Tarefas (substitui os 4 mini-cards antigos), aglutinado por padrão */
 .jpend-head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;flex-wrap:wrap}
+.jpend-head .ico{width:30px;height:30px;border-radius:8px;background:var(--blue-soft);display:grid;place-items:center;color:var(--blue);flex:none}
 .jpend-head h3{font-size:14.5px;margin:0}
 .jpend-counts{display:flex;gap:14px;margin-left:auto;flex-wrap:wrap}
 .jpend-count{font-size:12.5px;color:var(--txt-3)}
@@ -740,6 +741,8 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jpend-chev{width:22px;height:22px;flex:none;color:var(--txt-3);transition:transform .15s}
 .jpend-chev svg{width:100%;height:100%}
 .jpend-chev.open{transform:rotate(180deg)}
+.jpend-alert{background:var(--red-bg);border-color:color-mix(in srgb,var(--red) 24%, var(--line))}
+.jpend-alert .jpend-head .ico{background:var(--surface);color:var(--red)}
 
 /* Jornada — Serviços por ativo (Visão Geral), com rolagem quando tem muito conteúdo */
 .jserv-resumo{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:2px}
@@ -4769,6 +4772,12 @@ function mockRegional(nome){
   let h=0; for(let i=0;i<nome.length;i++) h=(h*31+nome.charCodeAt(i))>>>0;
   return MOCK_REGIONAIS[h%MOCK_REGIONAIS.length];
 }
+// placeholder até o Booked Value ganhar um campo de cadastro próprio — valor determinístico por cliente, não persiste
+function mockBookedValue(id){
+  if(!id) return 0;
+  let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0;
+  return 80000+(h%175)*5000;
+}
 function jContexto(c,m){
   const ro=!can('editClient');
   const {h,sv,tv,at}=m||{};
@@ -4880,7 +4889,7 @@ function jPendResumo(c){
   const abertas=DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status));
   const nPend=abertas.filter(a=>a.origem==='Pendência Operacional').length;
   const nTarefa=abertas.length-nPend;
-  return `<div class="card jpend" data-id="jornada.card.pendencias-tarefas-resumo">
+  return `<div class="card jpend${nPend?' jpend-alert':''}" data-id="jornada.card.pendencias-tarefas-resumo">
     <div class="jpend-head" onclick="App.jPendToggle()">
       <div class="ico">${svg(I.clock)}</div>
       <h3 data-id="jornada.texto.titulo-pendencias-tarefas-resumo">Pendências e Tarefas</h3>
@@ -4926,14 +4935,18 @@ function jGeral(c,m){
     <div class="card" data-id="jornada.card.info-cliente"><div class="card-head"><div class="ico">${svg(I.user)}</div><h3 data-id="jornada.texto.titulo-info-cliente">Cliente</h3>
       <div class="spacer"></div>${gate('editClient',`<button class="btn ghost sm" data-id="jornada.botao.editar-info-cliente" onclick="App.jTab('operacao')">${svg(I.edit)} Editar</button>`)}</div>
       <div class="card-body jinfos">
+        ${jInfo('Nome Comercial',esc(c.nomeFantasia),'jornada.texto.nome-comercial-cliente')}
+        ${jInfo('Razão Social',esc(c.nome),'jornada.texto.razao-social-cliente')}
+        ${jInfo('CNPJ',esc(c.cnpj),'jornada.texto.cnpj-cliente')}
+        ${jInfo('Classificação',esc(c.classificacao),'jornada.texto.classificacao-cliente')}
+        ${jInfo('Cliente Elite',c.elite?'Sim':'Não','jornada.texto.cliente-elite-cliente')}
         ${jInfo('Tipologia',esc(c.tipologia),'jornada.texto.tipologia-cliente')}
-        ${jInfo('Status',esc(statusEfetivo(c)),'jornada.texto.status-cliente')}
-        ${jInfo('Etapa',esc(etapaInfo(c.etapa).label),'jornada.texto.etapa-cliente')}
-        ${jInfo('Produtos',(c.produtos&&c.produtos.length)?esc(c.produtos.join(', ')):'—','jornada.texto.produtos-cliente')}
-        ${jInfo('Key Account',esc(c.keyAccount),'jornada.texto.key-account-cliente')}
-        ${jInfo('Booked Value',c.bookedValue?money(c.bookedValue):'—','jornada.indicador.booked-value-cliente')}
+        ${jInfo('Cidade',esc(c.cidade),'jornada.texto.cidade-cliente')}
+        ${jInfo('UF',esc(c.estado),'jornada.texto.uf-cliente')}
+        ${jInfo('Observação',esc(c.obs),'jornada.texto.observacao-cliente')}
       </div></div>
-    <div class="card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Serviços</h3></div>
+    <div class="card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Serviços</h3>
+      <div class="spacer"></div><span class="pill" data-id="jornada.indicador.bv-servicos-mock" title="Booked Value — ainda sem campo próprio de cadastro, valor mockado por enquanto">BV ${money(mockBookedValue(c.id))}</span></div>
       <div class="card-body">${jServicosResumo(c)}</div></div>
     <div class="card" data-id="jornada.card.ciclo-negociacao-resumo"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-ciclo-negociacao-resumo">Ciclo de Negociação</h3></div>
       <div class="card-body jinfos">
@@ -4944,7 +4957,6 @@ function jGeral(c,m){
         ${jInfo('Envio Contrato p/ Assinatura',fmtD(c.dataEnvioContrato),'jornada.texto.data-envio-contrato-resumo')}
         ${jInfo('Assinatura do Contrato',fmtD(c.dataAssinatura),'jornada.texto.data-assinatura-contrato-resumo')}
         ${jInfo('Assinatura Aditivo/Distrato',fmtD(c.dataAssinaturaAditivo),'jornada.texto.data-assinatura-aditivo-resumo')}
-        ${jInfo('Resp. pela Proposta',esc(c.respComercial),'jornada.texto.resp-proposta-resumo')}
       </div></div>
     <div class="card" data-id="jornada.card.ciclo-implantacao-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-ciclo-implantacao-resumo">Ciclo de Implantação</h3></div>
       <div class="card-body jinfos">
@@ -4952,7 +4964,6 @@ function jGeral(c,m){
         ${jInfo('Kickoff',fmtD(c.dataKickoff),'jornada.texto.data-kickoff-resumo')}
         ${jInfo('Go Live Previsto',fmtD(c.goLivePrevisto),'jornada.texto.go-live-previsto-resumo')}
         ${jInfo('Go Live Real',fmtD(c.goLiveReal),'jornada.texto.go-live-real-resumo')}
-        ${jInfo('Resp. Onboarding',esc(c.respOnboarding),'jornada.texto.resp-onboarding-resumo')}
       </div></div>
   </div>
   ${jTimelineWidget(c)}`;
