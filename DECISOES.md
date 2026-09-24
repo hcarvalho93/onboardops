@@ -289,3 +289,21 @@ De passagem, também corrigido o cabeçalho da tela de detalhe do cliente (`rend
 - Dados de teste: populados via console (`window.__OO.DB()` + `window.__OO.save()`, o mesmo caminho de persistência real do app) — 10 ativos com 2–3 serviços aleatórios cada em BARION, CALFTECH e RD VILLE; 2–4 ativos com 1–2 serviços em NOVA ALIANÇA, SOLARIS e "Ricardo De Lacerda Teodoro Ltda"; ativos que já existiam e não tinham serviços ganharam serviços também. Cliente "werwer" propositalmente **não tocado** (é lixo de teste já sinalizado, o usuário pediu pra deixar como está). Sincronizado com Supabase com sucesso (POST 200 em `/rest/v1/ativos`).
 
 **Teste:** verificado ao vivo (Claude in Chrome, sessão logada) — alerta vermelho confirmado com uma pendência injetada temporariamente (descartada depois, nunca persistida); card Cliente com os 9 campos corretos incluindo Observação real; card Serviços com scroll funcionando num cliente de 10 ativos (BARION) e sem scroll num cliente de 2 ativos (SOLARIS); `werwer` confirmado com 0 ativos após a rodada. Sem erros de console.
+
+---
+
+## 2026-09-25 — Serviços: rolagem não preenchia o card, chips trocados por lista de bullets
+
+**Contexto:** com dados de teste reais populados na rodada anterior, o usuário viu o card de Serviços "esticado" pelo `align-items:stretch` do `.jgrid` (pra ficar do mesmo tamanho dos cards vizinhos), mas o conteúdo interno (`.jserv-resumo`) tinha um `max-height:220px` fixo — sobrava um espaço em branco morto entre o fim da lista e o fim do card, e a barra de rolagem parecia "não chegar até o final do container". Também pediu pra trocar a visualização por chip/tag colorido por uma lista simples de bullets (a pedido, com um print de referência), e deixar o BV mais em destaque.
+
+**Causa raiz (mesma classe de bug já documentada antes neste projeto):** um elemento filho com altura fixa (`max-height`) dentro de um pai que foi esticado por flex/grid pro tamanho do maior irmão — a altura do `.card` cresce, mas o conteúdo scrollável interno não acompanha, porque nada ali dentro sabia que podia (ou devia) crescer.
+
+**Fix:** `.jserv-card` (nova classe só no card de Serviços) vira `display:flex;flex-direction:column`; seu `.card-body` também vira flex column com `flex:1;min-height:0`; e `.jserv-resumo` troca o `max-height:220px` fixo por `flex:1;min-height:0;overflow-y:auto` — agora a lista sempre ocupa exatamente a altura que o card esticado deixar disponível, e só nasce barra de rolagem se o conteúdo realmente não couber. `min-height:0` é obrigatório nos dois níveis flex intermediários — sem ele, um filho com `overflow` dentro de um flex item não encolhe, ele força o pai a crescer e a rolagem nunca aparece.
+
+**Visualização:** `jServicosResumo()` reescrita — cada ativo agora mostra nome + tipologia (alinhados nas pontas, mesma linha) e, abaixo, uma lista `<ul>` de verdade (bullets `•`, não mais chips/tags coloridos) com os nomes dos serviços; separador (`border-top`) entre um ativo e o próximo. Layout replicado a partir de um mockup fornecido pelo usuário.
+
+**Vocabulário:** o usuário perguntou se "bullet" era o nome certo pro elemento anterior (os chips coloridos) — não é. *Chip* (ou *tag*) é o nome do elemento em pílula com fundo colorido; *bullet* é o pontinho de marcador de lista (•), que é o que ele queria usar no lugar dos chips. Anotado pra reforçar em [[explain-terms-and-pm-concepts]] se ele confundir de novo.
+
+**BV em destaque:** trocado de `.pill` genérico pra uma classe própria `.jserv-bv` — fundo `var(--green-bg)`, texto `var(--green)` em negrito, fonte um pouco maior (14px) — sem virar um número gigante, só mais legível que o pill neutro anterior.
+
+**Teste:** verificado ao vivo em BARION (10 ativos, card alto — confirmado sem espaço morto, card termina alinhado com os vizinhos) e SOLARIS (2 ativos, card curto — sem rolagem desnecessária nem esticamento estranho). Sem erros de console.
