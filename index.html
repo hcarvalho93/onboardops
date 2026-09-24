@@ -413,8 +413,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 /* Jornada — abas 360, coladas no topbar (barra reta com texto sublinhado, estilo do print de referência) */
 #pageHead.jhead-hidden{display:none}
 #mainContent.jhead-hidden{padding-top:0}
-.jtabs-row{display:flex;align-items:center;gap:10px;padding:0 28px;margin-left:-28px;margin-right:290px;position:sticky;top:var(--topbar-h);z-index:16;background:#E6E9F0;box-shadow:var(--shadow)}
-.jtabs-row.jctx-closed{margin-right:62px}
+.jtabs-row{display:flex;align-items:center;gap:10px;padding:0 28px;margin-left:-28px;position:sticky;top:var(--topbar-h);z-index:16;background:#E6E9F0;box-shadow:var(--shadow)}
 .jtabs{display:flex;gap:26px;flex-wrap:wrap}
 .jtab{padding:14px 0;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:.15s}
 .jtab:hover{color:var(--txt)}
@@ -424,7 +423,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jtab-back svg{width:16px;height:16px}
 
 /* Jornada — card de identificação da operação (nome, nº AZO, estágio, meta, atalhos) */
-.jcard{margin-bottom:12px;padding:10px 16px}
+.jcard{margin-top:14px;margin-bottom:12px;padding:10px 16px}
 .jcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .jcard-left{display:flex;flex-direction:column;gap:4px;min-width:0}
 .jcard-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
@@ -450,7 +449,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jbody{position:relative}
 .jmain{min-width:0;margin-right:290px}
 .jbody.jctx-closed .jmain{margin-right:62px}
-.jctx{position:fixed;top:calc(var(--topbar-h) + 14px);right:28px;bottom:14px;width:272px;z-index:15;display:flex;flex-direction:column}
+.jctx{position:fixed;top:calc(var(--topbar-h) + 58px);right:28px;bottom:14px;width:272px;z-index:15;display:flex;flex-direction:column}
 .jbody.jctx-closed .jctx{width:44px}
 .jctx-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .jctx-title{font-size:12px;font-weight:700;color:var(--txt-2);text-transform:uppercase;letter-spacing:.04em}
@@ -4738,7 +4737,7 @@ function renderJornada(){
   const ph=el('pageHead'); if(ph) ph.classList.add('jhead-hidden');
   const mc=el('mainContent'); if(mc) mc.classList.add('jhead-hidden');
   el('view-jornada').innerHTML=`
-  <div class="jtabs-row${jCtxOpen?'':' jctx-closed'}">
+  <div class="jtabs-row">
     <div class="jtabs">${tabs.map(([k,l,idd])=>`<button class="jtab ${jTab===k?'active':''}" data-id="${idd}" onclick="App.jTab('${k}')">${esc(l)}</button>`).join('')}</div>
   </div>
   <div class="jbody ${jCtxOpen?'':'jctx-closed'}">
