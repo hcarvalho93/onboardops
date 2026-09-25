@@ -564,6 +564,21 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .op-ativo-chev svg{width:100%;height:100%}
 .op-ativo-card.open .op-ativo-chev{transform:rotate(180deg)}
 .op-ativo-body{padding:0 13px 14px;border-top:1px solid var(--line);padding-top:13px}
+
+/* Jornada — aba Ativos: lista no mesmo estilo de card do Cadastro (op-ativo-*), somente leitura com clique-para-detalhe */
+.jativo-head{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;flex-wrap:wrap}
+.jativo-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--txt-3)}
+.jativo-num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.jativo-kpis{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.jativo-kpi{flex:1;min-width:170px;display:flex;align-items:center;gap:11px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}
+.jativo-kpi .ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none}
+.jativo-kpi .ico svg{width:17px;height:17px}
+.jativo-kpi .txt{min-width:0}
+.jativo-kpi .txt span{display:block;font-size:11px;color:var(--txt-3);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jativo-kpi .txt b{display:block;font-size:19px;color:var(--txt);line-height:1.2;margin-top:1px}
+.jativo-kpi.k-blue .ico{background:var(--blue-soft);color:var(--blue)}
+.jativo-kpi.k-amber .ico{background:var(--amber-bg);color:var(--amber)}
+.jativo-kpi.k-green .ico{background:var(--green-bg);color:var(--green)}
 .form-flow{display:flex;flex-wrap:wrap;gap:14px 16px}
 .form-flow .field{flex:none}
 .form-flow .field.f-xs{width:86px}
@@ -2181,8 +2196,8 @@ const UF_REGIAO = {AC:'Norte',AP:'Norte',AM:'Norte',PA:'Norte',RO:'Norte',RR:'No
   ES:'Sudeste',MG:'Sudeste',RJ:'Sudeste',SP:'Sudeste', PR:'Sul',RS:'Sul',SC:'Sul'};
 const REGIAO_TONE = {'Norte':'green','Nordeste':'amber','Centro-Oeste':'violet','Sudeste':'blue','Sul':'slate'};
 // Status do ativo/SPE (ciclo do empreendimento)
-const ATIVO_STATUS = ['Estruturação','Lançamento','Comercialização','Obras','Entrega','Pós-obra'];
-const ATIVO_STATUS_TONE = {'Estruturação':'slate','Lançamento':'violet','Comercialização':'blue','Obras':'amber','Entrega':'green','Pós-obra':'slate'};
+const ATIVO_STATUS = ['Landbank','Pré-lançamento','Lançamento','Obras','Pós-obras','Pós-operacional'];
+const ATIVO_STATUS_TONE = {'Landbank':'slate','Pré-lançamento':'violet','Lançamento':'blue','Obras':'amber','Pós-obras':'green','Pós-operacional':'slate'};
 // Funil comercial (Middle Plataforma) — status da proposta
 const PROP_STATUS = ['Proposta Elaborada','Proposta Enviada','Em Negociação','Proposta Aprovada','Contrato Assinado','Proposta Perdida','Cancelada'];
 const PROP_STATUS_TONE = {'Proposta Elaborada':'slate','Proposta Enviada':'blue','Em Negociação':'amber','Proposta Aprovada':'violet','Contrato Assinado':'green','Proposta Perdida':'red','Cancelada':'red'};
@@ -3805,7 +3820,7 @@ function renderFicha(id){
   _fichaRepresentantes = Array.isArray(c.representantes)? JSON.parse(JSON.stringify(c.representantes)) : [];
   _fichaDocumentos = Array.isArray(c.documentos)? c.documentos.slice() : [];
   _cadAtivos = Array.isArray(c.ativos)? JSON.parse(JSON.stringify(c.ativos)).map(a=>({...a,_open:false})) : [];
-  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
+  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
   const historico = isNew? [] : DB().history.filter(h=>h.cliente===c.nome).slice(0,30);
 
   el('view-cadastro').innerHTML=`
@@ -4504,7 +4519,7 @@ function clienteModal(cli){
   const c=cli||{produtos:[]};
   const isNew=!cli;
   _cliAtivos = (c.ativos&&Array.isArray(c.ativos))? JSON.parse(JSON.stringify(c.ativos)) : [];
-  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
+  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
   el('modal').innerHTML=`
   <div class="modal-head"><div class="ico" style="width:34px;height:34px;border-radius:9px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center">${svg(I.clients)}</div>
     <h3>${isNew?'Novo Cliente':'Editar Cliente'}</h3><div class="spacer"></div>
@@ -4565,7 +4580,7 @@ function ativoListRender(){
         <div class="field"><label>CEP</label><input ${ro?'disabled':''} value="${esc(a.cep||'')}" onchange="App.ativoSet(${i},'cep',this.value)" placeholder="00000-000"></div>
         <div class="field full"><label>Endereço</label><input ${ro?'disabled':''} value="${esc(a.endereco||'')}" onchange="App.ativoSet(${i},'endereco',this.value)" placeholder="Logradouro, número, complemento"></div>
         ${sub('Números do Empreendimento')}
-        <div class="field"><label>Status do Ativo</label><select ${ro?'disabled':''} onchange="App.ativoSet(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Etapa</label><select ${ro?'disabled':''} onchange="App.ativoSet(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
         <div class="field"><label>Quantidade de Ativos</label><input ${ro?'disabled':''} type="number" min="0" value="${a.quantidade!=null?a.quantidade:1}" onchange="App.ativoSet(${i},'quantidade',this.value)"></div>
         <div class="field"><label>Total de Unidades</label><input ${ro?'disabled':''} type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.ativoSet(${i},'unidades',this.value)"></div>
         <div class="field"><label>Unidades Vendidas</label><input ${ro?'disabled':''} type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.ativoSet(${i},'unidadesVendidas',this.value)"></div>
@@ -4610,7 +4625,7 @@ function opDraftPersist(){ try{ localStorage.setItem(OP_DRAFT_KEY, JSON.stringif
 function opDraftLoad(){ try{ const raw=localStorage.getItem(OP_DRAFT_KEY); return raw?JSON.parse(raw):null; }catch(_){ return null; } }
 function opDraftClear(){ try{ localStorage.removeItem(OP_DRAFT_KEY); }catch(_){} }
 function renderNovaOperacao(){
-  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
+  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
   const linkedCli = _opClienteId? getCli(_opClienteId) : null;
   const opsExistentes = linkedCli? (linkedCli.operacoes||[]) : [];
   el('view-jornada').innerHTML=`
@@ -4706,7 +4721,7 @@ function ativoAccordionMarkup(list, prefix){
           <div class="field ativo-endereco"><label>Endereço</label><input data-id="ativo.campo.endereco" value="${esc(a.endereco||'')}" onchange="App.${prefix}Set(${i},'endereco',this.value)" placeholder="Logradouro, número, complemento"></div>
         </div>
         ${sub('Cronograma da Obra')}
-        <div class="field"><label>Status do Ativo</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Etapa</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
         <div class="field"><label>Lançamento</label><input data-id="ativo.campo.data-lancamento" type="date" value="${a.dataLancamento||''}" onchange="App.${prefix}Set(${i},'dataLancamento',this.value)"></div>
         <div class="field"><label>Início da Obra</label><input data-id="ativo.campo.data-inicio-obra" type="date" value="${a.dataInicioObra||''}" onchange="App.${prefix}Set(${i},'dataInicioObra',this.value)"></div>
         <div class="field"><label>Fim da Obra</label><input data-id="ativo.campo.data-fim-obra" type="date" value="${a.dataFimObra||''}" onchange="App.${prefix}Set(${i},'dataFimObra',this.value)"></div>
@@ -4952,23 +4967,42 @@ function jAtivos(c){
     if(a.estado)porEstado[a.estado]=(porEstado[a.estado]||0)+q; if(a.tipologia)porTip[a.tipologia]=(porTip[a.tipologia]||0)+q; if(a.statusAtivo)porStatus[a.statusAtivo]=(porStatus[a.statusAtivo]||0)+q; });
   return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.ativos-cliente"><h3 style="font-size:15px" data-id="jornada.texto.titulo-ativos-cliente">Ativos do Cliente</h3><div class="line"></div>
       ${canAtivos()?`<button class="btn primary sm" data-id="jornada.botao.gerenciar-cadastro" onclick="App.editCliente('${c.id}')">${svg(I.edit)} Gerenciar no cadastro</button>`:''}</div>
-    <div class="kpi-grid" style="margin-bottom:14px">
-      ${kpi('k-blue','Quantidade de Ativos',tot,'',ativos.length+' registro(s)','jornada.indicador.qtd-ativos')}
-      ${kpi('k-amber','Total de Unidades',num(unid),'','','jornada.indicador.total-unidades')}
-      ${kpi('k-green','VGV Total do Cliente',money(vgv),'','','jornada.indicador.vgv-total-cliente')}
-      ${kpi('k-slate','Localização',c.estado||'—','',esc(c.cidade||'—'),'jornada.indicador.localizacao-cliente')}
+    <div class="jativo-kpis" data-id="jornada.indicadores.ativos-cliente">
+      ${jAtivoKpi('k-blue','Quantidade de Ativos',tot,ativos.length+' registro(s)','jornada.indicador.qtd-ativos')}
+      ${jAtivoKpi('k-amber','Total de Unidades',num(unid),'','jornada.indicador.total-unidades')}
+      ${jAtivoKpi('k-green','VGV Total do Cliente',money(vgv),'','jornada.indicador.vgv-total-cliente')}
     </div>
-    ${ativos.length? `<div class="card" data-id="jornada.tabela.ativos-cliente"><div class="tbl-wrap"><table class="data"><thead><tr><th>Ativo</th><th>Tipologia</th><th>Status</th><th>Estado</th><th>Cidade</th><th>Região</th><th>Qtd</th><th>Unidades</th><th>VGV</th><th>Observações</th></tr></thead>
-      <tbody>${ativos.map((a,i)=>`<tr data-id="jornada.tabela.linha-ativo" style="cursor:pointer" onclick="App.jAtivoToggleDetalhe(${i})" title="Clique para ver os dados cadastrados"><td><b>${esc(a.nome||'—')}</b></td><td>${badge(a.tipologia||'—','slate')}</td>
-        <td>${a.statusAtivo?badge(a.statusAtivo,ATIVO_STATUS_TONE[a.statusAtivo]||'slate'):'—'}</td>
-        <td>${a.estado?badge(a.estado,REGIAO_TONE[regiaoDoEstado(a.estado)]||'slate'):'—'}</td><td>${esc(a.cidade||'—')}</td>
-        <td>${esc(a.regiao||regiaoDoEstado(a.estado)||'—')}</td><td class="num">${+a.quantidade||0}</td><td class="num">${num(+a.unidades||0)}</td><td class="num">${money(+a.vgv||0)}</td><td>${esc(a.obs||'—')}</td></tr>${jAtivoOpenIdx.has(i)?`<tr class="jativo-detail-row"><td colspan="10">${jAtivoDetalhe(a,c.id)}</td></tr>`:''}`).join('')}</tbody></table></div></div>
+    ${ativos.length? `<div class="op-ativo-list" data-id="jornada.lista.ativos-cliente">${ativos.map((a,i)=>{
+        const local=[a.cidade,a.estado].filter(Boolean).join('/');
+        const regiao=a.regiao||regiaoDoEstado(a.estado);
+        const open=jAtivoOpenIdx.has(i);
+        return `<div class="op-ativo-card${open?' open':''}" data-id="jornada.card.ativo">
+          <div class="jativo-head" onclick="App.jAtivoToggleDetalhe(${i})" title="Clique para ver os dados cadastrados">
+            <div class="op-ativo-ico">${svg(I.activation)}</div>
+            <div class="op-ativo-titulo"><b>${esc(a.nome||'—')}</b><small>${local?esc(local):'—'}</small></div>
+            <div class="jativo-tags">
+              ${badge(a.tipologia||'—','slate')}
+              ${regiao?badge(regiao,'slate'):''}
+              <span class="jativo-num">${num(+a.unidades||0)} un.</span>
+              <span class="jativo-num">${money(+a.vgv||0)}</span>
+            </div>
+            ${a.statusAtivo?badge(a.statusAtivo,ATIVO_STATUS_TONE[a.statusAtivo]||'slate'):`<span class="badge b-slate">Etapa não definida</span>`}
+            <span class="op-ativo-chev">${svg(I.chevronDown)}</span>
+          </div>
+          ${open?`<div class="op-ativo-body">${jAtivoDetalhe(a,c.id)}</div>`:''}
+        </div>`;}).join('')}</div>
       <div class="cfg-grid" style="margin-top:14px">
-        <div class="card" data-id="jornada.grafico.distribuicao-estado"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-estado">Distribuição por Estado</h3></div><div class="card-body">${geoBars(porEstado,uf=>REGIAO_TONE[regiaoDoEstado(uf)]||'blue',null,uf=>UF_NOME[uf]||uf)}</div></div>
+        <div class="card" data-id="jornada.grafico.distribuicao-estado"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-estado">Distribuição por Estado</h3></div><div class="card-body">${geoBars(porEstado,uf=>REGIAO_TONE[regiaoDoEstado(uf)]||'blue')}</div></div>
         <div class="card" data-id="jornada.grafico.distribuicao-tipologia"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-tipologia">Distribuição por Tipologia</h3></div><div class="card-body">${geoBars(porTip)}</div></div>
-        <div class="card" data-id="jornada.grafico.status-ativos"><div class="card-head"><h3 data-id="jornada.texto.titulo-status-ativos">Status dos Ativos</h3></div><div class="card-body">${geoBars(porStatus,s=>ATIVO_STATUS_TONE[s]||'slate')}</div></div>
+        <div class="card" data-id="jornada.grafico.status-ativos"><div class="card-head"><h3 data-id="jornada.texto.titulo-status-ativos">Etapa dos Ativos</h3></div><div class="card-body">${geoBars(porStatus,s=>ATIVO_STATUS_TONE[s]||'slate')}</div></div>
       </div>`
     : '<div class="card"><div class="card-body"><p style="color:var(--txt-3);text-align:center;padding:20px">Nenhum ativo cadastrado para este cliente.'+(canAtivos()?' Use “Gerenciar no cadastro”.':'')+'</p></div></div>'}`;
+}
+function jAtivoKpi(cls,lbl,val,foot,dataId){
+  return `<div class="jativo-kpi ${cls}" ${dataId?`data-id="${dataId}"`:''} title="${esc(lbl)}${foot?' — '+esc(foot):''}">
+    <div class="ico">${svg(kpiIcon(lbl))}</div>
+    <div class="txt"><span>${esc(lbl)}</span><b>${val}</b></div>
+  </div>`;
 }
 function jAtivoDetalhe(a,clienteId){
   const linha=(label,val)=>jInfo(label,val);
@@ -4984,7 +5018,7 @@ function jAtivoDetalhe(a,clienteId){
       ${linha('Cidade',esc(a.cidade))}
       ${linha('Estado',esc(a.estado))}
       ${linha('Endereço',esc(a.endereco))}
-      ${linha('Status do Ativo',esc(a.statusAtivo))}
+      ${linha('Etapa',esc(a.statusAtivo))}
       ${linha('Lançamento',fmtD(a.dataLancamento))}
       ${linha('Início da Obra',fmtD(a.dataInicioObra))}
       ${linha('Fim da Obra',fmtD(a.dataFimObra))}
@@ -6273,7 +6307,7 @@ async function entrarComUsuario(u,opts){
 function logAtivosDiff(clienteNome,antes,depois){
   const byId=arr=>{const m={};(arr||[]).forEach(a=>m[a.id]=a);return m;};
   const A=byId(antes), D=byId(depois);
-  const LBL={nome:'Nome',estado:'Estado',cidade:'Cidade',regiao:'Região',tipologia:'Tipologia',quantidade:'Quantidade',unidades:'Unidades',vgv:'VGV',statusAtivo:'Status do Ativo',obs:'Observações',
+  const LBL={nome:'Nome',estado:'Estado',cidade:'Cidade',regiao:'Região',tipologia:'Tipologia',quantidade:'Quantidade',unidades:'Unidades',vgv:'VGV',statusAtivo:'Etapa',obs:'Observações',
     semNomeDefinido:'Sem nome definido',empresaNaoConstituida:'Empresa não constituída',razaoSocial:'Razão Social',cnpj:'CNPJ',
     unidadesVendidas:'Unidades Vendidas',custoObra:'Custo de Obra',endereco:'Endereço',cep:'CEP',
     dataLancamento:'Lançamento',dataInicioObra:'Início da Obra',dataFimObra:'Fim da Obra',
@@ -7043,7 +7077,7 @@ window.App = {
       rows=d.clientes.map(c=>{ const h=calcHealth(c.id); const sv=calcSurvey(c.id);
         return [c.id,c.nome,c.estado||'',c.cidade||'',(etapaInfo(c.etapa).label||c.etapa||''),c.status||'',c.tipologia||'',c.respOnboarding||'',c.keyAccount||'',c.dataKickoff||'',c.goLivePrevisto||'',c.goLiveReal||'',(c.produtos||[]).join(' | '),ativosTotalCliente(c),h?h.total:'',h?h.cls:'—',sv?sv.media:'']; });
     } else if(tipo==='ativos'){
-      headers=['Cliente','Estado Cliente','Cidade Cliente','Ativo','Tipologia','Status do Ativo','Estado Ativo','Cidade Ativo','Região','Quantidade','Unidades','VGV Estimado','Observações'];
+      headers=['Cliente','Estado Cliente','Cidade Cliente','Ativo','Tipologia','Etapa','Estado Ativo','Cidade Ativo','Região','Quantidade','Unidades','VGV Estimado','Observações'];
       rows=[]; d.clientes.forEach(c=>(c.ativos||[]).forEach(a=>rows.push([c.nome,c.estado||'',c.cidade||'',a.nome||'',a.tipologia||'',a.statusAtivo||'',a.estado||'',a.cidade||'',a.regiao||regiaoDoEstado(a.estado)||'',(+a.quantidade||0),(+a.unidades||0),(+a.vgv||0),a.obs||''])));
     } else if(tipo==='geografico'){
       const ag=ativosAgrega(); const ufs=Object.keys({...ag.cliPorEstado,...ag.porEstado,...ag.vgvPorEstado,...ag.unidPorEstado}).sort();

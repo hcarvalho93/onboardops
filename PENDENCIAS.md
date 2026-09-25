@@ -135,3 +135,15 @@ Status: concluído em 2026-09-25, exceto os itens abertos abaixo. Ver DECISOES.m
 - [ ] Campo "Satisfação" (aba Interações do popover) é **local por enquanto** — não sincroniza com o Supabase (`interactionToRow`/`rowToInteraction` não incluem o campo, pra evitar mudar schema sem confirmação). Perguntar ao usuário se quer criar a coluna `satisfacao` na tabela `interactions`.
 - [ ] Tipos da aba Interações do popover (Ligação/Mensagem/E-mail/Reunião/Visita/Outros) usam um vocabulário próprio, diferente de `INT_TIPOS`/`INT_CANAIS` já existentes — essas interações não aparecem no filtro por "Tipo" da tela "Interações do Cliente" (só na listagem/timeline sem filtro). Avaliar se vale unificar os vocabulários depois.
 - [ ] `data-id` (Inspetor F9) não foi aplicado em nenhum elemento novo desta rodada (aba Serviços, página Tarefas, popover com abas, dropdown de personificação) — mesma regra já em vigor: preencher sob demanda quando o usuário notar falta durante o uso real
+
+---
+
+## Aba Ativos da Jornada padronizada com o Cadastro + "Etapa" + Estado só UF
+
+Status: concluído em 2026-09-25.
+
+- [x] Aba Ativos da Jornada trocou de tabela larga pra lista de cards no mesmo estilo visual do Cadastro (reaproveitando as classes `op-ativo-*` do accordion já existente)
+- [x] "Status do Ativo" renomeado pra "Etapa" em todo lugar (Cadastro, Nova Operação, detalhe da Jornada, Histórico, exportação CSV); novos valores: Landbank, Pré-lançamento, Lançamento, Obras, Pós-obras, Pós-operacional
+- [x] Campo "Estado" do cliente (Cadastro e Nova Operação) passou a mostrar só a UF no `<select>`, igual ao campo Estado do ativo (que já era assim)
+- [x] Card "Localização" removido do resumo da aba Ativos; os três KPIs restantes (Quantidade de Ativos/Total de Unidades/VGV Total) reduzidos pra um componente compacto próprio (`.jativo-kpi`), sem mexer no `.kpi` genérico usado em outras telas
+- [ ] **Dado existente não foi migrado**: ativos já cadastrados com as etapas antigas (Estruturação/Comercialização/Entrega/Pós-obra) continuam com o texto antigo no selo, mas o `<select>` de edição não marca nenhuma opção pra esses valores — precisa que alguém abra e resalve cada ativo com a etapa nova, um por um, quando notado. Avaliar se vale um script de migração/mapeamento se isso incomodar no uso real.
