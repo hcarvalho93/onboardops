@@ -413,11 +413,12 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 /* Jornada — abas 360, coladas no topbar (barra reta com texto sublinhado, estilo do print de referência) */
 #pageHead.jhead-hidden{display:none}
 #mainContent.jhead-hidden{padding-top:0}
-.jtabs-row{display:flex;align-items:center;gap:10px;padding:0 28px;margin-left:-28px;position:sticky;top:var(--topbar-h);z-index:16;background:var(--surface);border-bottom:1px solid var(--line)}
+.jtabs-row{display:flex;align-items:center;gap:10px;padding:0 28px;margin-left:-28px;margin-right:-28px;position:sticky;top:var(--topbar-h);z-index:16;background:var(--surface);border-bottom:1px solid var(--line)}
 .jtabs{display:flex;gap:26px;flex-wrap:wrap}
 .jtab{padding:14px 0;font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:.15s}
 .jtab:hover{color:var(--txt)}
 .jtab.active{color:var(--blue);font-weight:700;border-bottom-color:var(--blue)}
+.jtab:focus-visible{box-shadow:none;border-radius:0;outline:2px solid var(--blue-soft);outline-offset:-4px}
 .jtab-back{width:32px;height:32px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--surface);color:var(--txt-3);cursor:pointer;border-radius:9px}
 .jtab-back:hover{background:var(--surface-2);color:var(--txt)}
 .jtab-back svg{width:16px;height:16px}
@@ -433,8 +434,6 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jop-num:hover{text-decoration:underline}
 .jcard-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--txt-3)}
 .jcard-meta b{color:var(--txt-2);font-weight:600}
-.jcard-meta-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:2px;font-size:11px;color:var(--txt-3)}
-.jcard-meta-right b{color:var(--txt-2);font-weight:600}
 .jcard-actions{display:flex;gap:8px;flex-wrap:wrap}
 
 /* Jornada — estágio da negociação como selo único clicável (substitui a barra de pills) */
@@ -4753,6 +4752,8 @@ function renderJornada(){
               <span>Gerente: <b>${esc(c.respComercial||'—')}</b></span>
               <span>Onboarding: <b>${esc(c.respOnboarding||'—')}</b></span>
               <span>Key Account: <b>${esc(c.keyAccount||'—')}</b></span>
+              <span>Criado em <b>${fmtD(c.criadoEm)||'—'}</b></span>
+              <span>Última atualização <b>${ultimaAlt?fmtD(ultimaAlt.data):(fmtD(c.criadoEm)||'—')}</b></span>
             </div>
             <div class="jcard-actions">
               ${gate('createActivity',`<button type="button" class="btn sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Tarefa</button>`)}
@@ -4769,10 +4770,6 @@ function renderJornada(){
               ${jStageMenuOpen?`<div class="jstage-menu">${STATUS_NEGOCIACAO.map(s=>`<button type="button" onclick="App.setStatusNegociacao('${c.id}','${s}')">${esc(s)}</button>`).join('')}</div>`:''}
             </div>
             <div class="jstage-sla">${diasNaEtapa(c)} nesta etapa</div>
-            <div class="jcard-meta-right">
-              <span>Criado em <b>${fmtD(c.criadoEm)||'—'}</b></span>
-              <span>Última atualização <b>${ultimaAlt?fmtD(ultimaAlt.data):(fmtD(c.criadoEm)||'—')}</b></span>
-            </div>
           </div>
         </div>
       </div>
