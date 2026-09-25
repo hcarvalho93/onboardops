@@ -441,3 +441,17 @@ De passagem, também corrigido o cabeçalho da tela de detalhe do cliente (`rend
 **Fix:** `.jtab{border-radius:0}` (override local, seguindo o padrão já estabelecido no projeto de preferir seletor mais específico a editar a regra compartilhada, já que `.chip`/`.chip-btn`/`.vsw` ainda usam a pílula legitimamente). Adicionalmente, a pedido do usuário ("simplificar"): `.jtab.active` trocou `color:var(--blue)` e `border-bottom-color:var(--blue)` por `var(--txt)` (cinza quase preto, `#0E1726`/`#0B1220` conforme o tema — já a cor de texto principal do app) — sublinhado + texto escuro marcam a seleção, sem depender de azul.
 
 **Teste:** verificado ao vivo em "Ricardo De Lacerda Teodoro Ltda" via zoom de screenshot na barra de abas — sublinhado reto (sem curva) embaixo de "VISÃO GERAL", cor cinza quase preto, abas inativas seguem cinza claro (`var(--txt-3)`). A extensão Claude in Chrome caiu de novo logo depois desse teste (não foi possível confirmar via `getComputedStyle()` desta vez), mas a inspeção visual por zoom já confirma a correção do bug reportado.
+
+---
+
+## 2026-09-25 (10) — O fix anterior não funcionou de verdade: erro de especificidade CSS (a mesma classe de bug já documentada no projeto, cometida por mim desta vez)
+
+**Contexto:** usuário testou de novo (print de "ATIVOS" selecionado) e o semicírculo continuava — o diagnóstico da rodada anterior (regra `.jtab,.chip,.chip-btn,.vsw{border-radius:var(--radius-pill)}`) estava certo, mas o **fix** não tinha efeito nenhum.
+
+**Causa raiz do fix não funcionar:** `.jtab{border-radius:0}` (adicionado na linha ~418) e `.jtab,.chip,.chip-btn,.vsw{border-radius:var(--radius-pill)}` (linha ~1370, mais abaixo no arquivo) têm a **mesma especificidade** (um seletor de classe simples, 0-1-0). Com especificidade empatada, quem vem depois no arquivo vence — e a regra da pílula vem depois. Ou seja: eu apliquei exatamente o mesmo erro que este projeto já documentou várias vezes em DECISOES.md ("regra depois no arquivo vence em empate de especificidade") — dessa vez cometido por mim mesmo, não achado num código antigo.
+
+**Fix de verdade:** trocado `.jtab{border-radius:0}` por `.jtabs-row .jtab{border-radius:0}` — um seletor composto (dois níveis: contêiner + classe) tem especificidade 0-2-0, que vence a regra da pílula (0-1-0) **independente da ordem no arquivo**. É o mesmo padrão de correção já usado no caso `.jstage-bar .jstage` (registrado em 2026-09-23) — preferir escopar por um ancestral real a confiar na ordem das regras.
+
+**Lição:** ao corrigir um bug de CSS causado por uma regra compartilhada com a mesma especificidade do seletor problemático, sempre aumentar a especificidade do fix (escopar por um ancestral, não só repetir a mesma classe) — nunca contar com a posição no arquivo pra vencer o empate, mesmo que pareça que a nova regra "deveria" vencer por ter sido escrita depois na tela (a posição real no arquivo é o que importa, e é fácil perder a conta em um arquivo de milhares de linhas).
+
+**Teste:** verificado ao vivo em "Ricardo De Lacerda Teodoro Ltda", clicando de fato na aba (não só inspecionando por seletor) — `getComputedStyle(document.querySelector('.jtab.active')).borderRadius` → `"0px"` (era `"9999px"`/pílula antes do fix real). Confirmado também por zoom de screenshot: sublinhado reto sob "ATIVOS", sem curva nos cantos. Sem erros de console.
