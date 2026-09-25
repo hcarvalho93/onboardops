@@ -105,3 +105,12 @@ Status: concluído em 2026-09-25.
 - [x] Ativos do Cadastro embutidos direto na ficha (2ª rodada, 2026-09-25) — não precisa mais salvar o cliente antes de adicionar ativos, igual à Nova Operação; salvos junto no mesmo "Salvar Cadastro"
 - [x] Botão "Aglutinar tudo / Expandir tudo" adicionado nos Ativos (Cadastro e Nova Operação) — recolhe/expande todos os accordions de uma vez, além do toggle individual que já existia
 - [x] Cliente Elite virou `<select>` Sim/Não na ficha do cliente (era checkbox), igual à Nova Operação
+
+---
+
+## Número da Operação no cabeçalho da Jornada e no sidebar de Contexto
+
+Status: concluído em 2026-09-25.
+
+- [x] Número da Operação (link clicável pro AZO) reordenado no `jcard-title`: agora vem antes do nome, formato "#00000 | Nome do Cliente"
+- [x] Campo "Número da Operação" novo no sidebar de Contexto (topo do painel, antes de Responsáveis), editável com lápis — mesmo padrão de edição inline já usado nos campos de Responsáveis
