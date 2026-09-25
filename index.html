@@ -213,14 +213,9 @@ td.herdado::after{content:'herdado';display:block;font-size:9px;letter-spacing:.
 .kpi .val{font-family:var(--font-mono);font-size:30px;font-weight:600;letter-spacing:-.03em;margin-top:10px;line-height:1}
 .kpi .unit{font-size:13px;color:var(--txt-3);font-weight:500}
 .kpi .foot{font-size:11px;color:var(--txt-3);margin-top:7px;font-weight:500}
-.kpi::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
-.kpi.k-blue::after{background:var(--blue)} .kpi.k-blue .dot{background:var(--blue)}
-.kpi.k-navy::after{background:var(--navy-600)} .kpi.k-navy .dot{background:var(--navy-600)}
-.kpi.k-green::after{background:var(--green)} .kpi.k-green .dot{background:var(--green)}
-.kpi.k-purple::after{background:#7C3AED} .kpi.k-purple .dot{background:#7C3AED}
-.kpi.k-amber::after{background:var(--amber)} .kpi.k-amber .dot{background:var(--amber)}
-.kpi.k-teal::after{background:#0D9488} .kpi.k-teal .dot{background:#0D9488}
-.kpi.k-red::after{background:var(--red)} .kpi.k-red .dot{background:var(--red)} .kpi.k-red .val{color:var(--red)}
+/* barra lateral usa a mesma cor da barra superior (--kpi-accent, definida por variante no bloco KPI mais abaixo) */
+.kpi::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--kpi-accent,var(--brand))}
+.kpi.k-red .val{color:var(--red)}
 
 /* ---- grid de saúde ---- */
 .health-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-bottom:22px}
@@ -1223,6 +1218,7 @@ h3{ font-size:14.5px; letter-spacing:-.015em; font-weight:650; }
 
 /* acentos por tom (classes já usadas pelo app) */
 .kpi.k-blue{ --kpi-accent:var(--brand); }
+.kpi.k-navy{ --kpi-accent:var(--navy-600); }
 .kpi.k-green{ --kpi-accent:var(--green); }
 .kpi.k-amber{ --kpi-accent:var(--amber); }
 .kpi.k-red{ --kpi-accent:var(--red); }
@@ -2292,12 +2288,12 @@ const PERMS = {
 };
 
 // Visibilidade de módulos por perfil (nav)
-// "Middle" só enxerga as 5 áreas liberadas (Dashboard, Jornada, Cadastro, Tarefas, Relatórios) — por isso
-// os demais itens listam os perfis explicitamente em vez de usar o fallback NAV_ACCESS[key]||PERFIS.
+// "Middle" só enxerga as 5 áreas liberadas (Dashboard, Jornada, Cadastro, Tarefas, Relatórios).
+// Toda rota de NAV precisa de entrada aqui — navAllowed() bloqueia por padrão o que não estiver listado.
 const NAV_SEM_MIDDLE = PERFIS.filter(p=>p!=='Middle');
 const NAV_ACCESS = {
-  dashboard:PERFIS, pipeline:NAV_SEM_MIDDLE, jornada:PERFIS, cadastro:PERFIS,
-  pesquisa:NAV_SEM_MIDDLE, ativacao:NAV_SEM_MIDDLE, ttfv:NAV_SEM_MIDDLE, health:NAV_SEM_MIDDLE, relatorios:PERFIS,
+  dashboard:PERFIS, pipeline:NAV_SEM_MIDDLE, jornada:PERFIS, cadastro:PERFIS, cadastroAtivos:PERFIS,
+  pesquisa:NAV_SEM_MIDDLE, ativacao:NAV_SEM_MIDDLE, ttfv:NAV_SEM_MIDDLE, health:NAV_SEM_MIDDLE, relatorios:PERFIS, mapa:NAV_SEM_MIDDLE,
   tarefas:PERFIS,
   pendencias:NAV_SEM_MIDDLE, interacoes:NAV_SEM_MIDDLE, historico:NAV_SEM_MIDDLE,
   auditoria:['Gestão Executiva','Desenvolvedor'],
@@ -2395,7 +2391,7 @@ function seed(){
        goLivePrevisto:ago(46),goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
        keyAccount:'Ester Silva de Souza',respComercial:'Felipe Henrique',respKickoff:'Victor Abreu Espíndola',
        status:'Em andamento',etapa:'onboarding',obs:'',estado:'GO',cidade:'Goiânia',criadoEm:ago(120),criadoPor:'Waleria Santos',
-       ativos:[{id:'at_rd1',nome:'SPE Jardim Aurora',estado:'GO',cidade:'Goiânia',regiao:'Centro-Oeste',tipologia:'Incorporação',quantidade:1,unidades:240,vgv:180000000,statusAtivo:'Comercialização',criadoEm:ago(114),criadoPor:'Victor Abreu Espíndola',obs:''},
+       ativos:[{id:'at_rd1',nome:'SPE Jardim Aurora',estado:'GO',cidade:'Goiânia',regiao:'Centro-Oeste',tipologia:'Incorporação',quantidade:1,unidades:240,vgv:180000000,statusAtivo:'Lançamento',criadoEm:ago(114),criadoPor:'Victor Abreu Espíndola',obs:''},
                {id:'at_rd2',nome:'SPE Mar Azul',estado:'BA',cidade:'Salvador',regiao:'Nordeste',tipologia:'Multipropriedade',quantidade:3,unidades:520,vgv:420000000,statusAtivo:'Lançamento',criadoEm:ago(114),criadoPor:'Victor Abreu Espíndola',obs:'Resort em fase de lançamento'}]},
       {id:'barion',nome:'BARION EMPREENDIMENTOS IMOBILIARIOS LTDA.',cnpj:'23.456.789/0001-11',produtos:[],
        tipologia:'Incorporação',dataAssinatura:ago(122),dataKickoff:'',
@@ -2413,7 +2409,7 @@ function seed(){
        goLivePrevisto:ago(180),goLiveReal:ago(178),respOnboarding:'Natalia Yoshimura Lopes',
        keyAccount:'Ester Silva de Souza',respComercial:'Felipe Henrique',respKickoff:'Natalia Yoshimura Lopes',
        status:'Concluído',etapa:'operacao',obs:'Cliente operando com saúde excelente — referência de onboarding bem-sucedido.',estado:'SP',cidade:'Campinas',criadoEm:ago(210),criadoPor:'Waleria Santos',
-       ativos:[{id:'at_na1',nome:'SPE Alto da Serra',estado:'SP',cidade:'Campinas',regiao:'Sudeste',tipologia:'Incorporação',quantidade:1,unidades:300,vgv:220000000,statusAtivo:'Comercialização',criadoEm:ago(204),criadoPor:'Natalia Yoshimura Lopes',obs:''}]},
+       ativos:[{id:'at_na1',nome:'SPE Alto da Serra',estado:'SP',cidade:'Campinas',regiao:'Sudeste',tipologia:'Incorporação',quantidade:1,unidades:300,vgv:220000000,statusAtivo:'Lançamento',criadoEm:ago(204),criadoPor:'Natalia Yoshimura Lopes',obs:''}]},
       {id:'solaris',nome:'SOLARIS EMPREENDIMENTOS LTDA',cnpj:'56.789.012/0001-44',produtos:['Backoffice'],
        tipologia:'Incorporação',dataAssinatura:ago(160),dataKickoff:ago(150),
        goLivePrevisto:ago(90),goLiveReal:'',respOnboarding:'Victor Abreu Espíndola',
@@ -2695,27 +2691,34 @@ async function loadFromSupabase(){
   const erros=[cli,ati,rep,ops,srv,act,ttf,acts,ints,props,cfg,usrs,hist,logs].filter(r=>r.error);
   if(erros.length){ console.error('Falha ao carregar dados do Supabase',erros); throw erros[0].error; }
 
-  const clientes=(cli.data||[]).map(rowToCliente);
+  // IDs vão parar dentro de onclick="App.x('<id>')" — um ID gravado direto no banco com aspas/código viraria injeção de script.
+  // O app só gera IDs alfanuméricos; qualquer registro fora disso é descartado na leitura (e avisado no console).
+  const idOk=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,80}$/.test(v);
+  const refOk=v=>v==null||v===''||idOk(v);
+  let descartados=0; const valido=(r,...refs)=>{ const ok=idOk(r.id)&&refs.every(refOk); if(!ok) descartados++; return ok; };
+  const clientes=(cli.data||[]).filter(r=>valido(r)).map(rowToCliente);
   const byId={}; clientes.forEach(c=>byId[c.id]=c);
-  (ati.data||[]).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.ativos.push(rowToAtivo(r)); });
-  (rep.data||[]).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.representantes.push(rowToRepresentante(r)); });
-  (ops.data||[]).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.operacoes.push(rowToOperacao(r)); });
+  (ati.data||[]).filter(r=>valido(r,r.cliente_id)).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.ativos.push(rowToAtivo(r)); });
+  (rep.data||[]).filter(r=>valido(r,r.cliente_id)).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.representantes.push(rowToRepresentante(r)); });
+  (ops.data||[]).filter(r=>valido(r,r.cliente_id)).forEach(r=>{ const c=byId[r.cliente_id]; if(c) c.operacoes.push(rowToOperacao(r)); });
 
-  const surveys={}; (srv.data||[]).forEach(r=>{ surveys[r.cliente_id]=rowToSurvey(r); });
-  const activation={}; (act.data||[]).forEach(r=>{ activation[r.cliente_id]={items:r.items||{},dates:r.dates||{}}; });
-  const ttfv={}; (ttf.data||[]).forEach(r=>{ ttfv[r.cliente_id]=rowToTtfv(r); });
+  const surveys={}; (srv.data||[]).filter(r=>idOk(r.cliente_id)).forEach(r=>{ surveys[r.cliente_id]=rowToSurvey(r); });
+  const activation={}; (act.data||[]).filter(r=>idOk(r.cliente_id)).forEach(r=>{ activation[r.cliente_id]={items:r.items||{},dates:r.dates||{}}; });
+  const ttfv={}; (ttf.data||[]).filter(r=>idOk(r.cliente_id)).forEach(r=>{ ttfv[r.cliente_id]=rowToTtfv(r); });
 
   const c=cfg.data||{};
   const config={empresa:c.empresa||'Trinus',tagline:c.tagline||'Portal de Customer Success & Jornada do Cliente',
     thr:c.thr||{saudavel:70,atencao:40},escalaImediata:c.escala_imediata??30,escalaSemanal:c.escala_semanal??50,
     produtos:(c.produtos&&c.produtos.length)?c.produtos:PRODUTOS.slice(),tipologias:(c.tipologias&&c.tipologias.length)?c.tipologias:TIPOLOGIAS.slice()};
 
+  const activities=(acts.data||[]).filter(r=>valido(r,r.cliente_id)).map(rowToActivity);
+  const interactions=(ints.data||[]).filter(r=>valido(r,r.cliente_id)).map(rowToInteraction);
+  const propostas=(props.data||[]).filter(r=>valido(r)).map(rowToProposta);
+  if(descartados) console.warn('loadFromSupabase: '+descartados+' registro(s) com ID fora do padrão foram ignorados por segurança.');
   return migrate({
     clientes, surveys, activation, ttfv, config,
-    users:(usrs.data||[]).map(rowToUser),
-    activities:(acts.data||[]).map(rowToActivity),
-    interactions:(ints.data||[]).map(rowToInteraction),
-    propostas:(props.data||[]).map(rowToProposta),
+    users:(usrs.data||[]).filter(r=>idOk(r.id)).map(rowToUser),
+    activities, interactions, propostas,
     history:(hist.data||[]).map(rowToHist),
     logins:(logs.data||[]).map(rowToLogin)
   });
@@ -2822,7 +2825,7 @@ function jornadaFunil(){
     taxaKickoff:pct(kickoffs,contratos),taxaOnboarding:pct(onboarding,kickoffs),
     taxaOperacao:pct(operacao,onboarding),conversaoTotal:pct(operacao,contratos)};
 }
-function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 /* ===================== COMPETÊNCIA / PERÍODO (fechamento mensal e anual) =====================
    Registros são ÚNICOS, com datas por etapa. A contagem por período usa a data da etapa
    relevante (não o status atual). Período: {mode:'all'|'mes'|'ano'|'custom', mes, ano, de, ate}. */
@@ -3030,7 +3033,8 @@ function logSeg(who,evento,detalhe){ const t=nowParts();
   if(DB.history.length>2000) DB.history.length=2000;
   insertHistoryRemoto(row); }
 function can(cap){ const u=getSession(); if(!u) return false; const p=PERMS[u.perfil]||{}; return !!p[cap]; }
-function navAllowed(key){ const u=getSession(); if(!u) return false; const list=NAV_ACCESS[key]||PERFIS; return list.includes(u.perfil); }
+// bloqueia por padrão: uma rota nova sem entrada em NAV_ACCESS fica fechada, em vez de aberta a todos os perfis
+function navAllowed(key){ const u=getSession(); if(!u) return false; const list=NAV_ACCESS[key]; return !!list && list.includes(u.perfil); }
 function nowParts(){ const d=new Date(); const z=n=>String(n).padStart(2,'0');
   return {data:`${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()}`, hora:`${z(d.getHours())}:${z(d.getMinutes())}`, iso:d.toISOString()}; }
 function addHistory(entry){ const u=getSession(); const t=nowParts();
@@ -3262,7 +3266,7 @@ function renderDashTabs(activeId){
   const isDash=DASH_TABS.some(t=>t[0]===activeId);
   box.hidden=!isDash;
   if(!isDash) return;
-  box.innerHTML=DASH_TABS.map(([id,label])=>
+  box.innerHTML=DASH_TABS.filter(([id])=>navAllowed(id)).map(([id,label])=>
     `<button class="dash-tab ${id===activeId?'active':''}" onclick="App.go('${id}')">${esc(label)}</button>`).join('');
 }
 
@@ -3916,7 +3920,7 @@ function documentoListRender(){
   const box=el('docs_list'); if(!box) return;
   box.innerHTML = _fichaDocumentos.length ? _fichaDocumentos.map(a=>`<div class="anx-row"><span class="anx-nm">${svg(I.doc)} ${esc(a.nome)}</span>
       <span class="anx-sz">${anxSize(a.size)}</span>
-      <a class="btn ghost sm" href="${a.data}" download="${esc(a.nome)}" title="Baixar">${svg(I.download)}</a>
+      <a class="btn ghost sm" href="${anxHref(a.data)}" download="${esc(a.nome)}" title="Baixar">${svg(I.download)}</a>
       ${can('editClient')?`<button type="button" class="btn ghost sm" onclick="App.docDel('${a.id}')" title="Remover">${svg(I.trash)}</button>`:''}</div>`).join('')
     : '<p style="color:var(--txt-3)">Nenhum documento anexado.</p>';
 }
@@ -4410,7 +4414,6 @@ function renderConfig(){
         <div class="thr-row"><label>Atenção (≥)</label><input class="field" type="number" id="thrA" value="${cfg.thr.atencao}" min="1" max="100"> pontos</div>
         <p style="font-size:12px;color:var(--txt-3);margin:6px 0 12px">Abaixo do limite de Atenção, o cliente é classificado como <b style="color:var(--red)">Risco</b>. Padrão atual segue o Manual Operacional (≥70 / 40–69 / &lt;40).</p>
         <button class="btn primary sm" onclick="App.saveThr()">${svg(I.check)} Salvar limiares</button>
-        <button class="btn danger sm" onclick="App.resetDB()">${svg(I.trash)} Restaurar dados de exemplo</button>
       </div>
     </div>
     <div class="card">
@@ -4580,7 +4583,7 @@ function ativoListRender(){
         <div class="field"><label>CEP</label><input ${ro?'disabled':''} value="${esc(a.cep||'')}" onchange="App.ativoSet(${i},'cep',this.value)" placeholder="00000-000"></div>
         <div class="field full"><label>Endereço</label><input ${ro?'disabled':''} value="${esc(a.endereco||'')}" onchange="App.ativoSet(${i},'endereco',this.value)" placeholder="Logradouro, número, complemento"></div>
         ${sub('Números do Empreendimento')}
-        <div class="field"><label>Etapa</label><select ${ro?'disabled':''} onchange="App.ativoSet(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Etapa</label><select ${ro?'disabled':''} onchange="App.ativoSet(${i},'statusAtivo',this.value)">${etapaAtivoOptions(a.statusAtivo)}</select></div>
         <div class="field"><label>Quantidade de Ativos</label><input ${ro?'disabled':''} type="number" min="0" value="${a.quantidade!=null?a.quantidade:1}" onchange="App.ativoSet(${i},'quantidade',this.value)"></div>
         <div class="field"><label>Total de Unidades</label><input ${ro?'disabled':''} type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.ativoSet(${i},'unidades',this.value)"></div>
         <div class="field"><label>Unidades Vendidas</label><input ${ro?'disabled':''} type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.ativoSet(${i},'unidadesVendidas',this.value)"></div>
@@ -4610,7 +4613,7 @@ function gate(cap,html){ return can(cap)?html:''; }
 function nomeCliente(id){ const c=getCli(id); return c?c.nome:'—'; }
 function ativosDoCliente(cid){ const c=getCli(cid); return (c&&Array.isArray(c.ativos))?c.ativos:[]; }
 function ativoNome(cid,ativoId){ if(!ativoId) return ''; const a=ativosDoCliente(cid).find(x=>x.id===ativoId); return a?a.nome:''; }
-function ativoOptions(cid,sel){ return `<option value="">— (somente cliente)</option>`+ativosDoCliente(cid).map(a=>`<option value="${a.id}" ${sel===a.id?'selected':''}>${esc(a.nome||a.id)}${a.estado?' · '+a.estado:''}</option>`).join(''); }
+function ativoOptions(cid,sel){ return `<option value="">— (somente cliente)</option>`+ativosDoCliente(cid).map(a=>`<option value="${a.id}" ${sel===a.id?'selected':''}>${esc(a.nome||a.id)}${a.estado?' · '+esc(a.estado):''}</option>`).join(''); }
 
 /* ============================ MÓDULO — JORNADA DO CLIENTE (360°) ============================ */
 let jTab='geral';
@@ -4674,6 +4677,11 @@ function renderNovaOperacao(){
     <button class="btn primary" data-id="jornada.botao.salvar-nova-operacao" onclick="App.salvarNovaOperacao()">${svg(I.check)} Salvar Operação</button></div>`;
   opAtivoListRender();
 }
+// ativos gravados antes da troca de "Status" para "Etapa" podem ter um valor fora da lista atual — ele aparece marcado, sem sumir
+function etapaAtivoOptions(sel){
+  const legado = sel && !ATIVO_STATUS.includes(sel) ? `<option value="${esc(sel)}" selected>${esc(sel)} (etapa antiga)</option>` : '';
+  return `<option value="">—</option>${legado}${ATIVO_STATUS.map(s=>`<option ${sel===s?'selected':''}>${s}</option>`).join('')}`;
+}
 function ativoAccordionMarkup(list, prefix){
   const ufOpt=(sel)=>`<option value="">UF</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
   const sub=(txt)=>`<div class="field full ativo-sub">${txt}</div>`;
@@ -4721,7 +4729,7 @@ function ativoAccordionMarkup(list, prefix){
           <div class="field ativo-endereco"><label>Endereço</label><input data-id="ativo.campo.endereco" value="${esc(a.endereco||'')}" onchange="App.${prefix}Set(${i},'endereco',this.value)" placeholder="Logradouro, número, complemento"></div>
         </div>
         ${sub('Cronograma da Obra')}
-        <div class="field"><label>Etapa</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Etapa</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)">${etapaAtivoOptions(a.statusAtivo)}</select></div>
         <div class="field"><label>Lançamento</label><input data-id="ativo.campo.data-lancamento" type="date" value="${a.dataLancamento||''}" onchange="App.${prefix}Set(${i},'dataLancamento',this.value)"></div>
         <div class="field"><label>Início da Obra</label><input data-id="ativo.campo.data-inicio-obra" type="date" value="${a.dataInicioObra||''}" onchange="App.${prefix}Set(${i},'dataInicioObra',this.value)"></div>
         <div class="field"><label>Fim da Obra</label><input data-id="ativo.campo.data-fim-obra" type="date" value="${a.dataFimObra||''}" onchange="App.${prefix}Set(${i},'dataFimObra',this.value)"></div>
@@ -4768,8 +4776,9 @@ function cadAtivoListRender(){
 function jcliKCard(c){
   const h=calcHealth(c.id), e=etapaInfo(c.etapa);
   const ab=DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status)).length;
-  return `<div class="kcard" data-id="jornada.card.cliente-negociacao" draggable="true" onclick="App.abrirCliente('${c.id}')"
-      ondragstart="App.dragStartN(event,'${c.id}')" ondragend="App.dragEndN()">
+  const podeMover=can('editClient');
+  return `<div class="kcard" data-id="jornada.card.cliente-negociacao" ${podeMover?'draggable="true"':''} onclick="App.abrirCliente('${c.id}')"
+      ${podeMover?`ondragstart="App.dragStartN(event,'${c.id}')" ondragend="App.dragEndN()"`:''}>
     <div class="knm" data-id="jornada.texto.nome-cliente-kanban">${c.numeroOperacao?`#${esc(c.numeroOperacao)} | `:''}${esc(c.nome)}</div>
     <div class="kmeta" data-id="jornada.texto.info-cliente-kanban">${esc(c.tipologia||'—')} · KA ${esc((c.keyAccount||'—').split(' ')[0])}</div>
     <div class="krow">${badge(e.label,e.tone,'jornada.selo.etapa-cliente-kanban')} ${h?badge(num(h.total)+' · '+h.cls,h.tone,'jornada.selo.health-score-kanban'):''}</div>
@@ -4941,7 +4950,7 @@ function jContexto(c,m){
             <div class="jctx-indic-item"><span>Health Score</span><b>${h?num(h.total)+' · '+h.cls:'—'}</b></div>
             <div class="jctx-indic-item"><span>% Ativação</span><b>${(at!=null?at:0)}%</b></div>
             <div class="jctx-indic-item"><span>Pesquisa</span><b>${sv?num(sv.media,1)+' ('+sv.cls+')':'—'}</b></div>
-            <div class="jctx-indic-item"><span>TTFV</span><b>${tv?(tv.dias+' dias'):'—'}</b></div>
+            <div class="jctx-indic-item"><span>TTFV</span><b>${tv?(tv.dias+(tv.dias===1?' dia':' dias')):'—'}</b></div>
           </div>
         </div>
       </div>
@@ -4966,7 +4975,7 @@ function jAtivos(c){
   const porEstado={},porTip={},porStatus={}; ativos.forEach(a=>{ const q=+a.quantidade||0;
     if(a.estado)porEstado[a.estado]=(porEstado[a.estado]||0)+q; if(a.tipologia)porTip[a.tipologia]=(porTip[a.tipologia]||0)+q; if(a.statusAtivo)porStatus[a.statusAtivo]=(porStatus[a.statusAtivo]||0)+q; });
   return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.ativos-cliente"><h3 style="font-size:15px" data-id="jornada.texto.titulo-ativos-cliente">Ativos do Cliente</h3><div class="line"></div>
-      ${canAtivos()?`<button class="btn primary sm" data-id="jornada.botao.gerenciar-cadastro" onclick="App.editCliente('${c.id}')">${svg(I.edit)} Gerenciar no cadastro</button>`:''}</div>
+      ${canAtivos()?`<button class="btn primary sm" data-id="jornada.botao.gerenciar-cadastro" onclick="App.abrirFicha('${c.id}')">${svg(I.edit)} Gerenciar no cadastro</button>`:''}</div>
     <div class="jativo-kpis" data-id="jornada.indicadores.ativos-cliente">
       ${jAtivoKpi('k-blue','Quantidade de Ativos',tot,ativos.length+' registro(s)','jornada.indicador.qtd-ativos')}
       ${jAtivoKpi('k-amber','Total de Unidades',num(unid),'','jornada.indicador.total-unidades')}
@@ -5008,7 +5017,7 @@ function jAtivoDetalhe(a,clienteId){
   const linha=(label,val)=>jInfo(label,val);
   return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 10px">
       <span style="font-size:11px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.04em">Dados cadastrados do ativo</span>
-      ${canAtivos()?`<button type="button" class="btn ghost sm" onclick="event.stopPropagation();App.editCliente('${clienteId}')">${svg(I.edit)} Editar</button>`:''}
+      ${canAtivos()?`<button type="button" class="btn ghost sm" onclick="event.stopPropagation();App.abrirFicha('${clienteId}')">${svg(I.edit)} Editar</button>`:''}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px">
       ${linha('Nome do Empreendimento',esc(a.nome))}
@@ -5156,7 +5165,7 @@ function jTimelineWidget(c){
   let body='';
   if(jTlTab==='tarefas') body=atividadeList(DB().activities.filter(a=>a.cliente===c.id));
   else if(jTlTab==='interacoes'){ const ints=DB().interactions.filter(i=>i.cliente===c.id); body=ints.length?intTimeline(ints,false):'<p style="color:var(--txt-3)">Nenhuma interação registrada.</p>'; }
-  else if(jTlTab==='alteracoes') body=histTable(DB().history.filter(x=>x.cliente===c.nome),false);
+  else if(jTlTab==='alteracoes') body=histTable(DB().history.filter(x=>x.cliente===c.nome));
   else body=jTimelineGeral(c);
   return `<div class="card" style="margin-top:16px" data-id="jornada.card.timeline-operacao"><div class="card-head"><div class="ico">${svg(I.route)}</div><h3 data-id="jornada.texto.titulo-timeline-operacao">Linha do Tempo da Operação</h3></div>
     <div class="jtl-tabs">${subtabs.map(([k,l])=>`<button class="jtl-tab ${jTlTab===k?'active':''}" onclick="App.jTlSet('${k}')">${l}</button>`).join('')}</div>
@@ -5242,10 +5251,17 @@ function jPendencias(cid){
     <div class="card-body">${atividadeList(abertas)}</div></div>`;
 }
 function jDocs(cid){
-  const anexos=[]; DB().interactions.filter(i=>i.cliente===cid).forEach(i=>(i.anexos||[]).forEach(a=>anexos.push({...a,data:i.data})));
-  return `<div class="card" data-id="jornada.card.documentos"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3 data-id="jornada.texto.titulo-documentos">Documentos & Evidências</h3></div>
-    <div class="card-body">${anexos.length? anexos.map(a=>`<div class="doc-row" data-id="jornada.texto.item-documento">${svg(I.doc)} ${esc(a.nome||'arquivo')} <small>${fmtD(a.data)}</small></div>`).join('')
-      : '<p style="color:var(--txt-3)">Nenhum documento anexado. Anexos podem ser adicionados nos registros de WhatsApp.</p>'}</div></div>`;
+  const c=getCli(cid);
+  const docs=[];
+  ((c&&c.documentos)||[]).forEach(a=>docs.push({nome:a.nome,arquivo:a.data,size:a.size,quando:(a.quando||'').slice(0,10),origem:'Cadastro'}));
+  DB().interactions.filter(i=>i.cliente===cid).forEach(i=>(i.anexos||[]).forEach(a=>docs.push({nome:a.nome,arquivo:a.data,size:a.size,quando:i.data,origem:'Interação'})));
+  docs.sort((a,b)=>String(b.quando||'').localeCompare(String(a.quando||'')));
+  return `<div class="card" data-id="jornada.card.documentos"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3 data-id="jornada.texto.titulo-documentos">Documentos & Evidências</h3>
+      <span class="pill">${docs.length} arquivo(s)</span></div>
+    <div class="card-body">${docs.length? docs.map(a=>`<div class="anx-row" data-id="jornada.texto.item-documento"><span class="anx-nm">${svg(I.doc)} ${esc(a.nome||'arquivo')}</span>
+        <span class="anx-sz">${esc(a.origem)} · ${fmtD(a.quando)} · ${anxSize(a.size)}</span>
+        <a class="btn ghost sm" href="${anxHref(a.arquivo)}" download="${esc(a.nome||'arquivo')}" title="Baixar">${svg(I.download)}</a></div>`).join('')
+      : '<p style="color:var(--txt-3)">Nenhum documento anexado. Documentos podem ser adicionados no Cadastro do cliente ou nos registros de interação.</p>'}</div></div>`;
 }
 
 /* ============================ ATIVIDADES / KANBAN ============================ */
@@ -5271,8 +5287,9 @@ function kanbanAtividades(cid,override){
 }
 function atividadeCard(a){
   const f=farolAtividade(a);
-  return `<div class="kcard" data-id="atividade.card.principal" draggable="true" style="border-left-color:${toneVar(f.tone)}"
-      ondragstart="App.dragStartA(event,'${a.id}')" ondragend="App.dragEndA()" ondblclick="App.editAtividade('${a.id}')">
+  const podeMover=can('editActivity');
+  return `<div class="kcard" data-id="atividade.card.principal" ${podeMover?'draggable="true"':''} style="border-left-color:${toneVar(f.tone)}"
+      ${podeMover?`ondragstart="App.dragStartA(event,'${a.id}')" ondragend="App.dragEndA()"`:''} ondblclick="App.editAtividade('${a.id}')">
     <div class="knm" data-id="atividade.texto.titulo">${esc(a.titulo)}</div>
     <div class="kmeta" data-id="atividade.texto.info-card">${esc(nomeCliente(a.cliente))} · ${esc(a.responsavel||'—')}</div>
     <div class="krow">${badge(a.prioridade,PRIOR_TONE[a.prioridade],'atividade.selo.prioridade')} ${a.origem?badge(a.origem,ORIGEM_TONE[a.origem]||'slate','atividade.selo.origem'):''} ${farolDot(f.tone,f.label)}</div>
@@ -5289,7 +5306,7 @@ function renderTarefas(){
   <div class="section-bar" style="margin-top:0" data-id="tarefas.secao.cabecalho"><h2 data-id="tarefas.texto.titulo">Minhas Tarefas</h2><div class="line"></div>
     <span class="pill">${minhas.length} tarefa(s)</span>
     ${gate('createActivity',`<button class="btn primary sm" data-id="tarefas.botao.nova-tarefa" onclick="App.novaAtividade()">${svg(I.plus)} Nova tarefa</button>`)}</div>
-  <p style="font-size:12.5px;color:var(--txt-3);margin:-8px 0 14px">Todas as tarefas em que você é responsável, de todas as operações — arraste entre colunas ou clique numa tarefa pra editar.</p>
+  <p style="font-size:12.5px;color:var(--txt-3);margin:-8px 0 14px">Todas as tarefas em que você é responsável, de todas as operações — arraste entre colunas ou dê dois cliques numa tarefa pra editar.</p>
   ${minhas.length? kanbanAtividades(null,minhas) : '<div class="card"><div class="card-body"><p style="color:var(--txt-3);text-align:center;padding:20px">Nenhuma tarefa atribuída a você no momento.</p></div></div>'}`;
 }
 
@@ -5495,11 +5512,13 @@ let _cliAtivos=[];   // ativos em edição no modal de cliente (legado — usado
 let _cadAtivos=[];   // ativos em edição na página dedicada de Ativos do Cadastro
 function canAtivos(){ const u=getSession(); return !!u && (u.perfil==='Gestão Executiva'||u.perfil==='Onboarding'||u.perfil==='Middle'||u.perfil==='Desenvolvedor'); }
 function anxSize(n){ n=+n||0; return n<1024?n+' B':n<1048576?(n/1024).toFixed(0)+' KB':(n/1048576).toFixed(1)+' MB'; }
+// o conteúdo do anexo vem do banco e vira href — só aceita data: URL de arquivo, nunca javascript: ou afins
+function anxHref(u){ return /^data:[a-z0-9.+\/-]+(;[a-z0-9=.+-]+)*;base64,[a-z0-9+\/=\s]*$/i.test(String(u||''))?esc(u):'#'; }
 function intAnexoRender(){ const box=el('in_anexos_list'); if(!box) return;
   box.innerHTML = _intAnexos.length
     ? _intAnexos.map(a=>`<div class="anx-row"><span class="anx-nm">${svg(I.doc)} ${esc(a.nome)}</span>
         <span class="anx-sz">${anxSize(a.size)}</span>
-        <a class="btn ghost sm" href="${a.data}" download="${esc(a.nome)}" title="Baixar">${svg(I.download)}</a>
+        <a class="btn ghost sm" href="${anxHref(a.data)}" download="${esc(a.nome)}" title="Baixar">${svg(I.download)}</a>
         <button type="button" class="btn ghost sm" onclick="App.intAnexoDel('${a.id}')" title="Remover">${svg(I.trash)}</button></div>`).join('')
     : '<p style="font-size:12px;color:var(--txt-3);margin:0 0 6px">Nenhum anexo. O arquivo é incorporado ao registro (armazenamento local).</p>';
 }
@@ -5523,7 +5542,7 @@ function intTimeline(list,showCli){
     ${isDia?intDiarioBlocos(i):''}
     ${i.texto?`<details class="int-full"><summary>${isDia?'Ver conversa integral do dia':'Ver conversa completa'}</summary><pre>${esc(i.texto)}</pre></details>`:''}
     ${i.proximaAcao?`<div class="int-next">→ Próxima ação: <b>${esc(i.proximaAcao)}</b>${i.prazoAcao?' · prazo '+fmtD(i.prazoAcao):''}</div>`:''}
-    ${(i.anexos&&i.anexos.length)?`<div class="anx-list">${i.anexos.map(x=>`<a class="anx-chip" href="${x.data}" download="${esc(x.nome)}" title="${esc(x.path||x.nome)}">${svg(I.doc)} ${esc(x.nome)} <span class="anx-sz">${anxSize(x.size)}</span></a>`).join('')}</div>`:''}
+    ${(i.anexos&&i.anexos.length)?`<div class="anx-list">${i.anexos.map(x=>`<a class="anx-chip" href="${anxHref(x.data)}" download="${esc(x.nome)}" title="${esc(x.path||x.nome)}">${svg(I.doc)} ${esc(x.nome)} <span class="anx-sz">${anxSize(x.size)}</span></a>`).join('')}</div>`:''}
     ${ linked
       ? `<div class="link-ref"><span class="link-ref-lbl">${svg(I.clock)} Atividade vinculada</span>
           <div class="link-ref-body">${esc(linked.titulo)} · ${esc(linked.status)}</div>
@@ -5541,18 +5560,17 @@ function renderHistorico(){
   const h=DB().history;
   el('view-historico').innerHTML=`
   <div class="section-bar"><h2>Histórico de Alterações</h2><div class="line"></div>
-    <span class="pill">${h.length} registro(s)</span>
-    ${gate('clearHistory',`<button class="btn ghost sm" onclick="App.limparHistorico()">${svg(I.trash)} Limpar histórico</button>`)}</div>
-  <div class="card"><div class="card-body">${histTable(h,can('deleteHistory'))}</div></div>`;
+    <span class="pill">${h.length} registro(s)</span></div>
+  <div class="card"><div class="card-body">${histTable(h)}</div></div>`;
 }
-function histTable(list,canDel){
+// trilha de auditoria é somente leitura — não há exclusão pela interface
+function histTable(list){
   if(!list.length) return '<p style="color:var(--txt-3)">Nenhuma alteração registrada.</p>';
   return `<div class="tbl-wrap" data-id="alteracao.tabela.principal"><table class="data"><thead><tr>
-    <th>Data</th><th>Hora</th><th>Usuário</th><th>Módulo</th><th>Cliente</th><th>Campo</th><th>De</th><th>Para</th>${canDel?'<th></th>':''}
+    <th>Data</th><th>Hora</th><th>Usuário</th><th>Módulo</th><th>Cliente</th><th>Campo</th><th>De</th><th>Para</th>
   </tr></thead><tbody>${list.map(x=>`<tr data-id="alteracao.tabela.linha">
     <td class="num">${esc(x.data)}</td><td class="num">${esc(x.hora)}</td><td>${esc(x.usuario)}</td><td>${esc(x.modulo||'—')}</td>
     <td>${esc(x.cliente||'—')}</td><td>${esc(x.campo||'—')}</td><td>${esc(x.de||'—')}</td><td><b>${esc(x.para||'—')}</b></td>
-    ${canDel?`<td><button class="btn ghost sm" onclick="App.delHistorico('${x.id}')">${svg(I.trash)}</button></td>`:''}
   </tr>`).join('')}</tbody></table></div>`;
 }
 
@@ -5982,7 +6000,7 @@ function renderBackup(){
       <div class="card-body">
         ${can('restore')?`<textarea class="cell" id="restoreBox" style="width:100%;min-height:120px;font-family:var(--font-mono);font-size:12px" placeholder="Cole aqui o conteúdo do arquivo de backup (.json)…"></textarea>
         <button class="btn primary" style="margin-top:10px" onclick="App.restaurarBackup()">${svg(I.check)} Restaurar</button>
-        <p style="color:var(--amber);font-size:12px;margin-top:8px">Atenção: a restauração sobrescreve todos os dados atuais.</p>`
+        <p style="color:var(--amber);font-size:12px;margin-top:8px">Atenção: a restauração sobrescreve os registros atuais que existem no backup (mesmo código). Registros criados depois do backup não são apagados.</p>`
         :'<p style="color:var(--txt-3);font-size:12px">Apenas a Gestão Executiva pode restaurar backups.</p>'}
       </div></div>
   </div>
@@ -6016,13 +6034,15 @@ function renderUsuarios(){
     <span class="desc">pessoas com acesso ao sistema · login por e-mail + senha (Supabase Auth)</span></div>
     <div class="tbl-wrap"><table class="data"><thead><tr>
       <th>Nome</th><th>E-mail</th><th>Cargo</th><th>Perfil</th><th>Ações</th>
-    </tr></thead><tbody>${d.users.length?d.users.map((u,i)=>`<tr${u.ativo===false?' style="opacity:.55"':''}>
-      <td><b>${esc(u.nome)}</b></td><td>${esc(u.email)}</td><td>${esc(u.cargo||'—')}</td><td>${badge(u.perfil,perfilTone(u.perfil))}</td>
-      <td style="text-align:right;white-space:nowrap">
+    </tr></thead><tbody>${d.users.length?d.users.map((u,i)=>`<tr${u.ativo===false||!u.id?' style="opacity:.55"':''}>
+      <td><b>${esc(u.nome)}</b>${u.id?'':' <span class="badge b-amber" title="Pessoa pré-cadastrada no código, ainda sem conta no banco">Aguardando 1º acesso</span>'}</td>
+      <td>${esc(u.email)}</td><td>${esc(u.cargo||'—')}</td><td>${badge(u.perfil,perfilTone(u.perfil))}</td>
+      <td style="text-align:right;white-space:nowrap">${u.id?`
         <button class="btn ghost sm" title="Editar" onclick="App.editUsuario(${i})">${svg(I.edit)}</button>
         <button class="btn ghost sm" title="Enviar link de redefinição de senha" onclick="App.resetarSenhaUsuario(${i})">${svg(I.history)}</button>
         <button class="btn ghost sm" title="${u.ativo===false?'Reativar':'Desativar'}" onclick="App.toggleAtivo(${i})">${svg(u.ativo===false?I.check:I.x)}</button>
-        <button class="btn ghost sm" title="Remover acesso" onclick="App.delUsuario(${i})">${svg(I.trash)}</button></td>
+        <button class="btn ghost sm" title="Remover acesso" onclick="App.delUsuario(${i})">${svg(I.trash)}</button>`
+        :`<span style="font-size:11.5px;color:var(--txt-3)" title="Sem conta no banco ainda — editar ou desativar não teria efeito. O perfil vem da lista fixa do código até a pessoa criar a senha.">sem ações até criar conta</span>`}</td>
     </tr>`).join(''):emptyRow(5,'Ninguém acessou o sistema ainda. As contas aparecem aqui após o primeiro acesso.')}</tbody></table></div>
     <div class="card-body" style="border-top:1px solid var(--line)"><p style="font-size:12px;color:var(--txt-3);margin:0">
       Novos acessos são criados pela própria pessoa em "Criar senha / Primeiro acesso" na tela de login — a Gestão Executiva não cria contas manualmente. ·
@@ -6294,7 +6314,8 @@ async function entrarComUsuario(u,opts){
   catch(e){ console.error(e);
     g.innerHTML='<div class="login-card" style="text-align:center;padding:40px 34px"><div class="login-sub" style="color:var(--red)">Não foi possível carregar os dados do banco. Verifique sua conexão e recarregue a página.</div></div>';
     return; }
-  logLogin(u); logSeg(u.nome,'Login realizado','');
+  // sessão restaurada ao recarregar a página não é um login novo — não polui a trilha de auditoria
+  if(!(opts&&opts.restaurada)){ logLogin(u); logSeg(u.nome,'Login realizado',''); }
   g.style.display='none'; el('app').style.display='';
   buildBrand(); buildUserChip(); renderNotifBadge(); jTab='geral'; Object.keys(filters).forEach(k=>filters[k]='');
   const hashCliente=(location.hash.match(/cliente=([^&]+)/)||[])[1];
@@ -6346,8 +6367,9 @@ window.App = {
     try{ requestAnimationFrame(autofitValues); }catch(_){ autofitValues(); }
   },
   // cliente CRUD
-  novoCliente(){ if(!can('createClient')){ toast('Ação não permitida para seu perfil.'); return; } clienteModal(null); },
-  editCliente(id){ clienteModal(getCli(id)); },
+  // o modal antigo (clienteModal) foi substituído pela ficha do Cadastro — os dois atalhos apontam pra ela
+  novoCliente(){ this.novaFicha(); },
+  editCliente(id){ this.abrirFicha(id); },
   delCliente(id){ if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const c=getCli(id); if(!confirm('Excluir "'+c.nome+'"? Os dados relacionados também serão removidos.')) return;
     const d=DB(); d.clientes=d.clientes.filter(x=>x.id!==id); delete d.surveys[id]; delete d.activation[id]; delete d.ttfv[id];
@@ -6667,7 +6689,6 @@ window.App = {
     if(!confirm('Remover o produto “'+p+'”? Ele será desmarcado de todos os clientes.')) return;
     d.config.produtos.splice(i,1); d.clientes.forEach(c=>{ if(c.produtos) c.produtos=c.produtos.filter(x=>x!==p); });
     save(d); this.refresh(); toast('Produto removido'); },
-  resetDB(){ resetDB(); },
 
   /* ---- V4: navegação da jornada ---- */
   limparContexto(){ filters.cliente=''; buildFilters(); this.refresh(); buildCrumb(el('pageTitle')?el('pageTitle').textContent:''); },
@@ -7058,12 +7079,6 @@ window.App = {
     this.closeModal(); Object.keys(intF).forEach(k=>intF[k]=''); intF.cliente=i.cliente; this.go('interacoes');
     if(can('whatsAdd')) interacaoModal(i); },
 
-  /* ---- V4: histórico ---- */
-  limparHistorico(){ if(!can('clearHistory')){ toast('Ação não permitida para seu perfil.'); return; }
-    if(!confirm('Limpar TODO o histórico de alterações? Esta ação não pode ser desfeita.')) return;
-    const d=DB(); d.history=[]; save(d); this.refresh(); toast('Histórico limpo'); },
-  delHistorico(id){ if(!can('deleteHistory')){ toast('Ação não permitida para seu perfil.'); return; }
-    const d=DB(); d.history=d.history.filter(x=>x.id!==id); save(d); this.refresh(); toast('Registro removido'); },
 
   /* ---- V4: backup ---- */
   exportarBackup(){ if(!can('backup')){ toast('Ação não permitida para seu perfil.'); return; }
@@ -7109,7 +7124,7 @@ window.App = {
   restaurarBackup(){ if(!can('restore')){ toast('Ação não permitida para seu perfil.'); return; }
     const box=el('restoreBox'); let obj; try{ obj=JSON.parse(box.value); }catch(e){ alert('Conteúdo inválido. Cole o JSON completo do backup.'); return; }
     if(!obj||!Array.isArray(obj.clientes)){ alert('Backup inválido: estrutura de clientes não encontrada.'); return; }
-    if(!confirm('Restaurar este backup? Todos os dados atuais serão sobrescritos.')) return;
+    if(!confirm('Restaurar este backup?\n\nOs registros do backup sobrescrevem os atuais que tiverem o mesmo código. Registros criados depois do backup NÃO são apagados, e o Histórico de Alterações não é alterado.')) return;
     save(obj); addHistory({modulo:'Backup',cliente:'—',campo:'Restauração',de:'—',para:'Backup restaurado'}); save();
     this.go('dashboard'); toast('Backup restaurado'); },
 
@@ -7239,7 +7254,7 @@ supa.auth.onAuthStateChange((event)=>{
   const {data:{session}}=await supa.auth.getSession();
   if(session){
     const perfil=await carregarPerfil(session.user);
-    if(perfil && perfil.ativo!==false){ entrarComUsuario(perfil); return; }
+    if(perfil && perfil.ativo!==false){ entrarComUsuario(perfil,{restaurada:true}); return; }
     await supa.auth.signOut();
   }
   showLogin();
