@@ -35,7 +35,7 @@ Status: concluído em 2026-09-23, a partir de um PDF de especificação do usuá
 - [x] Sidebar de Contexto à direita: altura total da operação, botão de aglutinar virado pra direita (fecha) / esquerda (abre), Responsáveis (Gerente de Contas, Onboarding, Key Account — avatar + nome + subtítulo + lápis de edição), Nível de Prioridade, Etiquetas
 - [x] Schema Supabase: colunas `etiquetas text[]` e `prioridade text` adicionadas em `clientes` (2026-09-23), sincronização testada e confirmada (upsert retornando 200)
 - [ ] "Regional" do responsável é **mockada** (função `mockRegional()`, hash do nome → uma de 5 regionais fixas) — trocar por dado real quando o cadastro de usuários for enriquecido com regional/e-mail etc.
-- [ ] Botões "+ Pesquisa"/"+ Ativação"/"+ First Value" navegam pra tela própria (já filtrada pelo cliente) em vez de abrir dentro da operação — combinado como solução provisória até essas telas serem trazidas pra dentro da Jornada
+- [x] Botões "+ Pesquisa"/"+ Ativação"/"+ First Value" navegavam pra tela própria em vez de abrir dentro da operação — resolvido em 2026-09-25 (ver seção "Pesquisa Pós-Kickoff/Ativação/First Value dentro da Jornada" abaixo)
 
 ---
 
@@ -80,3 +80,14 @@ Status: concluído em 2026-09-24 (ver DECISOES.md pros detalhes técnicos).
 - [x] Quatro ajustes pós-teste real (2026-09-25, sexta rodada): anel de foco circular da aba ativa neutralizado (`.jtab:focus-visible`, causa raiz era regra global `:focus-visible` — não reproduzido no ambiente de teste, aplicado por leitura de código); barra de abas agora sangra os dois lados (`margin-right:-28px` além do `margin-left` que já existia), encostando de verdade na borda direita; "Criado em"/"Última atualização" voltaram pra `.jcard-meta` (lado do Key Account), `.jcard-meta-right` removida; assimetria vertical do card corrigida como efeito colateral da mudança anterior (coluna esquerda virou a mais alta, padding-bottom passou a valer)
 - [x] Causa raiz real do semicírculo sob a aba ativa (2026-09-25, sétima rodada): não era o foco — era `border-radius:var(--radius-pill)` sobrevivente de `.jtab,.chip,.chip-btn,.vsw{}` (resquício do design antigo em pílula das abas), arredondando os cantos do sublinhado. Fix inicial: `.jtab{border-radius:0}`. Também simplificado a pedido do usuário: aba ativa marcada só por sublinhado + `color:var(--txt)` (cinza quase preto), sem mais azul
 - [x] Fix da rodada anterior não funcionava de verdade (2026-09-25, oitava rodada): `.jtab{border-radius:0}` empatava em especificidade com a regra da pílula e perdia por vir antes no arquivo. Corrigido com `.jtabs-row .jtab{border-radius:0}` (especificidade maior, vence independente da ordem) — confirmado via `getComputedStyle` clicando de fato na aba
+
+---
+
+## Pesquisa Pós-Kickoff, Ativação Operacional e First Value dentro da Jornada
+
+Status: concluído em 2026-09-25.
+
+- [x] Três abas novas na barra da operação: Pós-Kickoff, Ativação, First Value (entre Tarefas e Documentos) — reaproveitam a lógica das telas independentes (`renderPesquisa`/`renderAtivacao`/`renderTTFV`) sem duplicar dados, escopadas ao cliente aberto via `filters.cliente` (que a Jornada já mantém fixo)
+- [x] Botões de atalho "+ Pesquisa"/"+ Ativação"/"+ First Value" renomeados e trocados pra abrir a aba correspondente dentro da operação (`App.jTab(...)`), em vez de navegar pra fora
+- [x] Telas independentes (sidebar) mantidas por enquanto — servem de visão de portfólio até o usuário migrar esse uso pros Dashboards (combinado, ainda não feito)
+- [ ] Migração da visão de portfólio (todos os clientes de uma vez) pros Dashboards — mencionada pelo usuário como próximo passo, não especificada ainda

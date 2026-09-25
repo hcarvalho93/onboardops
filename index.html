@@ -4732,7 +4732,9 @@ function renderJornada(){
     return;
   }
   const c=sel, h=calcHealth(c.id), e=etapaInfo(c.etapa), sv=calcSurvey(c.id), tv=calcTTFV(c.id), at=calcAtivacao(c.id);
-  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Tarefas','jornada.aba.atividades'],['docs','Documentos','jornada.aba.documentos']];
+  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Tarefas','jornada.aba.atividades'],
+    ['kickoff','Pós-Kickoff','jornada.aba.pos-kickoff'],['ativacao','Ativação','jornada.aba.ativacao'],['firstvalue','First Value','jornada.aba.first-value'],
+    ['docs','Documentos','jornada.aba.documentos']];
   const ultimaAlt=DB().history.find(x=>x.cliente===c.nome);
   const ph=el('pageHead'); if(ph) ph.classList.add('jhead-hidden');
   const mc=el('mainContent'); if(mc) mc.classList.add('jhead-hidden');
@@ -4759,9 +4761,9 @@ function renderJornada(){
             <div class="jcard-actions">
               ${gate('createActivity',`<button type="button" class="btn sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Tarefa</button>`)}
               ${gate('whatsAdd',`<button type="button" class="btn sm" onclick="App.novaInteracao('${c.id}','evento')">${svg(I.plus)} Interações</button>`)}
-              <button type="button" class="btn sm" onclick="App.jAtalho('pesquisa','${c.id}')">${svg(I.plus)} Pesquisa</button>
-              <button type="button" class="btn sm" onclick="App.jAtalho('ativacao','${c.id}')">${svg(I.plus)} Ativação</button>
-              <button type="button" class="btn sm" onclick="App.jAtalho('ttfv','${c.id}')">${svg(I.plus)} First Value</button>
+              <button type="button" class="btn sm" onclick="App.jTab('kickoff')">${svg(I.plus)} Pós-Kickoff</button>
+              <button type="button" class="btn sm" onclick="App.jTab('ativacao')">${svg(I.plus)} Ativação</button>
+              <button type="button" class="btn sm" onclick="App.jTab('firstvalue')">${svg(I.plus)} First Value</button>
               <button type="button" class="btn sm" onclick="App.jTab('docs')">${svg(I.plus)} Documentação</button>
             </div>
           </div>
@@ -4914,8 +4916,70 @@ function jPanel(c,m){
   if(jTab==='ativos') return jAtivos(c);
   if(jTab==='atividades') return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.kanban-atividades-tab"><h3 style="font-size:15px" data-id="jornada.texto.titulo-kanban-atividades-tab">Kanban de Atividades</h3><div class="line"></div>
     ${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-tab" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova atividade</button>`)}</div>`+kanbanAtividades(c.id);
+  if(jTab==='kickoff') return jPosKickoffPanel(c,m);
+  if(jTab==='ativacao') return jAtivacaoPanel(c,m);
+  if(jTab==='firstvalue') return jFirstValuePanel(c,m);
   if(jTab==='docs') return jDocs(c.id);
   return '';
+}
+/* Jornada — Pós-Kickoff/Ativação/First Value trazidos pra dentro da operação (antes eram telas próprias, navegadas via filters.cliente) */
+function jPosKickoffPanel(c,m){
+  const s=DB().surveys[c.id]||{}; const r=m.sv; const ss=surveyStatus(c);
+  return `<div class="card">
+    <div class="card-head"><div class="ico">${svg(I.survey)}</div><h3>Pesquisa de Experiência Pós-Kickoff</h3>
+      <span class="desc">notas 1–5 · média e classificação automáticas</span></div>
+    <div class="tbl-wrap"><table class="data"><thead><tr>
+      <th>Data Resposta</th><th>Status</th>${SURVEY_Q.map(q=>`<th class="num" title="${q[1]}">${q[1].split(' ')[0]} ${q[1].split(' ').slice(1).join(' ')}</th>`).join('')}
+      <th>Média</th><th>Classificação</th><th></th><th>Comentários</th>
+    </tr></thead><tbody><tr>
+      <td><input class="cell" type="date" value="${s.dataResposta||''}" onchange="App.setSurvey('${c.id}','dataResposta',this.value)"></td>
+      <td>${badge(ss.status,ss.tone)}${ss.status==='Em atraso'&&ss.dias!=null?`<br><span style="font-size:10.5px;color:var(--txt-3)">${ss.dias} dias do kickoff</span>`:''}</td>
+      ${SURVEY_Q.map(q=>`<td>${rating(c.id,q[0],s[q[0]])}</td>`).join('')}
+      <td class="num"><b>${r?num(r.media,1):'—'}</b></td>
+      <td>${r?badge(r.cls,r.tone):'<span class="badge b-slate"><span class="d"></span>pendente</span>'}</td>
+      <td>${r?semaforo(r.tone):''}</td>
+      <td style="max-width:240px"><input class="cell" value="${esc(s.comentarios||'')}" placeholder="comentário do cliente…" onchange="App.setSurvey('${c.id}','comentarios',this.value)"></td>
+      </tr></tbody></table></div>
+  </div>
+  <p style="font-size:12px;color:var(--txt-3);margin-top:10px">Escala: 1 = Muito ruim · 2 = Ruim · 3 = Regular · 4 = Bom · 5 = Excelente. Classificação: 5,0 Excelente · 4,0–4,9 Boa · 3,0–3,9 Atenção · &lt;3 Crítica.</p>`;
+}
+function jAtivacaoPanel(c,m){
+  const pct=m.at;
+  return `<div class="card">
+    <div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativação Operacional</h3><div class="spacer"></div>
+      <span class="pill">${TOTAL_MARCOS} marcos · ${MILESTONES.length} famílias</span>
+      <div style="min-width:160px;margin-left:10px">${prog(pct)}</div></div>
+    <div class="card-body">
+      ${MILESTONES.map(g=>{const gp=calcAtivacaoGrupo(c.id,g.key);
+        return `<details class="act-block" ${gp<100&&gp>0?'open':''}>
+        <summary><span class="chev">${svg('<path d="M9 18l6-6-6-6"/>')}</span>${esc(g.label)}
+          <span class="grp-prog">${prog(gp)}</span></summary>
+        <div class="act-inner"><div class="form-grid" style="grid-template-columns:repeat(4,1fr)">
+          ${g.items.map(([k,lbl])=>`<div class="field"><label>${lbl}</label>${actSelect(c.id,g.key,k)}</div>`).join('')}
+        </div>
+        ${periodRow(c.id,g.key)}
+        </div></details>`;}).join('')}
+    </div></div>`;
+}
+function jFirstValuePanel(c,m){
+  const t=DB().ttfv[c.id]||{}; const r=m.tv;
+  return `<div class="card">
+    <div class="card-head"><div class="ico">${svg(I.ttfv)}</div><h3>Time to First Value (TTFV)</h3>
+      <span class="desc">dias entre kickoff e a primeira geração de valor · datas herdadas do Cadastro</span></div>
+    <div class="tbl-wrap"><table class="data"><thead><tr>
+      <th>Primeira Entrega de Valor</th><th>Data Kickoff</th><th>Go Live Prev.</th><th>Data 1ª Geração</th>
+      <th>Dias</th><th>Classificação</th><th></th>
+    </tr></thead><tbody><tr>
+      <td>${ttfvTipo(c.id,t)}</td>
+      <td class="num herdado" title="herdado do Cadastro">${fmtD(c.dataKickoff)}</td>
+      <td class="num herdado" title="herdado do Cadastro">${fmtD(c.goLivePrevisto)}</td>
+      <td><input class="cell" type="date" value="${t.dataValor||''}" onchange="App.setTTFV('${c.id}','dataValor',this.value)"></td>
+      <td class="num"><b>${r?(r.dias+(r.projetado?'*':'')):'—'}</b></td>
+      <td>${r?badge(r.cls,r.tone):'<span class="badge b-slate"><span class="d"></span>aguardando</span>'}</td>
+      <td>${r?semaforo(r.tone):''}</td>
+      </tr></tbody></table></div>
+  </div>
+  <p style="font-size:12px;color:var(--txt-3);margin-top:10px">Classificação: ≤30 Excelente · 31–60 Bom · 61–90 Atenção · &gt;90 Crítico. * dias projetados (ainda sem geração de valor registrada). Datas de Kickoff e Go Live são herdadas automaticamente do Cadastro.</p>`;
 }
 function jInfo(label,val,dataId){ return `<div class="jinfo"><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${val||'—'}</b></div>`; }
 function jInfoBlock(label,val,dataId){ return `<div class="jinfo-block"><span>${label}</span><b${dataId?` data-id="${dataId}"`:''}>${val||'—'}</b></div>`; }
