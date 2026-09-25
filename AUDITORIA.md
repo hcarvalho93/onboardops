@@ -49,6 +49,10 @@ Em Authentication → URL Configuration, o **Site URL está `http://localhost:30
 - Site URL → `https://onboardops.pages.dev`
 - Redirect URLs → adicionar `https://onboardops.pages.dev/**` e `http://localhost:8080/**`
 
+### 1.7 URLs de pré-visualização do Cloudflare Pages sem a trava do Access
+Cada branch enviada ao GitHub vira um endereço próprio (ex.: `auditoria-completa-correcoes.onboardops.pages.dev`). Testado: o endereço principal pede o login do Cloudflare Access, **o de pré-visualização abre o app direto, sem trava**. O Access foi configurado só para `onboardops.pages.dev`, não para os subdomínios.
+**Para você fazer** (precisa do seu login no Cloudflare): Zero Trust → Access → Applications → `onboardops.pages.dev` → adicionar um segundo destino `*.onboardops.pages.dev`; **ou** em Workers & Pages → onboardops → Settings → desligar "Preview deployments".
+
 ---
 
 ## 2. Corrigido nesta rodada (código — vai no PR)
