@@ -91,3 +91,14 @@ Status: concluído em 2026-09-25.
 - [x] Botões de atalho "+ Pesquisa"/"+ Ativação"/"+ First Value" renomeados e trocados pra abrir a aba correspondente dentro da operação (`App.jTab(...)`), em vez de navegar pra fora
 - [x] Telas independentes ocultadas da sidebar em 2026-09-25 (2ª rodada) — continuam existindo e funcionais (`hideNav:true` no array `NAV`, mesmo mecanismo já usado por `pipeline`/`cadastroAtivos`/`mapa`), só não aparecem mais como item de navegação. **Lembrar o usuário quando fizer sentido** (ex.: se pedir visão de portfólio de pesquisa/ativação/TTFV antes dos Dashboards cobrirem isso, ou pra decidir reativar/apagar de vez)
 - [ ] Migração da visão de portfólio (todos os clientes de uma vez) pros Dashboards — mencionada pelo usuário como próximo passo, não especificada ainda
+
+---
+
+## Ajustes no Cadastro (campos, ordem, consistência com Nova Operação)
+
+Status: concluído em 2026-09-25.
+
+- [x] Card "Dados da Holding" trocado de `.form-grid` (2 colunas largas) pra `.form-flow` (larguras fixas por campo), mesmo sistema visual da Nova Operação — sem o buscador de cliente, Número da Operação e Status (que não fazem sentido no Cadastro)
+- [x] Endereço movido pro fim do card (full-width), mesmo padrão da Nova Operação (campo full-width sempre por último)
+- [x] Ordem dos cards na ficha do cliente: Ativos agora vem antes de Documentos (era o contrário)
+- [x] Confirmado que o formulário de Ativo dentro do Cadastro já é idêntico ao da Nova Operação — `ativoAccordionMarkup()` é literalmente a mesma função nos dois lugares, não precisou de nenhuma mudança

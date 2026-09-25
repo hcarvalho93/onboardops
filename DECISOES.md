@@ -485,3 +485,19 @@ De passagem, também corrigido o cabeçalho da tela de detalhe do cliente (`rend
 **Combinado com o usuário:** lembrar dele sobre essas 3 telas ocultas quando fizer sentido — por exemplo, se ele pedir uma visão de portfólio (todos os clientes) de pesquisa/ativação/TTFV antes dos Dashboards ganharem essa função, ou se pedir pra reativar/apagar de vez. Registrado também em memória (fora deste arquivo) pra persistir entre sessões.
 
 **Teste:** verificado ao vivo — sidebar não mostra mais as 3 entradas (grupo OPERAÇÃO ficou só com Dashboards/Jornada do Cliente/Cadastro), sem erros de console.
+
+---
+
+## 2026-09-25 (13) — Cadastro: card "Dados da Holding" no mesmo estilo compacto da Nova Operação, Ativos/Documentos trocados de posição
+
+**Contexto:** usuário mandou prints comparando o card "Dados da Holding" (Cadastro) — campos largos, um por linha, layout de grid 2 colunas — com o cabeçalho da "Nova Operação" (Jornada) — campos compactos, vários por linha, tamanhos proporcionais ao conteúdo. Pediu pra deixar o Cadastro parecido, mas sem os campos que só fazem sentido em Nova Operação (buscador de cliente, Número da Operação, Status). Também pediu pra trocar a ordem dos cards "Ativos" e "Documentos" na ficha do cliente, e confirmar que o formulário de cadastro de Ativo dentro do Cadastro é igual ao da Nova Operação.
+
+**Decisão — `.form-grid` trocado por `.form-flow`:** o card "Dados da Holding" (`renderFicha()`) usava `.form-grid` (grid CSS de 2 colunas iguais — cada campo ocupa ~50% da largura do card, por isso ficavam tão largos). Trocado pra `.form-flow` (flex-wrap com larguras fixas por classe — `f-xs`/`f-sm`/`f-md`/`f-lg`/`f-xl`/`f-full`), o mesmo sistema que a Nova Operação já usa. Larguras escolhidas espelhando os papéis equivalentes em Nova Operação: Razão Social `f-xl` (300px, como lá), Nome Fantasia `f-lg` (230px, como o "Nome Comercial" de lá), CNPJ `f-md` (200px, igual), Estado `f-xs` (86px, como o "UF" de lá), Cidade `f-lg` (230px, igual), Classificação `f-xs` (86px). Cliente Elite (checkbox) sem largura fixa, mesmo padrão de "rótulo invisível `&nbsp;` pra alinhar verticalmente" já usado no campo "Representante principal" da ficha.
+
+**Endereço movido pro fim do card (agora `f-full`):** antes ficava entre CNPJ e Estado, como `field full` num grid — no meio de uma fileira, isso quebraria o fluxo em 3 linhas em vez de 2. Movido pra depois de Cliente Elite, mesmo padrão da Nova Operação (que também deixa seu único campo full-width — Observações — por último). "Operações" (lista de chips, só aparece se o cliente já tiver operações no AZO) continua full-width, agora depois de Endereço.
+
+**Ativos e Documentos trocados de posição:** ordem na ficha do cliente agora é Dados da Holding → Representantes → **Ativos** → **Documentos** → (nota da Jornada) → Timeline (antes Documentos vinha antes de Ativos). Só reordenação de blocos no HTML, nenhuma lógica mudou.
+
+**Ativo do Cadastro já era idêntico ao da Nova Operação — nenhuma mudança necessária:** `ativoAccordionMarkup()` (documentado em 2026-09-22 como componente compartilhado) é chamada tanto por `opAtivoListRender()` (Nova Operação, prefixo `opAtivo`) quanto por `cadAtivoListRender()` (Cadastro → "Ver / Adicionar Ativos", prefixo `cadAtivo`) — é literalmente a mesma função, não duas cópias parecidas. Confirmado ao vivo (accordion expandido em ambos os contextos, visual idêntico).
+
+**Teste:** verificado ao vivo em BARION EMPREENDIMENTOS — "Dados da Holding" com Razão Social/Nome Fantasia/CNPJ/Estado/Cidade/Classificação/Cliente Elite numa fileira só, Endereço full-width abaixo; ordem Ativos→Documentos confirmada; accordion de Ativo (via "Ver / Adicionar Ativos") com o mesmo layout do Ativo em Nova Operação. Sem erros de console.

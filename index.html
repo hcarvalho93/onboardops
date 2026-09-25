@@ -3782,17 +3782,17 @@ function renderFicha(id){
 
   <div class="card"><div class="card-head"><div class="ico">${svg(I.clients)}</div><h3>Dados da Holding</h3>
     <span class="desc">identificação da holding/construtora/incorporadora</span></div>
-    <div class="card-body"><div class="form-grid">
-      <div class="field"><label>Razão Social *</label><input id="f_nome" ${ro?'disabled':''} value="${esc(c.nome||'')}" placeholder="Razão social completa"></div>
-      <div class="field"><label>Nome Fantasia</label><input id="f_fantasia" ${ro?'disabled':''} value="${esc(c.nomeFantasia||'')}" placeholder="Como o cliente é conhecido"></div>
-      <div class="field"><label>CNPJ</label><input id="f_cnpj" data-id="cadastro.campo.cnpj-holding" ${ro?'disabled':''} value="${esc(c.cnpj||'')}" placeholder="00.000.000/0000-00"></div>
-      <div class="field full"><label>Endereço</label><input id="f_endereco" ${ro?'disabled':''} value="${esc(c.endereco||'')}" placeholder="Logradouro, número, complemento"></div>
-      <div class="field"><label>Estado</label><select id="f_estado" ${ro?'disabled':''}>${ufOpts(c.estado||'')}</select></div>
-      <div class="field"><label>Cidade</label><input id="f_cidade" ${ro?'disabled':''} value="${esc(c.cidade||'')}"></div>
-      <div class="field"><label>Classificação</label><select id="f_classif" ${ro?'disabled':''}><option value="">—</option>${CLASSIFICACOES.map(v=>`<option ${c.classificacao===v?'selected':''}>${v}</option>`).join('')}</select></div>
-      <div class="field" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:${ro?'default':'pointer'}">
+    <div class="card-body"><div class="form-flow">
+      <div class="field f-xl"><label>Razão Social *</label><input id="f_nome" ${ro?'disabled':''} value="${esc(c.nome||'')}" placeholder="Razão social completa"></div>
+      <div class="field f-lg"><label>Nome Fantasia</label><input id="f_fantasia" ${ro?'disabled':''} value="${esc(c.nomeFantasia||'')}" placeholder="Como o cliente é conhecido"></div>
+      <div class="field f-md"><label>CNPJ</label><input id="f_cnpj" data-id="cadastro.campo.cnpj-holding" ${ro?'disabled':''} value="${esc(c.cnpj||'')}" placeholder="00.000.000/0000-00"></div>
+      <div class="field f-xs"><label>Estado</label><select id="f_estado" ${ro?'disabled':''}>${ufOpts(c.estado||'')}</select></div>
+      <div class="field f-lg"><label>Cidade</label><input id="f_cidade" ${ro?'disabled':''} value="${esc(c.cidade||'')}"></div>
+      <div class="field f-xs"><label>Classificação</label><select id="f_classif" ${ro?'disabled':''}><option value="">—</option>${CLASSIFICACOES.map(v=>`<option ${c.classificacao===v?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="field"><label>&nbsp;</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:${ro?'default':'pointer'}">
         <input type="checkbox" id="f_elite" ${ro?'disabled':''} ${c.elite?'checked':''}> <span class="ico-sm">${svg(I.star,1.8)}</span> Cliente Elite</label></div>
-      ${(c.operacoes&&c.operacoes.length)?`<div class="field full"><label>Operações</label>
+      <div class="field f-full"><label>Endereço</label><input id="f_endereco" ${ro?'disabled':''} value="${esc(c.endereco||'')}" placeholder="Logradouro, número, complemento"></div>
+      ${(c.operacoes&&c.operacoes.length)?`<div class="field f-full"><label>Operações</label>
         <div class="op-hist" style="margin:0">${c.operacoes.map(o=> o.numero
           ? `<a class="op-chip" href="${azoProposalUrl(o.numero)}" target="_blank" rel="noopener noreferrer" title="Ver operação no AZO">Nº ${esc(o.numero)} · ${esc(o.statusNegociacao||'—')}</a>`
           : `<span class="op-chip" style="cursor:default">Sem número · ${esc(o.statusNegociacao||'—')}</span>`
@@ -3806,17 +3806,17 @@ function renderFicha(id){
     <div class="card-body"><div id="reps_list"></div></div>
   </div>
 
+  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos</h3>
+    <span class="desc">empreendimentos, SPEs e operações vinculadas</span><span class="pill">${(c.ativos||[]).length} ativo(s)</span>
+    <div class="spacer"></div>${isNew?`<span style="font-size:12px;color:var(--txt-3)">Salve o cadastro para adicionar ativos</span>`
+      :`<button type="button" class="btn primary sm" onclick="App.abrirAtivosCliente('${c.id}')">${svg(I.plus)} Ver / Adicionar Ativos</button>`}</div>
+  </div>
+
   <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3>Documentos</h3>
     <span class="desc">contrato social, procurações, certidões…</span><span class="pill">${_fichaDocumentos.length} documento(s)</span>
     <div class="spacer"></div>${ro?'':`<input type="file" id="cli_doc_file" style="display:none" onchange="App.docAdd(event)">
       <button type="button" class="btn ghost sm" onclick="document.getElementById('cli_doc_file').click()">${svg(I.upload)} Anexar documento</button>`}</div>
     <div class="card-body"><div id="docs_list"></div></div>
-  </div>
-
-  <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos</h3>
-    <span class="desc">empreendimentos, SPEs e operações vinculadas</span><span class="pill">${(c.ativos||[]).length} ativo(s)</span>
-    <div class="spacer"></div>${isNew?`<span style="font-size:12px;color:var(--txt-3)">Salve o cadastro para adicionar ativos</span>`
-      :`<button type="button" class="btn primary sm" onclick="App.abrirAtivosCliente('${c.id}')">${svg(I.plus)} Ver / Adicionar Ativos</button>`}</div>
   </div>
 
   ${!isNew?`<div class="card note-card" style="margin-top:16px"><div class="card-body" style="display:flex;align-items:center;gap:10px">
