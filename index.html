@@ -3768,8 +3768,10 @@ function renderFicha(id){
     : getCli(id);
   if(!c){ App.fecharFicha(); return; }
   const ro = !can('editClient');
+  const roAtivos = !canAtivos();
   _fichaRepresentantes = Array.isArray(c.representantes)? JSON.parse(JSON.stringify(c.representantes)) : [];
   _fichaDocumentos = Array.isArray(c.documentos)? c.documentos.slice() : [];
+  _cadAtivos = Array.isArray(c.ativos)? JSON.parse(JSON.stringify(c.ativos)).map(a=>({...a,_open:false})) : [];
   const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
   const historico = isNew? [] : DB().history.filter(h=>h.cliente===c.nome).slice(0,30);
 
@@ -3789,8 +3791,7 @@ function renderFicha(id){
       <div class="field f-xs"><label>Estado</label><select id="f_estado" ${ro?'disabled':''}>${ufOpts(c.estado||'')}</select></div>
       <div class="field f-lg"><label>Cidade</label><input id="f_cidade" ${ro?'disabled':''} value="${esc(c.cidade||'')}"></div>
       <div class="field f-xs"><label>Classificação</label><select id="f_classif" ${ro?'disabled':''}><option value="">—</option>${CLASSIFICACOES.map(v=>`<option ${c.classificacao===v?'selected':''}>${v}</option>`).join('')}</select></div>
-      <div class="field"><label>&nbsp;</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:${ro?'default':'pointer'}">
-        <input type="checkbox" id="f_elite" ${ro?'disabled':''} ${c.elite?'checked':''}> <span class="ico-sm">${svg(I.star,1.8)}</span> Cliente Elite</label></div>
+      <div class="field f-xs"><label>Cliente Elite</label><select id="f_elite" ${ro?'disabled':''}><option ${!c.elite?'selected':''}>Não</option><option ${c.elite?'selected':''}>Sim</option></select></div>
       <div class="field f-full"><label>Endereço</label><input id="f_endereco" ${ro?'disabled':''} value="${esc(c.endereco||'')}" placeholder="Logradouro, número, complemento"></div>
       ${(c.operacoes&&c.operacoes.length)?`<div class="field f-full"><label>Operações</label>
         <div class="op-hist" style="margin:0">${c.operacoes.map(o=> o.numero
@@ -3807,9 +3808,10 @@ function renderFicha(id){
   </div>
 
   <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos</h3>
-    <span class="desc">empreendimentos, SPEs e operações vinculadas</span><span class="pill">${(c.ativos||[]).length} ativo(s)</span>
-    <div class="spacer"></div>${isNew?`<span style="font-size:12px;color:var(--txt-3)">Salve o cadastro para adicionar ativos</span>`
-      :`<button type="button" class="btn primary sm" onclick="App.abrirAtivosCliente('${c.id}')">${svg(I.plus)} Ver / Adicionar Ativos</button>`}</div>
+    <span class="desc">empreendimentos, SPEs e operações vinculadas</span><span class="pill" id="cad_ativos_pill">${_cadAtivos.length} ativo(s)</span>
+    <div class="spacer"></div>${roAtivos?'':`<button type="button" class="btn ghost sm" id="cad_ativos_toggle_all" onclick="App.cadAtivoToggleAll()">${ativosToggleAllLabel(_cadAtivos)}</button>
+      <button type="button" class="btn primary sm" onclick="App.cadAtivoAdd()">${svg(I.plus)} Adicionar ativo</button>`}</div>
+    <div class="card-body"><div id="cad_ativos_list"></div></div>
   </div>
 
   <div class="card" style="margin-top:16px"><div class="card-head"><div class="ico">${svg(I.doc)}</div><h3>Documentos</h3>
@@ -3840,6 +3842,7 @@ function renderFicha(id){
 
   representanteListRender();
   documentoListRender();
+  cadAtivoListRender();
 }
 function representanteListRender(){
   const box=el('reps_list'); if(!box) return; const ro=!can('editClient');
@@ -4612,7 +4615,8 @@ function renderNovaOperacao(){
 
   <div class="card" style="margin-top:16px" data-id="jornada.card.ativos-nova-operacao"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Ativos</h3>
     <span class="desc">empreendimentos vinculados a esta operação</span><span class="pill" id="op_ativos_pill">${_opAtivos.length} ativo(s)</span>
-    <div class="spacer"></div><button type="button" class="btn primary sm" data-id="jornada.botao.adicionar-ativo" onclick="App.opAtivoAdd()">${svg(I.plus)} Adicionar ativo</button></div>
+    <div class="spacer"></div><button type="button" class="btn ghost sm" id="op_ativos_toggle_all" onclick="App.opAtivoToggleAll()">${ativosToggleAllLabel(_opAtivos)}</button>
+    <button type="button" class="btn primary sm" data-id="jornada.botao.adicionar-ativo" onclick="App.opAtivoAdd()">${svg(I.plus)} Adicionar ativo</button></div>
     <div class="card-body"><div id="op_ativos_list"></div></div>
   </div>
 
@@ -4684,14 +4688,32 @@ function ativoAccordionMarkup(list, prefix){
     </div>`;
   }).join('') : '<p style="font-size:12.5px;color:var(--txt-3);margin:4px 0 0">Nenhum ativo adicionado ainda.</p>';
 }
+function ativosToggleAllLabel(list){ return svg(I.chevronDown)+' '+(list.some(a=>a._open)?'Aglutinar tudo':'Expandir tudo'); }
 function opAtivoListRender(){
   const box=el('op_ativos_list'); if(!box) return;
   const pill=el('op_ativos_pill'); if(pill) pill.textContent=_opAtivos.length+' ativo(s)';
+  const toggleBtn=el('op_ativos_toggle_all'); if(toggleBtn) toggleBtn.innerHTML=ativosToggleAllLabel(_opAtivos);
   box.innerHTML = ativoAccordionMarkup(_opAtivos,'opAtivo');
+}
+function normalizarAtivosLista(list, ativosAntes){
+  const np=nowParts(); const quem=(getSession&&getSession()?getSession().nome:'')||'';
+  const antesById={}; (ativosAntes||[]).forEach(a=>{antesById[a.id]=a;});
+  return list.map(a=>{ const prev=antesById[a.id]; return {id:(a.id&&!String(a.id).startsWith('tmp'))?a.id:('at'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),
+      nome:(a.nome||'').trim(),estado:a.estado||'',cidade:(a.cidade||'').trim(),regiao:a.regiao||regiaoDoEstado(a.estado),
+      tipologia:a.tipologia||TIPOLOGIAS[0],quantidade:+a.quantidade||1,unidades:+a.unidades||0,vgv:+a.vgv||0,statusAtivo:a.statusAtivo||'',obs:(a.obs||'').trim(),
+      semNomeDefinido:!!a.semNomeDefinido,empresaNaoConstituida:!!a.empresaNaoConstituida,
+      razaoSocial:(a.razaoSocial||'').trim(),cnpj:(a.cnpj||'').trim(),unidadesVendidas:+a.unidadesVendidas||0,custoObra:+a.custoObra||0,
+      endereco:a.endereco||'',cep:a.cep||'',
+      dataLancamento:a.dataLancamento||'',dataInicioObra:a.dataInicioObra||'',dataFimObra:a.dataFimObra||'',
+      posObraMeses:+a.posObraMeses||0,posOperacionalMeses:+a.posOperacionalMeses||0,obrasNaRegiao:+a.obrasNaRegiao||0,distanciaMaxObras:+a.distanciaMaxObras||0,
+      servicos:Array.isArray(a.servicos)?a.servicos.slice():[],
+      criadoEm:(prev&&prev.criadoEm)||a.criadoEm||np.iso.slice(0,10),criadoPor:(prev&&prev.criadoPor)||a.criadoPor||quem};})
+    .filter(a=>a.nome||a.estado||a.cidade||a.semNomeDefinido);
 }
 function cadAtivoListRender(){
   const box=el('cad_ativos_list'); if(!box) return;
   const pill=el('cad_ativos_pill'); if(pill) pill.textContent=_cadAtivos.length+' ativo(s)';
+  const toggleBtn=el('cad_ativos_toggle_all'); if(toggleBtn) toggleBtn.innerHTML=ativosToggleAllLabel(_cadAtivos);
   box.innerHTML = ativoAccordionMarkup(_cadAtivos,'cadAtivo');
 }
 function jcliKCard(c){
@@ -6227,7 +6249,7 @@ window.App = {
     if(repsDepois.length && !repsDepois.some(p=>p.principal)) repsDepois[0].principal=true;
     const after={nome,nomeFantasia:v('f_fantasia'),cnpj:v('f_cnpj'),endereco:v('f_endereco'),
       estado:(el('f_estado')?el('f_estado').value:(c.estado||'')),cidade:v('f_cidade'),
-      classificacao:(el('f_classif')?el('f_classif').value:''),elite:!!(el('f_elite')&&el('f_elite').checked),
+      classificacao:(el('f_classif')?el('f_classif').value:''),elite:(el('f_elite')?el('f_elite').value==='Sim':!!c.elite),
       representantes:repsDepois,documentos:_fichaDocumentos.slice()};
     Object.assign(c,after);
     if(isNew){ c.criadoEm=c.criadoEm||np.iso.slice(0,10); c.criadoPor=c.criadoPor||quem; if(!Array.isArray(c.operacoes)) c.operacoes=[]; if(!Array.isArray(c.etiquetas)) c.etiquetas=[]; d.clientes.push(c);
@@ -6235,30 +6257,24 @@ window.App = {
     else logClienteDiff(c,before,after,{nome:'Razão Social',nomeFantasia:'Nome Fantasia',cnpj:'CNPJ',endereco:'Endereço',
       estado:'Estado do Cliente',cidade:'Cidade do Cliente',classificacao:'Classificação',elite:'Cliente Elite'});
     if(repsDepois.length!==repsAntes.length) addHistory({modulo:'Cadastro',cliente:nome,campo:'Representantes',de:repsAntes.length+' representante(s)',para:repsDepois.length+' representante(s)'});
+    const ativosAntes=Array.isArray(c.ativos)?JSON.parse(JSON.stringify(c.ativos)):[];
+    const ativosDepois=canAtivos()? normalizarAtivosLista(_cadAtivos,ativosAntes) : ativosAntes;
+    c.ativos=ativosDepois;
+    if(canAtivos()) logAtivosDiff(c.nome,ativosAntes,ativosDepois);
     save(d);
     const idsDepois=new Set(repsDepois.map(p=>p.id));
     repsAntes.filter(p=>!idsDepois.has(p.id)).forEach(p=>deleteRemoto('representantes',p.id));
+    const ativosIdsDepois=new Set(ativosDepois.map(a=>a.id));
+    ativosAntes.filter(a=>!ativosIdsDepois.has(a.id)).forEach(a=>deleteRemoto('ativos',a.id));
     filters.cliente=c.id; this.refresh(); toast('Cadastro salvo');
   },
-  // ---- Ativos do cliente (página própria, reaproveita o mesmo estado do modal legado) ----
+  // ---- Ativos do cliente (página própria legada — Ativos agora também são editáveis direto na ficha) ----
   abrirAtivosCliente(id){ filters.cliente=id; this.go('cadastroAtivos'); },
   salvarAtivosCliente(id){
     if(!canAtivos()){ toast('Ação não permitida.'); return; }
     const d=DB(); const c=getCli(id); if(!c) return;
-    const np=nowParts(); const quem=(getSession&&getSession()?getSession().nome:'')||'';
     const ativosAntes=Array.isArray(c.ativos)?JSON.parse(JSON.stringify(c.ativos)):[];
-    const antesById={}; ativosAntes.forEach(a=>{antesById[a.id]=a;});
-    const ativosDepois=_cadAtivos.map(a=>{ const prev=antesById[a.id]; return {id:(a.id&&!String(a.id).startsWith('tmp'))?a.id:('at'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),
-        nome:(a.nome||'').trim(),estado:a.estado||'',cidade:(a.cidade||'').trim(),regiao:a.regiao||regiaoDoEstado(a.estado),
-        tipologia:a.tipologia||TIPOLOGIAS[0],quantidade:+a.quantidade||1,unidades:+a.unidades||0,vgv:+a.vgv||0,statusAtivo:a.statusAtivo||'',obs:(a.obs||'').trim(),
-        semNomeDefinido:!!a.semNomeDefinido,empresaNaoConstituida:!!a.empresaNaoConstituida,
-        razaoSocial:(a.razaoSocial||'').trim(),cnpj:(a.cnpj||'').trim(),unidadesVendidas:+a.unidadesVendidas||0,custoObra:+a.custoObra||0,
-        endereco:a.endereco||'',cep:a.cep||'',
-        dataLancamento:a.dataLancamento||'',dataInicioObra:a.dataInicioObra||'',dataFimObra:a.dataFimObra||'',
-        posObraMeses:+a.posObraMeses||0,posOperacionalMeses:+a.posOperacionalMeses||0,obrasNaRegiao:+a.obrasNaRegiao||0,distanciaMaxObras:+a.distanciaMaxObras||0,
-        servicos:Array.isArray(a.servicos)?a.servicos.slice():[],
-        criadoEm:(prev&&prev.criadoEm)||a.criadoEm||np.iso.slice(0,10),criadoPor:(prev&&prev.criadoPor)||a.criadoPor||quem};})
-      .filter(a=>a.nome||a.estado||a.cidade||a.semNomeDefinido);
+    const ativosDepois=normalizarAtivosLista(_cadAtivos,ativosAntes);
     c.ativos=ativosDepois;
     logAtivosDiff(c.nome,ativosAntes,ativosDepois);
     save(d);
@@ -6274,6 +6290,7 @@ window.App = {
     const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', servicos:(a.servicos||[]).slice(), _open:true};
     _cadAtivos.splice(i+1,0,copy); cadAtivoListRender(); },
   cadAtivoToggle(i){ if(!_cadAtivos[i]) return; _cadAtivos[i]._open=!_cadAtivos[i]._open; cadAtivoListRender(); },
+  cadAtivoToggleAll(){ const anyOpen=_cadAtivos.some(a=>a._open); _cadAtivos.forEach(a=>a._open=!anyOpen); cadAtivoListRender(); },
   cadAtivoSet(i,campo,val){ if(!_cadAtivos[i]) return;
     const NUM=['quantidade','vgv','unidades','unidadesVendidas','posObraMeses','posOperacionalMeses'];
     _cadAtivos[i][campo]= NUM.includes(campo)? (+val||0) : val;
@@ -6574,6 +6591,7 @@ window.App = {
     const copy={...a, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:a.nome?a.nome+' (cópia)':'', servicos:(a.servicos||[]).slice(), _open:true};
     _opAtivos.splice(i+1,0,copy); opDraftPersist(); opAtivoListRender(); },
   opAtivoToggle(i){ if(!_opAtivos[i]) return; _opAtivos[i]._open=!_opAtivos[i]._open; opDraftPersist(); opAtivoListRender(); },
+  opAtivoToggleAll(){ const anyOpen=_opAtivos.some(a=>a._open); _opAtivos.forEach(a=>a._open=!anyOpen); opDraftPersist(); opAtivoListRender(); },
   opAtivoSet(i,campo,val){ if(!_opAtivos[i]) return;
     const NUM=['quantidade','vgv','unidades','unidadesVendidas','posObraMeses','posOperacionalMeses'];
     _opAtivos[i][campo]= NUM.includes(campo)? (+val||0) : val;

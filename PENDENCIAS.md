@@ -102,3 +102,6 @@ Status: concluído em 2026-09-25.
 - [x] Endereço movido pro fim do card (full-width), mesmo padrão da Nova Operação (campo full-width sempre por último)
 - [x] Ordem dos cards na ficha do cliente: Ativos agora vem antes de Documentos (era o contrário)
 - [x] Confirmado que o formulário de Ativo dentro do Cadastro já é idêntico ao da Nova Operação — `ativoAccordionMarkup()` é literalmente a mesma função nos dois lugares, não precisou de nenhuma mudança
+- [x] Ativos do Cadastro embutidos direto na ficha (2ª rodada, 2026-09-25) — não precisa mais salvar o cliente antes de adicionar ativos, igual à Nova Operação; salvos junto no mesmo "Salvar Cadastro"
+- [x] Botão "Aglutinar tudo / Expandir tudo" adicionado nos Ativos (Cadastro e Nova Operação) — recolhe/expande todos os accordions de uma vez, além do toggle individual que já existia
+- [x] Cliente Elite virou `<select>` Sim/Não na ficha do cliente (era checkbox), igual à Nova Operação
