@@ -433,6 +433,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jcard-title h2{font-size:16px;font-weight:700;margin:0}
 .jop-num{font-size:12px;font-weight:700;color:var(--blue);text-decoration:none;background:var(--blue-soft);padding:3px 10px;border-radius:20px;white-space:nowrap}
 .jop-num:hover{text-decoration:underline}
+.jop-num-sep{color:var(--txt-3);font-weight:600}
 .jcard-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--txt-3)}
 .jcard-meta b{color:var(--txt-2);font-weight:600}
 .jcard-actions{display:flex;gap:8px;flex-wrap:wrap}
@@ -4770,8 +4771,8 @@ function renderJornada(){
         <div class="jcard-top">
           <div class="jcard-left">
             <div class="jcard-title">
+              ${c.numeroOperacao?`<a class="jop-num" href="${azoProposalUrl(c.numeroOperacao)}" target="_blank" rel="noopener noreferrer" title="Ver operação no AZO">#${esc(c.numeroOperacao)}</a><span class="jop-num-sep">|</span>`:''}
               <h2 data-id="jornada.texto.nome-cliente-detalhe">${esc(c.nome)}</h2>
-              ${c.numeroOperacao?`<a class="jop-num" href="${azoProposalUrl(c.numeroOperacao)}" target="_blank" rel="noopener noreferrer" title="Ver operação no AZO">#${esc(c.numeroOperacao)}</a>`:''}
             </div>
             <div class="jcard-meta">
               <span>Gerente: <b>${esc(c.respComercial||'—')}</b></span>
@@ -4852,6 +4853,17 @@ function jContexto(c,m){
     </div>
     <div class="jctx-body">
       <div class="jctx-panel">
+        <div class="jctx-block">
+          <span class="jctx-lbl">Número da Operação</span>
+          ${jCtxEditField==='numeroOperacao'
+            ? `<div class="jctx-row"><input type="text" autofocus value="${esc(c.numeroOperacao||'')}" placeholder="Nº da operação no AZO"
+                onkeydown="if(event.key==='Enter'){App.jRespSet('${c.id}','numeroOperacao',this.value);}else if(event.key==='Escape'){this.dataset.cancel='1';App.jRespEditToggle(null);}"
+                onblur="if(this.dataset.cancel)return;App.jRespSet('${c.id}','numeroOperacao',this.value)"></div>`
+            : `<div style="display:flex;align-items:center;gap:8px">
+                <b style="font-size:13px">${c.numeroOperacao?('#'+esc(c.numeroOperacao)):'—'}</b>
+                ${ro?'':`<button type="button" class="jctx-pencil" title="Editar Número da Operação" onclick="App.jRespEditToggle('numeroOperacao')">${svg(I.edit)}</button>`}
+              </div>`}
+        </div>
         <div class="jctx-block">
           <span class="jctx-lbl">Responsáveis</span>
           <div class="jctx-resp">
@@ -6527,7 +6539,7 @@ window.App = {
     if(!can('editClient')){ toast('Ação não permitida para seu perfil.'); return; }
     const d=DB(); const c=getCli(id); if(!c) return;
     if(c[campo]===valor){ this.refresh(); return; }
-    const LBL={respOnboarding:'Resp. Onboarding',keyAccount:'Key Account',respComercial:'Gerente de Contas',prioridade:'Nível de Prioridade'};
+    const LBL={respOnboarding:'Resp. Onboarding',keyAccount:'Key Account',respComercial:'Gerente de Contas',prioridade:'Nível de Prioridade',numeroOperacao:'Número da Operação'};
     addHistory({modulo:'Jornada',cliente:c.nome,campo:LBL[campo]||campo,de:c[campo]||'—',para:valor||'—'});
     c[campo]=valor;
     save(d); this.refresh(); toast('Atualizado');
