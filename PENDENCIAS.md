@@ -114,3 +114,24 @@ Status: concluído em 2026-09-25.
 
 - [x] Número da Operação (link clicável pro AZO) reordenado no `jcard-title`: agora vem antes do nome, formato "#00000 | Nome do Cliente"
 - [x] Campo "Número da Operação" novo no sidebar de Contexto (topo do painel, antes de Responsáveis), editável com lápis — mesmo padrão de edição inline já usado nos campos de Responsáveis
+
+---
+
+## Compilado de 11 ajustes via PDF (economia de créditos)
+
+Status: concluído em 2026-09-25, exceto os itens abertos abaixo. Ver DECISOES.md pros detalhes técnicos completos.
+
+- [x] `jcard-actions` reduzido de 5 pra 3 botões (Tarefa/Interações/Documentação)
+- [x] `.jop-num` sem estilo de pílula, mesmo tamanho do título
+- [x] Número da operação também no card do Kanban de Negociação (`jcliKCard`)
+- [x] Aba "Serviços" nova na Jornada (entre Ativos e Atividades), edição direta por ativo
+- [x] Card "Ativos e Serviços" com contagem; bloco Consolidado só com Booked Value
+- [x] Cabeçalho do Contexto sem a palavra "Contexto", botão de aglutinar alinhado ao topo do jcard (~2px de diferença)
+- [x] Linhas da aba Ativos clicáveis, expandem detalhe somente-leitura com botão Editar
+- [x] Página "Tarefas" (Kanban pessoal, cross-operação, filtrado por responsável)
+- [x] Popover "Nova Atividade" com abas Tarefas/Interações (Interações = formulário novo e simplificado)
+- [x] Perfis "Middle" (5 áreas liberadas) e "Desenvolvedor" (cópia de Gestão Executiva) + personificação de perfil no menu do usuário
+- [x] Conta do usuário convertida pra "Desenvolvedor" (feito pela tela de Gestão de Usuários)
+- [ ] Campo "Satisfação" (aba Interações do popover) é **local por enquanto** — não sincroniza com o Supabase (`interactionToRow`/`rowToInteraction` não incluem o campo, pra evitar mudar schema sem confirmação). Perguntar ao usuário se quer criar a coluna `satisfacao` na tabela `interactions`.
+- [ ] Tipos da aba Interações do popover (Ligação/Mensagem/E-mail/Reunião/Visita/Outros) usam um vocabulário próprio, diferente de `INT_TIPOS`/`INT_CANAIS` já existentes — essas interações não aparecem no filtro por "Tipo" da tela "Interações do Cliente" (só na listagem/timeline sem filtro). Avaliar se vale unificar os vocabulários depois.
+- [ ] `data-id` (Inspetor F9) não foi aplicado em nenhum elemento novo desta rodada (aba Serviços, página Tarefas, popover com abas, dropdown de personificação) — mesma regra já em vigor: preencher sob demanda quando o usuário notar falta durante o uso real
