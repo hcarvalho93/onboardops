@@ -114,3 +114,36 @@ Status: concluído em 2026-09-25.
 
 - [x] Número da Operação (link clicável pro AZO) reordenado no `jcard-title`: agora vem antes do nome, formato "#00000 | Nome do Cliente"
 - [x] Campo "Número da Operação" novo no sidebar de Contexto (topo do painel, antes de Responsáveis), editável com lápis — mesmo padrão de edição inline já usado nos campos de Responsáveis
+
+---
+
+## Compilado de 11 ajustes via PDF (economia de créditos)
+
+Status: concluído em 2026-09-25, exceto os itens abertos abaixo. Ver DECISOES.md pros detalhes técnicos completos.
+
+- [x] `jcard-actions` reduzido de 5 pra 3 botões (Tarefa/Interações/Documentação)
+- [x] `.jop-num` sem estilo de pílula, mesmo tamanho do título
+- [x] Número da operação também no card do Kanban de Negociação (`jcliKCard`)
+- [x] Aba "Serviços" nova na Jornada (entre Ativos e Atividades), edição direta por ativo
+- [x] Card "Ativos e Serviços" com contagem; bloco Consolidado só com Booked Value
+- [x] Cabeçalho do Contexto sem a palavra "Contexto", botão de aglutinar alinhado ao topo do jcard (~2px de diferença)
+- [x] Linhas da aba Ativos clicáveis, expandem detalhe somente-leitura com botão Editar
+- [x] Página "Tarefas" (Kanban pessoal, cross-operação, filtrado por responsável)
+- [x] Popover "Nova Atividade" com abas Tarefas/Interações (Interações = formulário novo e simplificado)
+- [x] Perfis "Middle" (5 áreas liberadas) e "Desenvolvedor" (cópia de Gestão Executiva) + personificação de perfil no menu do usuário
+- [x] Conta do usuário convertida pra "Desenvolvedor" (feito pela tela de Gestão de Usuários)
+- [ ] Campo "Satisfação" (aba Interações do popover) é **local por enquanto** — não sincroniza com o Supabase (`interactionToRow`/`rowToInteraction` não incluem o campo, pra evitar mudar schema sem confirmação). Perguntar ao usuário se quer criar a coluna `satisfacao` na tabela `interactions`.
+- [ ] Tipos da aba Interações do popover (Ligação/Mensagem/E-mail/Reunião/Visita/Outros) usam um vocabulário próprio, diferente de `INT_TIPOS`/`INT_CANAIS` já existentes — essas interações não aparecem no filtro por "Tipo" da tela "Interações do Cliente" (só na listagem/timeline sem filtro). Avaliar se vale unificar os vocabulários depois.
+- [ ] `data-id` (Inspetor F9) não foi aplicado em nenhum elemento novo desta rodada (aba Serviços, página Tarefas, popover com abas, dropdown de personificação) — mesma regra já em vigor: preencher sob demanda quando o usuário notar falta durante o uso real
+
+---
+
+## Aba Ativos da Jornada padronizada com o Cadastro + "Etapa" + Estado só UF
+
+Status: concluído em 2026-09-25.
+
+- [x] Aba Ativos da Jornada trocou de tabela larga pra lista de cards no mesmo estilo visual do Cadastro (reaproveitando as classes `op-ativo-*` do accordion já existente)
+- [x] "Status do Ativo" renomeado pra "Etapa" em todo lugar (Cadastro, Nova Operação, detalhe da Jornada, Histórico, exportação CSV); novos valores: Landbank, Pré-lançamento, Lançamento, Obras, Pós-obras, Pós-operacional
+- [x] Campo "Estado" do cliente (Cadastro e Nova Operação) passou a mostrar só a UF no `<select>`, igual ao campo Estado do ativo (que já era assim)
+- [x] Card "Localização" removido do resumo da aba Ativos; os três KPIs restantes (Quantidade de Ativos/Total de Unidades/VGV Total) reduzidos pra um componente compacto próprio (`.jativo-kpi`), sem mexer no `.kpi` genérico usado em outras telas
+- [ ] **Dado existente não foi migrado**: ativos já cadastrados com as etapas antigas (Estruturação/Comercialização/Entrega/Pós-obra) continuam com o texto antigo no selo, mas o `<select>` de edição não marca nenhuma opção pra esses valores — precisa que alguém abra e resalve cada ativo com a etapa nova, um por um, quando notado. Avaliar se vale um script de migração/mapeamento se isso incomodar no uso real.

@@ -431,7 +431,7 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jcard-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
 .jcard-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .jcard-title h2{font-size:16px;font-weight:700;margin:0}
-.jop-num{font-size:12px;font-weight:700;color:var(--blue);text-decoration:none;background:var(--blue-soft);padding:3px 10px;border-radius:20px;white-space:nowrap}
+.jop-num{font-size:16px;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap}
 .jop-num:hover{text-decoration:underline}
 .jop-num-sep{color:var(--txt-3);font-weight:600}
 .jcard-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--txt-3)}
@@ -452,13 +452,12 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jbody.jctx-closed .jmain{margin-right:62px}
 .jctx{position:fixed;top:calc(var(--topbar-h) + 58px);right:28px;bottom:14px;width:272px;z-index:15;display:flex;flex-direction:column}
 .jbody.jctx-closed .jctx{width:44px}
-.jctx-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.jctx-title{font-size:12px;font-weight:700;color:var(--txt-2);text-transform:uppercase;letter-spacing:.04em}
+.jctx-head{display:flex;align-items:center;justify-content:flex-end}
 .jctx-chev{width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--txt-3);cursor:pointer;transition:transform .15s;transform:rotate(-90deg)}
 .jctx-chev svg{width:15px;height:15px}
 .jbody.jctx-closed .jctx-chev{transform:rotate(90deg)}
-.jbody.jctx-closed .jctx-title,.jbody.jctx-closed .jctx-body{display:none}
-.jctx-body{margin-top:12px;flex:1;min-height:0;display:flex;flex-direction:column;gap:16px}
+.jbody.jctx-closed .jctx-body{display:none}
+.jctx-body{margin-top:6px;flex:1;min-height:0;display:flex;flex-direction:column;gap:16px}
 .jctx-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
 .jctx-panel:first-child{flex:1;min-height:0}
 .jctx-panel:last-child{flex:none}
@@ -489,8 +488,9 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jctx-indic-item{display:flex;flex-direction:column;gap:2px}
 .jctx-indic-item span{font-size:10.5px;color:var(--txt-3)}
 .jctx-indic-item b{font-size:12.5px;font-weight:600;color:var(--txt-2)}
-.jctx-bv{gap:3px}
-.jctx-bv b{color:var(--green);font-weight:700;font-size:21px;line-height:1.15}
+.jctx-bv-solo{display:flex;flex-direction:column;gap:3px}
+.jctx-bv-solo span{font-size:11px;color:var(--txt-3)}
+.jctx-bv-solo b{color:var(--green);font-weight:700;font-size:28px;line-height:1.15}
 @media(max-width:900px){ .jmain,.jbody.jctx-closed .jmain{margin-right:0} .jctx,.jbody.jctx-closed .jctx{position:static;height:auto;width:auto;top:auto;right:auto;bottom:auto} }
 .jgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:stretch}
 .jgrid .card-head{flex-wrap:nowrap}
@@ -564,6 +564,21 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .op-ativo-chev svg{width:100%;height:100%}
 .op-ativo-card.open .op-ativo-chev{transform:rotate(180deg)}
 .op-ativo-body{padding:0 13px 14px;border-top:1px solid var(--line);padding-top:13px}
+
+/* Jornada — aba Ativos: lista no mesmo estilo de card do Cadastro (op-ativo-*), somente leitura com clique-para-detalhe */
+.jativo-head{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;flex-wrap:wrap}
+.jativo-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--txt-3)}
+.jativo-num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.jativo-kpis{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.jativo-kpi{flex:1;min-width:170px;display:flex;align-items:center;gap:11px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}
+.jativo-kpi .ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none}
+.jativo-kpi .ico svg{width:17px;height:17px}
+.jativo-kpi .txt{min-width:0}
+.jativo-kpi .txt span{display:block;font-size:11px;color:var(--txt-3);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jativo-kpi .txt b{display:block;font-size:19px;color:var(--txt);line-height:1.2;margin-top:1px}
+.jativo-kpi.k-blue .ico{background:var(--blue-soft);color:var(--blue)}
+.jativo-kpi.k-amber .ico{background:var(--amber-bg);color:var(--amber)}
+.jativo-kpi.k-green .ico{background:var(--green-bg);color:var(--green)}
 .form-flow{display:flex;flex-wrap:wrap;gap:14px 16px}
 .form-flow .field{flex:none}
 .form-flow .field.f-xs{width:86px}
@@ -778,6 +793,20 @@ select.cell.s-pend{background:var(--amber-bg);color:var(--amber);border-color:tr
 .jserv-resumo-cidade{font-size:11px;font-weight:400;color:var(--txt-3)}
 .jserv-resumo-list{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:4px}
 .jserv-resumo-list li{font-size:12px;color:var(--txt-2);line-height:1.4}
+
+/* Jornada — aba Serviços (edição direta dos serviços de cada ativo) */
+.jsrv-block{padding-bottom:16px}
+.jsrv-block+.jsrv-block{border-top:1px solid var(--line);padding-top:16px}
+.jsrv-block-head{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.jsrv-cidade{font-size:12px;font-weight:400;color:var(--txt-3)}
+
+/* Nova Atividade — popover com abas Tarefas / Interações */
+.at-modal-tabs{display:flex;justify-content:center;gap:6px;margin:-6px 0 16px;border-bottom:1px solid var(--line)}
+.at-modal-tab{border:none;background:none;padding:8px 18px;font-size:13px;font-weight:600;color:var(--txt-3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.at-modal-tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.qi-sat{display:flex;gap:8px}
+.qi-sat-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s}
+.qi-sat-btn.on{border-color:var(--blue);background:var(--blue-soft)}
 
 /* Jornada — Linha do Tempo da Operação (Visão Geral), com sub-abas */
 .jtl-tabs{display:flex;gap:4px;flex-wrap:wrap;padding:0 18px;border-bottom:1px solid var(--line)}
@@ -1811,6 +1840,9 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
 .um-item svg{ width:16px; height:16px; flex:none; color:var(--txt-3); }
 .um-item:hover{ background:var(--surface-2); }
 .um-item.um-danger{ color:var(--red); }
+.um-imp{ padding:6px 8px 10px; display:flex; flex-direction:column; gap:4px }
+.um-imp label{ font-size:11px; font-weight:700; color:var(--txt-3); text-transform:uppercase; letter-spacing:.03em }
+.um-imp select{ width:100%; font-size:13px; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--txt) }
 .um-item.um-danger svg{ color:var(--red); }
 .mod-ico{ display:flex; align-items:center; }
 .mod-tile{
@@ -1931,7 +1963,7 @@ table.data thead th{ border-bottom-color:var(--line); background:transparent; }
 window.__fdiTryLoad = function(perfil){
   if(window.__fdiLoaded) return;
   var isLocal = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  var isAdmin = perfil==='Gestão Executiva';
+  var isAdmin = perfil==='Gestão Executiva' || perfil==='Desenvolvedor';
   if(!isLocal && !isAdmin) return;
   window.__fdiLoaded = true;
   var v=Date.now();
@@ -2027,6 +2059,7 @@ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__fdiTryLoad();
       <section class="view" id="view-health"></section>
       <section class="view" id="view-relatorios"></section>
       <section class="view" id="view-mapa"></section>
+      <section class="view" id="view-tarefas"></section>
       <section class="view" id="view-pendencias"></section>
       <section class="view" id="view-interacoes"></section>
       <section class="view" id="view-historico"></section>
@@ -2163,8 +2196,8 @@ const UF_REGIAO = {AC:'Norte',AP:'Norte',AM:'Norte',PA:'Norte',RO:'Norte',RR:'No
   ES:'Sudeste',MG:'Sudeste',RJ:'Sudeste',SP:'Sudeste', PR:'Sul',RS:'Sul',SC:'Sul'};
 const REGIAO_TONE = {'Norte':'green','Nordeste':'amber','Centro-Oeste':'violet','Sudeste':'blue','Sul':'slate'};
 // Status do ativo/SPE (ciclo do empreendimento)
-const ATIVO_STATUS = ['Estruturação','Lançamento','Comercialização','Obras','Entrega','Pós-obra'];
-const ATIVO_STATUS_TONE = {'Estruturação':'slate','Lançamento':'violet','Comercialização':'blue','Obras':'amber','Entrega':'green','Pós-obra':'slate'};
+const ATIVO_STATUS = ['Landbank','Pré-lançamento','Lançamento','Obras','Pós-obras','Pós-operacional'];
+const ATIVO_STATUS_TONE = {'Landbank':'slate','Pré-lançamento':'violet','Lançamento':'blue','Obras':'amber','Pós-obras':'green','Pós-operacional':'slate'};
 // Funil comercial (Middle Plataforma) — status da proposta
 const PROP_STATUS = ['Proposta Elaborada','Proposta Enviada','Em Negociação','Proposta Aprovada','Contrato Assinado','Proposta Perdida','Cancelada'];
 const PROP_STATUS_TONE = {'Proposta Elaborada':'slate','Proposta Enviada':'blue','Em Negociação':'amber','Proposta Aprovada':'violet','Contrato Assinado':'green','Proposta Perdida':'red','Cancelada':'red'};
@@ -2236,7 +2269,7 @@ const LOGO_WHITE='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAACtCAYAAACu
      • Onboarding        — cria/edita clientes, jornada, atividades e interações
      • Key Account       — acompanha clientes, registra interações e atividades
      • Área Parceira     — somente leitura (atribuído dinamicamente a e-mails externos)              */
-const PERFIS = ['Gestão Executiva','Onboarding','Key Account','Área Parceira'];
+const PERFIS = ['Gestão Executiva','Onboarding','Key Account','Área Parceira','Middle','Desenvolvedor'];
 
 // Mapeamento de perfis legados (migração de bases v4.0–v4.2)
 const PERFIL_LEGADO = {'Administrador':'Gestão Executiva','Diretor':'Gestão Executiva','Liderança':'Gestão Executiva'};
@@ -2251,18 +2284,26 @@ const PERMS = {
   'Key Account':{viewAll:1,editOps:1,editClient:0,createClient:0,createActivity:1,editActivity:1,deleteActivity:0,
     history:1,clearHistory:0,deleteHistory:0,users:0,backup:0,restore:0,whatsAdd:1,whatsEditAny:0,whatsDelete:0,config:0,audit:0},
   'Área Parceira':{viewAll:1,editOps:0,editClient:0,createClient:0,createActivity:0,editActivity:0,deleteActivity:0,
-    history:1,clearHistory:0,deleteHistory:0,users:0,backup:0,restore:0,whatsAdd:0,whatsEditAny:0,whatsDelete:0,config:0,audit:0}
+    history:1,clearHistory:0,deleteHistory:0,users:0,backup:0,restore:0,whatsAdd:0,whatsEditAny:0,whatsDelete:0,config:0,audit:0},
+  'Middle':{viewAll:1,editOps:1,editClient:1,createClient:1,createActivity:1,editActivity:1,deleteActivity:0,
+    history:1,clearHistory:0,deleteHistory:0,users:0,backup:0,restore:0,whatsAdd:1,whatsEditAny:0,whatsDelete:0,config:0,audit:0},
+  'Desenvolvedor':{viewAll:1,editOps:1,editClient:1,createClient:1,createActivity:1,editActivity:1,deleteActivity:1,
+    history:1,clearHistory:1,deleteHistory:1,users:1,backup:1,restore:1,whatsAdd:1,whatsEditAny:1,whatsDelete:1,config:1,audit:1}
 };
 
 // Visibilidade de módulos por perfil (nav)
+// "Middle" só enxerga as 5 áreas liberadas (Dashboard, Jornada, Cadastro, Tarefas, Relatórios) — por isso
+// os demais itens listam os perfis explicitamente em vez de usar o fallback NAV_ACCESS[key]||PERFIS.
+const NAV_SEM_MIDDLE = PERFIS.filter(p=>p!=='Middle');
 const NAV_ACCESS = {
-  dashboard:PERFIS, pipeline:PERFIS, jornada:PERFIS, cadastro:PERFIS,
-  pesquisa:PERFIS, ativacao:PERFIS, ttfv:PERFIS, health:PERFIS, relatorios:PERFIS,
-  pendencias:PERFIS, interacoes:PERFIS, historico:PERFIS,
-  auditoria:['Gestão Executiva'],
-  backup:['Gestão Executiva'],
-  usuarios:['Gestão Executiva'],
-  config:['Gestão Executiva']
+  dashboard:PERFIS, pipeline:NAV_SEM_MIDDLE, jornada:PERFIS, cadastro:PERFIS,
+  pesquisa:NAV_SEM_MIDDLE, ativacao:NAV_SEM_MIDDLE, ttfv:NAV_SEM_MIDDLE, health:NAV_SEM_MIDDLE, relatorios:PERFIS,
+  tarefas:PERFIS,
+  pendencias:NAV_SEM_MIDDLE, interacoes:NAV_SEM_MIDDLE, historico:NAV_SEM_MIDDLE,
+  auditoria:['Gestão Executiva','Desenvolvedor'],
+  backup:['Gestão Executiva','Desenvolvedor'],
+  usuarios:['Gestão Executiva','Desenvolvedor'],
+  config:['Gestão Executiva','Desenvolvedor']
 };
 
 // Usuários internos pré-cadastrados (identificação automática por e-mail corporativo).
@@ -2277,7 +2318,7 @@ const USERS_SEED = [
   {nome:'Ester Silva de Souza',               email:'ester.souza@trinusco.com.br',    perfil:'Key Account',   cargo:'Key Account'},
   {nome:'Victor Abreu Espíndola',             email:'victor.espindola@trinusco.com.br',perfil:'Onboarding',   cargo:'Analista de Onboarding'},
   {nome:'Natalia Yoshimura Lopes',            email:'natalia.yoshimura@trinusco.com.br',perfil:'Onboarding',  cargo:'Analista de Onboarding'},
-  {nome:'Henrique Beserra',                   email:'henrique.beserra@trinusco.com.br', perfil:'Gestão Executiva', cargo:'Administrador'}
+  {nome:'Henrique Beserra',                   email:'henrique.beserra@trinusco.com.br', perfil:'Desenvolvedor', cargo:'Administrador'}
 ];
 
 // Atividades / Kanban
@@ -2954,6 +2995,7 @@ function toneVar(t){ return ({green:'var(--green)',amber:'var(--amber)',red:'var
    ║  (camada desacoplada — substituível por Microsoft Entra ID sem tocar no resto)║
    ╚═══════════════════════════════════════════════════════════════════════════╝ */
 let CURRENT=null;
+let _impersonarPerfil=null; // só tem efeito quando CURRENT.perfil==='Desenvolvedor' — ver getSession()
 function guestFromEmail(email){ email=String(email||'').trim().toLowerCase();
   const local=(email.split('@')[0]||'externo').replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
   return {nome:local||'Parceiro Externo', email, perfil:'Área Parceira', cargo:'Parceiro Externo', dinamico:true}; }
@@ -2965,8 +3007,12 @@ async function carregarPerfil(authUser){
   }catch(e){ console.error(e); return null; }
 }
 // restauração real da sessão acontece no boot() via supa.auth.getSession() — este getter só lê o estado em memória
-function getSession(){ return CURRENT; }
+function getSession(){ if(_impersonarPerfil && CURRENT && CURRENT.perfil==='Desenvolvedor') return Object.assign({},CURRENT,{perfil:_impersonarPerfil}); return CURRENT; }
 function setSession(u){ CURRENT=u; }
+// Personificação de perfil (só para a conta real 'Desenvolvedor') — expostas à parte B, que não enxerga CURRENT diretamente
+function isRealDev(){ return !!(CURRENT && CURRENT.perfil==='Desenvolvedor'); }
+function getImpersonarPerfil(){ return _impersonarPerfil; }
+function setImpersonarPerfil(perfil){ if(!isRealDev()) return; _impersonarPerfil=perfil||null; }
 function clearSession(){ CURRENT=null; }
 
 /* ---- Senhas: agora 100% delegadas ao Supabase Auth (bcrypt no servidor,
@@ -3035,7 +3081,7 @@ window.__OO = {I,svg,MILESTONES,TOTAL_MARCOS,PRODUTOS,TIPOLOGIAS,UFS,UF_NOME,REG
   calcSurvey,surveyStatus,pesquisasEmAtraso,calcAtivacao,calcAtivacaoGrupo,calcTTFV,calcHealth,getCli,emAtraso,statusEfetivo,
   produtos,etapaInfo,toneVar,calcPeriodo,getActDates,
   guestFromEmail,carregarPerfil,getSession,setSession,clearSession,can,navAllowed,nowParts,addHistory,logClienteDiff,logLogin,farolAtividade,
-  supa,deleteRemoto,loadFromSupabase,setDB,logSeg};
+  supa,deleteRemoto,loadFromSupabase,setDB,logSeg,isRealDev,getImpersonarPerfil,setImpersonarPerfil};
 })();
 
 /* =============================================================================
@@ -3052,7 +3098,7 @@ const {I,svg,MILESTONES,TOTAL_MARCOS,PRODUTOS,TIPOLOGIAS,UFS,UF_NOME,REGIOES,UF_
   calcSurvey,surveyStatus,pesquisasEmAtraso,calcAtivacao,calcAtivacaoGrupo,calcTTFV,calcHealth,getCli,emAtraso,statusEfetivo,
   etapaInfo,toneVar,
   getSession,setSession,clearSession,can,navAllowed,nowParts,addHistory,logClienteDiff,logLogin,farolAtividade,guestFromEmail,
-  carregarPerfil,supa,deleteRemoto,loadFromSupabase,setDB,logSeg} = O;
+  carregarPerfil,supa,deleteRemoto,loadFromSupabase,setDB,logSeg,isRealDev,getImpersonarPerfil,setImpersonarPerfil} = O;
 const produtos = ()=>O.produtos();
 const DB = ()=>O.DB();
 // Funil comercial (ciclo de negociação) — colunas da Jornada, espelha os status da planilha do Middle
@@ -3148,7 +3194,7 @@ let _dragId=null;
 const NAV = [
   ['dashboard','Dashboards','Visão consolidada da carteira de onboarding em tempo real',I.dashboard,'OPERAÇÃO'],
   ['pipeline','Pipeline da Carteira','Funil de propostas, evolução da carteira e jornada por etapa',I.kanban,null,true],
-  ['jornada','Jornada do Cliente','Painel 360° do cliente — atividades, interações e histórico',I.route],
+  ['jornada','Jornada','Painel 360° do cliente — atividades, interações e histórico',I.route],
   ['cadastro','Cadastro','Registro mestre de clientes, representantes e ativos',I.clients],
   ['cadastroAtivos','Ativos do Cliente','Empreendimentos, SPEs e operações do cliente',I.clients,null,true],
   ['pesquisa','Pesquisa Pós-Kickoff','Voz do cliente e satisfação imediata após o kickoff',I.survey,null,true],
@@ -3157,7 +3203,8 @@ const NAV = [
   ['health','Health Score','Saúde composta do onboarding por cliente',I.health,'INTELIGÊNCIA'],
   ['relatorios','Relatórios','Relatório executivo e apresentação para governança',I.report],
   ['mapa','Mapa de Distribuição','Distribuição geográfica de clientes e ativos/SPEs da carteira',I.map,null,true],
-  ['pendencias','Pendências e Atividades','Central de tudo que está aberto, com farol operacional',I.clock,'ATIVIDADES'],
+  ['tarefas','Tarefas','Kanban pessoal — todas as tarefas em que você é responsável, de todas as operações',I.clock,'ATIVIDADES'],
+  ['pendencias','Pendências e Atividades','Central de tudo que está aberto, com farol operacional',I.clock],
   ['interacoes','Interações do Cliente','Histórico de WhatsApp e tratativas — CRM do cliente',I.chat],
   ['historico','Histórico de Alterações','Rastreabilidade de todas as modificações',I.history,'GOVERNANÇA'],
   ['auditoria','Auditoria','Acessos e ações por usuário',I.eye],
@@ -3773,7 +3820,7 @@ function renderFicha(id){
   _fichaRepresentantes = Array.isArray(c.representantes)? JSON.parse(JSON.stringify(c.representantes)) : [];
   _fichaDocumentos = Array.isArray(c.documentos)? c.documentos.slice() : [];
   _cadAtivos = Array.isArray(c.ativos)? JSON.parse(JSON.stringify(c.ativos)).map(a=>({...a,_open:false})) : [];
-  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
+  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
   const historico = isNew? [] : DB().history.filter(h=>h.cliente===c.nome).slice(0,30);
 
   el('view-cadastro').innerHTML=`
@@ -4472,7 +4519,7 @@ function clienteModal(cli){
   const c=cli||{produtos:[]};
   const isNew=!cli;
   _cliAtivos = (c.ativos&&Array.isArray(c.ativos))? JSON.parse(JSON.stringify(c.ativos)) : [];
-  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
+  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
   el('modal').innerHTML=`
   <div class="modal-head"><div class="ico" style="width:34px;height:34px;border-radius:9px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center">${svg(I.clients)}</div>
     <h3>${isNew?'Novo Cliente':'Editar Cliente'}</h3><div class="spacer"></div>
@@ -4533,7 +4580,7 @@ function ativoListRender(){
         <div class="field"><label>CEP</label><input ${ro?'disabled':''} value="${esc(a.cep||'')}" onchange="App.ativoSet(${i},'cep',this.value)" placeholder="00000-000"></div>
         <div class="field full"><label>Endereço</label><input ${ro?'disabled':''} value="${esc(a.endereco||'')}" onchange="App.ativoSet(${i},'endereco',this.value)" placeholder="Logradouro, número, complemento"></div>
         ${sub('Números do Empreendimento')}
-        <div class="field"><label>Status do Ativo</label><select ${ro?'disabled':''} onchange="App.ativoSet(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Etapa</label><select ${ro?'disabled':''} onchange="App.ativoSet(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
         <div class="field"><label>Quantidade de Ativos</label><input ${ro?'disabled':''} type="number" min="0" value="${a.quantidade!=null?a.quantidade:1}" onchange="App.ativoSet(${i},'quantidade',this.value)"></div>
         <div class="field"><label>Total de Unidades</label><input ${ro?'disabled':''} type="number" min="0" value="${a.unidades!=null?a.unidades:0}" onchange="App.ativoSet(${i},'unidades',this.value)"></div>
         <div class="field"><label>Unidades Vendidas</label><input ${ro?'disabled':''} type="number" min="0" value="${a.unidadesVendidas!=null?a.unidadesVendidas:0}" onchange="App.ativoSet(${i},'unidadesVendidas',this.value)"></div>
@@ -4567,6 +4614,7 @@ function ativoOptions(cid,sel){ return `<option value="">— (somente cliente)</
 
 /* ============================ MÓDULO — JORNADA DO CLIENTE (360°) ============================ */
 let jTab='geral';
+let jAtivoOpenIdx=new Set();
 let _dragCli=null;
 const OP_DRAFT_KEY='oo_draft_nova_operacao';
 const opDraftBlank=()=>({numero:'',estagio:'Proposta',fantasia:'',nome:'',cnpj:'',classif:'',elite:false,cidade:'',estado:'',tip:TIPOLOGIAS[0],obs:''});
@@ -4577,7 +4625,7 @@ function opDraftPersist(){ try{ localStorage.setItem(OP_DRAFT_KEY, JSON.stringif
 function opDraftLoad(){ try{ const raw=localStorage.getItem(OP_DRAFT_KEY); return raw?JSON.parse(raw):null; }catch(_){ return null; } }
 function opDraftClear(){ try{ localStorage.removeItem(OP_DRAFT_KEY); }catch(_){} }
 function renderNovaOperacao(){
-  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u} · ${UF_NOME[u]}</option>`).join('');
+  const ufOpts=(sel)=>`<option value="">—</option>`+UFS.map(u=>`<option value="${u}" ${sel===u?'selected':''}>${u}</option>`).join('');
   const linkedCli = _opClienteId? getCli(_opClienteId) : null;
   const opsExistentes = linkedCli? (linkedCli.operacoes||[]) : [];
   el('view-jornada').innerHTML=`
@@ -4673,7 +4721,7 @@ function ativoAccordionMarkup(list, prefix){
           <div class="field ativo-endereco"><label>Endereço</label><input data-id="ativo.campo.endereco" value="${esc(a.endereco||'')}" onchange="App.${prefix}Set(${i},'endereco',this.value)" placeholder="Logradouro, número, complemento"></div>
         </div>
         ${sub('Cronograma da Obra')}
-        <div class="field"><label>Status do Ativo</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Etapa</label><select data-id="ativo.campo.status-ativo" onchange="App.${prefix}Set(${i},'statusAtivo',this.value)"><option value="">—</option>${ATIVO_STATUS.map(s=>`<option ${a.statusAtivo===s?'selected':''}>${s}</option>`).join('')}</select></div>
         <div class="field"><label>Lançamento</label><input data-id="ativo.campo.data-lancamento" type="date" value="${a.dataLancamento||''}" onchange="App.${prefix}Set(${i},'dataLancamento',this.value)"></div>
         <div class="field"><label>Início da Obra</label><input data-id="ativo.campo.data-inicio-obra" type="date" value="${a.dataInicioObra||''}" onchange="App.${prefix}Set(${i},'dataInicioObra',this.value)"></div>
         <div class="field"><label>Fim da Obra</label><input data-id="ativo.campo.data-fim-obra" type="date" value="${a.dataFimObra||''}" onchange="App.${prefix}Set(${i},'dataFimObra',this.value)"></div>
@@ -4722,7 +4770,7 @@ function jcliKCard(c){
   const ab=DB().activities.filter(a=>a.cliente===c.id&&!['Concluído','Cancelado'].includes(a.status)).length;
   return `<div class="kcard" data-id="jornada.card.cliente-negociacao" draggable="true" onclick="App.abrirCliente('${c.id}')"
       ondragstart="App.dragStartN(event,'${c.id}')" ondragend="App.dragEndN()">
-    <div class="knm" data-id="jornada.texto.nome-cliente-kanban">${esc(c.nome)}</div>
+    <div class="knm" data-id="jornada.texto.nome-cliente-kanban">${c.numeroOperacao?`#${esc(c.numeroOperacao)} | `:''}${esc(c.nome)}</div>
     <div class="kmeta" data-id="jornada.texto.info-cliente-kanban">${esc(c.tipologia||'—')} · KA ${esc((c.keyAccount||'—').split(' ')[0])}</div>
     <div class="krow">${badge(e.label,e.tone,'jornada.selo.etapa-cliente-kanban')} ${h?badge(num(h.total)+' · '+h.cls,h.tone,'jornada.selo.health-score-kanban'):''}</div>
     <div class="jcli-foot" data-id="jornada.indicador.atividades-abertas-kanban">${ab} atividade(s) aberta(s)</div>
@@ -4755,7 +4803,7 @@ function renderJornada(){
     return;
   }
   const c=sel, h=calcHealth(c.id), e=etapaInfo(c.etapa), sv=calcSurvey(c.id), tv=calcTTFV(c.id), at=calcAtivacao(c.id);
-  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['ativos','Ativos','jornada.aba.ativos'],['atividades','Tarefas','jornada.aba.atividades'],
+  const tabs=[['geral','Visão Geral','jornada.aba.visao-geral'],['ativos','Ativos','jornada.aba.ativos'],['servicos','Serviços','jornada.aba.servicos'],['atividades','Atividades','jornada.aba.atividades'],
     ['kickoff','Pós-Kickoff','jornada.aba.pos-kickoff'],['ativacao','Ativação','jornada.aba.ativacao'],['firstvalue','First Value','jornada.aba.first-value'],
     ['docs','Documentos','jornada.aba.documentos']];
   const ultimaAlt=DB().history.find(x=>x.cliente===c.nome);
@@ -4784,9 +4832,6 @@ function renderJornada(){
             <div class="jcard-actions">
               ${gate('createActivity',`<button type="button" class="btn sm" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Tarefa</button>`)}
               ${gate('whatsAdd',`<button type="button" class="btn sm" onclick="App.novaInteracao('${c.id}','evento')">${svg(I.plus)} Interações</button>`)}
-              <button type="button" class="btn sm" onclick="App.jTab('kickoff')">${svg(I.plus)} Pós-Kickoff</button>
-              <button type="button" class="btn sm" onclick="App.jTab('ativacao')">${svg(I.plus)} Ativação</button>
-              <button type="button" class="btn sm" onclick="App.jTab('firstvalue')">${svg(I.plus)} First Value</button>
               <button type="button" class="btn sm" onclick="App.jTab('docs')">${svg(I.plus)} Documentação</button>
             </div>
           </div>
@@ -4848,7 +4893,6 @@ function jContexto(c,m){
   };
   return `<aside class="jctx">
     <div class="jctx-head">
-      <span class="jctx-title">Contexto</span>
       <button type="button" class="jctx-chev" onclick="App.jCtxToggle()" title="${jCtxOpen?'Aglutinar':'Expandir'}">${svg(I.chevronDown)}</button>
     </div>
     <div class="jctx-body">
@@ -4889,11 +4933,7 @@ function jContexto(c,m){
       <div class="jctx-panel">
         <div class="jctx-block">
           <span class="jctx-lbl">Consolidado</span>
-          <div class="jctx-indic-grid">
-            <div class="jctx-indic-item jctx-bv"><span>BV</span><b data-id="jornada.indicador.bv-consolidado">${money(mockBookedValue(c.id))}</b></div>
-            <div class="jctx-indic-item"><span>Total de Ativos</span><b data-id="jornada.indicador.total-ativos-consolidado">${(c.ativos||[]).length}</b></div>
-            <div class="jctx-indic-item"><span>Total de Serviços</span><b data-id="jornada.indicador.total-servicos-consolidado">${(c.ativos||[]).reduce((s,a)=>s+(a.servicos||[]).length,0)}</b></div>
-          </div>
+          <div class="jctx-bv-solo"><span>Booked Value</span><b data-id="jornada.indicador.bv-consolidado">${money(mockBookedValue(c.id))}</b></div>
         </div>
         <div class="jctx-block">
           <span class="jctx-lbl">Indicadores</span>
@@ -4927,27 +4967,72 @@ function jAtivos(c){
     if(a.estado)porEstado[a.estado]=(porEstado[a.estado]||0)+q; if(a.tipologia)porTip[a.tipologia]=(porTip[a.tipologia]||0)+q; if(a.statusAtivo)porStatus[a.statusAtivo]=(porStatus[a.statusAtivo]||0)+q; });
   return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.ativos-cliente"><h3 style="font-size:15px" data-id="jornada.texto.titulo-ativos-cliente">Ativos do Cliente</h3><div class="line"></div>
       ${canAtivos()?`<button class="btn primary sm" data-id="jornada.botao.gerenciar-cadastro" onclick="App.editCliente('${c.id}')">${svg(I.edit)} Gerenciar no cadastro</button>`:''}</div>
-    <div class="kpi-grid" style="margin-bottom:14px">
-      ${kpi('k-blue','Quantidade de Ativos',tot,'',ativos.length+' registro(s)','jornada.indicador.qtd-ativos')}
-      ${kpi('k-amber','Total de Unidades',num(unid),'','','jornada.indicador.total-unidades')}
-      ${kpi('k-green','VGV Total do Cliente',money(vgv),'','','jornada.indicador.vgv-total-cliente')}
-      ${kpi('k-slate','Localização',c.estado||'—','',esc(c.cidade||'—'),'jornada.indicador.localizacao-cliente')}
+    <div class="jativo-kpis" data-id="jornada.indicadores.ativos-cliente">
+      ${jAtivoKpi('k-blue','Quantidade de Ativos',tot,ativos.length+' registro(s)','jornada.indicador.qtd-ativos')}
+      ${jAtivoKpi('k-amber','Total de Unidades',num(unid),'','jornada.indicador.total-unidades')}
+      ${jAtivoKpi('k-green','VGV Total do Cliente',money(vgv),'','jornada.indicador.vgv-total-cliente')}
     </div>
-    ${ativos.length? `<div class="card" data-id="jornada.tabela.ativos-cliente"><div class="tbl-wrap"><table class="data"><thead><tr><th>Ativo</th><th>Tipologia</th><th>Status</th><th>Estado</th><th>Cidade</th><th>Região</th><th>Qtd</th><th>Unidades</th><th>VGV</th><th>Observações</th></tr></thead>
-      <tbody>${ativos.map(a=>`<tr data-id="jornada.tabela.linha-ativo"><td><b>${esc(a.nome||'—')}</b></td><td>${badge(a.tipologia||'—','slate')}</td>
-        <td>${a.statusAtivo?badge(a.statusAtivo,ATIVO_STATUS_TONE[a.statusAtivo]||'slate'):'—'}</td>
-        <td>${a.estado?badge(a.estado,REGIAO_TONE[regiaoDoEstado(a.estado)]||'slate'):'—'}</td><td>${esc(a.cidade||'—')}</td>
-        <td>${esc(a.regiao||regiaoDoEstado(a.estado)||'—')}</td><td class="num">${+a.quantidade||0}</td><td class="num">${num(+a.unidades||0)}</td><td class="num">${money(+a.vgv||0)}</td><td>${esc(a.obs||'—')}</td></tr>`).join('')}</tbody></table></div></div>
+    ${ativos.length? `<div class="op-ativo-list" data-id="jornada.lista.ativos-cliente">${ativos.map((a,i)=>{
+        const local=[a.cidade,a.estado].filter(Boolean).join('/');
+        const regiao=a.regiao||regiaoDoEstado(a.estado);
+        const open=jAtivoOpenIdx.has(i);
+        return `<div class="op-ativo-card${open?' open':''}" data-id="jornada.card.ativo">
+          <div class="jativo-head" onclick="App.jAtivoToggleDetalhe(${i})" title="Clique para ver os dados cadastrados">
+            <div class="op-ativo-ico">${svg(I.activation)}</div>
+            <div class="op-ativo-titulo"><b>${esc(a.nome||'—')}</b><small>${local?esc(local):'—'}</small></div>
+            <div class="jativo-tags">
+              ${badge(a.tipologia||'—','slate')}
+              ${regiao?badge(regiao,'slate'):''}
+              <span class="jativo-num">${num(+a.unidades||0)} un.</span>
+              <span class="jativo-num">${money(+a.vgv||0)}</span>
+            </div>
+            ${a.statusAtivo?badge(a.statusAtivo,ATIVO_STATUS_TONE[a.statusAtivo]||'slate'):`<span class="badge b-slate">Etapa não definida</span>`}
+            <span class="op-ativo-chev">${svg(I.chevronDown)}</span>
+          </div>
+          ${open?`<div class="op-ativo-body">${jAtivoDetalhe(a,c.id)}</div>`:''}
+        </div>`;}).join('')}</div>
       <div class="cfg-grid" style="margin-top:14px">
-        <div class="card" data-id="jornada.grafico.distribuicao-estado"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-estado">Distribuição por Estado</h3></div><div class="card-body">${geoBars(porEstado,uf=>REGIAO_TONE[regiaoDoEstado(uf)]||'blue',null,uf=>UF_NOME[uf]||uf)}</div></div>
+        <div class="card" data-id="jornada.grafico.distribuicao-estado"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-estado">Distribuição por Estado</h3></div><div class="card-body">${geoBars(porEstado,uf=>REGIAO_TONE[regiaoDoEstado(uf)]||'blue')}</div></div>
         <div class="card" data-id="jornada.grafico.distribuicao-tipologia"><div class="card-head"><h3 data-id="jornada.texto.titulo-distribuicao-tipologia">Distribuição por Tipologia</h3></div><div class="card-body">${geoBars(porTip)}</div></div>
-        <div class="card" data-id="jornada.grafico.status-ativos"><div class="card-head"><h3 data-id="jornada.texto.titulo-status-ativos">Status dos Ativos</h3></div><div class="card-body">${geoBars(porStatus,s=>ATIVO_STATUS_TONE[s]||'slate')}</div></div>
+        <div class="card" data-id="jornada.grafico.status-ativos"><div class="card-head"><h3 data-id="jornada.texto.titulo-status-ativos">Etapa dos Ativos</h3></div><div class="card-body">${geoBars(porStatus,s=>ATIVO_STATUS_TONE[s]||'slate')}</div></div>
       </div>`
     : '<div class="card"><div class="card-body"><p style="color:var(--txt-3);text-align:center;padding:20px">Nenhum ativo cadastrado para este cliente.'+(canAtivos()?' Use “Gerenciar no cadastro”.':'')+'</p></div></div>'}`;
+}
+function jAtivoKpi(cls,lbl,val,foot,dataId){
+  return `<div class="jativo-kpi ${cls}" ${dataId?`data-id="${dataId}"`:''} title="${esc(lbl)}${foot?' — '+esc(foot):''}">
+    <div class="ico">${svg(kpiIcon(lbl))}</div>
+    <div class="txt"><span>${esc(lbl)}</span><b>${val}</b></div>
+  </div>`;
+}
+function jAtivoDetalhe(a,clienteId){
+  const linha=(label,val)=>jInfo(label,val);
+  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 10px">
+      <span style="font-size:11px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.04em">Dados cadastrados do ativo</span>
+      ${canAtivos()?`<button type="button" class="btn ghost sm" onclick="event.stopPropagation();App.editCliente('${clienteId}')">${svg(I.edit)} Editar</button>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px">
+      ${linha('Nome do Empreendimento',esc(a.nome))}
+      ${linha('Razão Social',esc(a.razaoSocial))}
+      ${linha('CNPJ',esc(a.cnpj))}
+      ${linha('Tipo do Ativo',esc(a.tipologia))}
+      ${linha('Cidade',esc(a.cidade))}
+      ${linha('Estado',esc(a.estado))}
+      ${linha('Endereço',esc(a.endereco))}
+      ${linha('Etapa',esc(a.statusAtivo))}
+      ${linha('Lançamento',fmtD(a.dataLancamento))}
+      ${linha('Início da Obra',fmtD(a.dataInicioObra))}
+      ${linha('Fim da Obra',fmtD(a.dataFimObra))}
+      ${linha('Total de Unidades',a.unidades!=null?num(a.unidades):null)}
+      ${linha('Unidades Vendidas',a.unidadesVendidas!=null?num(a.unidadesVendidas):null)}
+      ${linha('VGV',a.vgv!=null?money(a.vgv):null)}
+      ${linha('Serviços Contratados',(a.servicos&&a.servicos.length)?esc(a.servicos.join(', ')):null)}
+      ${linha('Observações',esc(a.obs))}
+    </div>`;
 }
 function jPanel(c,m){
   if(jTab==='geral') return jGeral(c,m);
   if(jTab==='ativos') return jAtivos(c);
+  if(jTab==='servicos') return jServicosPanel(c);
   if(jTab==='atividades') return `<div class="section-bar" style="margin-top:0" data-id="jornada.secao.kanban-atividades-tab"><h3 style="font-size:15px" data-id="jornada.texto.titulo-kanban-atividades-tab">Kanban de Atividades</h3><div class="line"></div>
     ${gate('createActivity',`<button class="btn primary sm" data-id="jornada.botao.nova-atividade-tab" onclick="App.novaAtividade('${c.id}')">${svg(I.plus)} Nova atividade</button>`)}</div>`+kanbanAtividades(c.id);
   if(jTab==='kickoff') return jPosKickoffPanel(c,m);
@@ -4955,6 +5040,23 @@ function jPanel(c,m){
   if(jTab==='firstvalue') return jFirstValuePanel(c,m);
   if(jTab==='docs') return jDocs(c.id);
   return '';
+}
+/* Jornada — aba Serviços: visão + edição dos serviços contratados de cada ativo, salvando direto (sem rascunho) */
+function jServicosPanel(c){
+  const ativos=c.ativos||[];
+  if(!ativos.length) return `<div class="card"><div class="card-body"><p style="color:var(--txt-3);text-align:center;padding:20px">Nenhum ativo cadastrado para este cliente.</p></div></div>`;
+  return `<div class="card"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3>Serviços por Ativo</h3>
+      <span class="desc">serviços contratados de cada ativo — clique num serviço abaixo pra adicionar ou remover</span></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:20px">
+      ${ativos.map((a,i)=>`<div class="jsrv-block">
+        <div class="jsrv-block-head">
+          <b>${esc(a.nome||`Ativo ${i+1}`)}</b>${a.cidade?`<span class="jsrv-cidade">| ${esc(a.cidade)}</span>`:''}
+          <span class="badge b-slate">${(a.servicos&&a.servicos.length)||0} serviço(s)</span>
+        </div>
+        <input class="serv-busca-input" placeholder="Buscar ou clicar num serviço abaixo…" autocomplete="off" oninput="App.jSrvBusca(${i},this.value)" style="width:100%;margin-top:8px">
+        <div class="serv-list" id="jSrv_res_${i}">${servicoResultsMarkup('',a.servicos,'jSrv',i)}</div>
+      </div>`).join('')}
+    </div></div>`;
 }
 /* Jornada — Pós-Kickoff/Ativação/First Value trazidos pra dentro da operação (antes eram telas próprias, navegadas via filters.cliente) */
 function jPosKickoffPanel(c,m){
@@ -5098,7 +5200,8 @@ function jGeral(c,m){
         ${jInfo('UF',esc(c.estado),'jornada.texto.uf-cliente')}
         ${jInfoBlock('Observação',esc(c.obs),'jornada.texto.observacao-cliente')}
       </div></div>
-    <div class="card jserv-card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Serviços</h3></div>
+    <div class="card jserv-card" data-id="jornada.card.servicos-resumo"><div class="card-head"><div class="ico">${svg(I.activation)}</div><h3 data-id="jornada.texto.titulo-servicos-resumo">Ativos e Serviços</h3>
+      <span class="pill">${(c.ativos||[]).length} Ativo${(c.ativos||[]).length===1?'':'s'} | ${(c.ativos||[]).reduce((s,a)=>s+(a.servicos||[]).length,0)} Serviço${(c.ativos||[]).reduce((s,a)=>s+(a.servicos||[]).length,0)===1?'':'s'}</span></div>
       <div class="card-body">${jServicosResumo(c)}</div></div>
     <div class="card" data-id="jornada.card.ciclos-operacao-resumo"><div class="card-head"><div class="ico">${svg(I.cal)}</div><h3 data-id="jornada.texto.titulo-ciclos-operacao-resumo">Ciclos da Operação</h3></div>
       <div class="card-body jinfos">
@@ -5176,6 +5279,18 @@ function atividadeCard(a){
     ${gate('editActivity',`<select class="kmove" data-id="atividade.campo.mover-status" onchange="App.moverAtividade('${a.id}',this.value)" onclick="event.stopPropagation()">
       ${ATIV_STATUS.map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select>`)}
   </div>`;
+}
+
+/* ============================ MÓDULO — TAREFAS (kanban pessoal, cross-operação) ============================ */
+function renderTarefas(){
+  const me=getSession();
+  const minhas=DB().activities.filter(a=>me&&a.responsavel===me.nome);
+  el('view-tarefas').innerHTML=`
+  <div class="section-bar" style="margin-top:0" data-id="tarefas.secao.cabecalho"><h2 data-id="tarefas.texto.titulo">Minhas Tarefas</h2><div class="line"></div>
+    <span class="pill">${minhas.length} tarefa(s)</span>
+    ${gate('createActivity',`<button class="btn primary sm" data-id="tarefas.botao.nova-tarefa" onclick="App.novaAtividade()">${svg(I.plus)} Nova tarefa</button>`)}</div>
+  <p style="font-size:12.5px;color:var(--txt-3);margin:-8px 0 14px">Todas as tarefas em que você é responsável, de todas as operações — arraste entre colunas ou clique numa tarefa pra editar.</p>
+  ${minhas.length? kanbanAtividades(null,minhas) : '<div class="card"><div class="card-body"><p style="color:var(--txt-3);text-align:center;padding:20px">Nenhuma tarefa atribuída a você no momento.</p></div></div>'}`;
 }
 
 /* ============================ MÓDULO — PENDÊNCIAS E ATIVIDADES (hub operacional) ============================ */
@@ -5378,7 +5493,7 @@ function whatsTimeline(cid){
 let _intAnexos=[];
 let _cliAtivos=[];   // ativos em edição no modal de cliente (legado — usado só pelo modal antigo)
 let _cadAtivos=[];   // ativos em edição na página dedicada de Ativos do Cadastro
-function canAtivos(){ const u=getSession(); return !!u && (u.perfil==='Gestão Executiva'||u.perfil==='Onboarding'); }
+function canAtivos(){ const u=getSession(); return !!u && (u.perfil==='Gestão Executiva'||u.perfil==='Onboarding'||u.perfil==='Middle'||u.perfil==='Desenvolvedor'); }
 function anxSize(n){ n=+n||0; return n<1024?n+' B':n<1048576?(n/1024).toFixed(0)+' KB':(n/1048576).toFixed(1)+' MB'; }
 function intAnexoRender(){ const box=el('in_anexos_list'); if(!box) return;
   box.innerHTML = _intAnexos.length
@@ -5705,7 +5820,7 @@ function renderMapa(){
       : emptyRow(7,'Nenhum cliente para os filtros.')}</tbody></table></div></div>`;
 }
 /* ============================ MÓDULO — MIDDLE PLATAFORMA (funil comercial) ============================ */
-function canComercial(){ const u=getSession(); return !!u && (u.perfil==='Gestão Executiva'||u.perfil==='Onboarding'); }
+function canComercial(){ const u=getSession(); return !!u && (u.perfil==='Gestão Executiva'||u.perfil==='Onboarding'||u.perfil==='Desenvolvedor'); }
 function funnelStage(label,valor,sub,tone,widthPct){
   return `<div class="fnl-stage"><div class="fnl-bar" style="width:${widthPct}%;background:${toneVar(tone)}"></div>
     <div class="fnl-meta"><span class="fnl-lbl">${esc(label)}</span><span class="fnl-val">${valor}${sub?` <small>${esc(sub)}</small>`:''}</span></div></div>`;
@@ -5925,6 +6040,9 @@ function modalShell(icon,title,bodyHTML,footHTML){
   <div class="modal-foot">${footHTML}</div>`;
   el('modalBg').classList.add('open');
 }
+const INT_RAPIDA_TIPOS=['Ligação','Mensagem','E-mail','Reunião','Visita','Outros'];
+const QI_SAT_EMOJI={1:'😠',2:'😕',3:'😐',4:'🙂',5:'😄'};
+let atModalTab='tarefas', atModalCidPre='', atModalTarefasBody='', atModalTarefasFoot='';
 function atividadeModal(a,cidPre,origemInt){
   const x=a||{prioridade:'Média',status:'A Fazer',cliente:cidPre||''};
   const cs=DB().clientes;
@@ -5957,8 +6075,45 @@ function atividadeModal(a,cidPre,origemInt){
   const foot=`${(a&&a.id&&can('deleteActivity'))?`<button class="btn ghost" onclick="App.delAtividade('${a.id}')">${svg(I.trash)} Excluir</button>`:''}
     <div class="spacer"></div><button class="btn ghost" onclick="App.closeModal()">Cancelar</button>
     <button class="btn primary" onclick="App.saveAtividade('${(a&&a.id)||''}')">${svg(I.check)} Salvar</button>`;
-  modalShell(I.clock,(a&&a.id)?'Editar Atividade':'Nova Atividade',body,foot);
-  el('modal').querySelectorAll('#at_tags [data-t]').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
+  if(a&&a.id){
+    modalShell(I.clock,'Editar Atividade',body,foot);
+    el('modal').querySelectorAll('#at_tags [data-t]').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
+    return;
+  }
+  atModalTab='tarefas'; atModalCidPre=cidPre||''; atModalTarefasBody=body; atModalTarefasFoot=foot;
+  renderAtModal();
+}
+function renderAtModal(){
+  const tabsHead=`<div class="at-modal-tabs">
+    <button type="button" class="at-modal-tab ${atModalTab==='tarefas'?'on':''}" onclick="App.atModalSetTab('tarefas')">Tarefas</button>
+    <button type="button" class="at-modal-tab ${atModalTab==='interacoes'?'on':''}" onclick="App.atModalSetTab('interacoes')">Interações</button>
+  </div>`;
+  if(atModalTab==='tarefas'){
+    modalShell(I.clock,'Nova Atividade',tabsHead+atModalTarefasBody,atModalTarefasFoot);
+    el('modal').querySelectorAll('#at_tags [data-t]').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
+  } else {
+    modalShell(I.chat,'Nova Atividade',tabsHead+interacaoRapidaBody(atModalCidPre),interacaoRapidaFoot());
+    el('modal').querySelectorAll('#qi_sat .qi-sat-btn').forEach(b=>b.onclick=()=>{
+      el('modal').querySelectorAll('#qi_sat .qi-sat-btn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+    });
+  }
+}
+function interacaoRapidaBody(cidPre){
+  const cs=DB().clientes;
+  return `<div class="form-grid">
+    <div class="field full"><label>Título *</label><input id="qi_tit" placeholder="Ex.: Alinhamento sobre cronograma"></div>
+    <div class="field"><label>Cliente relacionado</label><select id="qi_cli"><option value="">—</option>${cs.map(c=>`<option value="${c.id}" ${cidPre===c.id?'selected':''}>${esc(c.nome)}</option>`).join('')}</select></div>
+    <div class="field"><label>Tipo</label><select id="qi_tipo">${INT_RAPIDA_TIPOS.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    <div class="field full"><label>Nível de satisfação</label>
+      <div class="qi-sat" id="qi_sat">${[1,2,3,4,5].map(v=>`<button type="button" class="qi-sat-btn ${v===3?'on':''}" data-v="${v}" title="${v}">${QI_SAT_EMOJI[v]}</button>`).join('')}</div>
+    </div>
+    <div class="field full"><label>Descrição</label><textarea id="qi_desc" placeholder="Descreva a interação…"></textarea></div>
+  </div>`;
+}
+function interacaoRapidaFoot(){
+  return `<div class="spacer"></div><button class="btn ghost" onclick="App.closeModal()">Cancelar</button>
+    <button class="btn primary" onclick="App.saveInteracaoRapida()">${svg(I.check)} Salvar</button>`;
 }
 function atividadesRelacionadas(x){
   if(!x.cliente) return '';
@@ -6047,13 +6202,21 @@ function buildUserChip(){ const u=getSession(); const c=el('userChip'); if(!c) r
   if(!u){ c.innerHTML=''; return; }
   const ro = u.perfil==='Área Parceira';
   const podeConfig = navAllowed('usuarios');
+  const isDev = isRealDev();
+  const impAtual = getImpersonarPerfil();
+  const impBox = isDev ? `<div class="um-imp"><label>Visualizar como</label>
+      <select onchange="App.setImpersonar(this.value)">
+        <option value="" ${!impAtual?'selected':''}>Desenvolvedor (real)</option>
+        ${PERFIS.filter(p=>p!=='Desenvolvedor').map(p=>`<option value="${esc(p)}" ${impAtual===p?'selected':''}>${esc(p)}</option>`).join('')}
+      </select></div>` : '';
   c.innerHTML=`
     <button class="uchip-mini${ro?' uchip-mini-ro':''}" id="uchipBtn" data-id="global.botao.abrir-menu-usuario" onclick="App.toggleUserMenu()" title="${esc(u.nome)}">
       <div class="uavatar">${esc((u.nome[0]||'?'))}</div>
     </button>
     <div class="user-menu" id="userMenu" data-id="global.menu.usuario" hidden>
       <div class="um-head" data-id="global.texto.identificacao-usuario"><div class="uavatar">${esc((u.nome[0]||'?'))}</div>
-        <div class="uinfo"><b>${esc(u.nome)}</b><small>${esc(u.email)}</small><small>${esc(u.perfil)}${ro?' (Somente Leitura)':''}</small></div></div>
+        <div class="uinfo"><b>${esc(u.nome)}</b><small>${esc(u.email)}</small><small>${esc(u.perfil)}${ro?' (Somente Leitura)':''}${impAtual?' · visualizando como':''}</small></div></div>
+      ${impBox}
       <div class="um-div"></div>
       ${podeConfig?`<button class="um-item" data-id="global.botao.configuracoes" onmousedown="App.go('usuarios');App.closeUserMenu()">${svg(I.settings)}Configurações</button>`:''}
       <button class="um-item" data-id="global.botao.alternar-tema-menu" onmousedown="App.toggleTheme();App.closeUserMenu()">${svg(I.theme)}Alternar tema</button>
@@ -6144,7 +6307,7 @@ async function entrarComUsuario(u,opts){
 function logAtivosDiff(clienteNome,antes,depois){
   const byId=arr=>{const m={};(arr||[]).forEach(a=>m[a.id]=a);return m;};
   const A=byId(antes), D=byId(depois);
-  const LBL={nome:'Nome',estado:'Estado',cidade:'Cidade',regiao:'Região',tipologia:'Tipologia',quantidade:'Quantidade',unidades:'Unidades',vgv:'VGV',statusAtivo:'Status do Ativo',obs:'Observações',
+  const LBL={nome:'Nome',estado:'Estado',cidade:'Cidade',regiao:'Região',tipologia:'Tipologia',quantidade:'Quantidade',unidades:'Unidades',vgv:'VGV',statusAtivo:'Etapa',obs:'Observações',
     semNomeDefinido:'Sem nome definido',empresaNaoConstituida:'Empresa não constituída',razaoSocial:'Razão Social',cnpj:'CNPJ',
     unidadesVendidas:'Unidades Vendidas',custoObra:'Custo de Obra',endereco:'Endereço',cep:'CEP',
     dataLancamento:'Lançamento',dataInicioObra:'Início da Obra',dataFimObra:'Fim da Obra',
@@ -6177,7 +6340,7 @@ window.App = {
     el('filters').style.display = (FILTER_VIEWS.includes(current) && semDetalheAberto)?'flex':'none';
     buildNav(); buildFilters(); renderNotifBadge();
     ({dashboard:renderDashboard,pipeline:renderPipeline,jornada:renderJornada,cadastro:renderCadastro,cadastroAtivos:renderCadastroAtivos,pesquisa:renderPesquisa,
-      ativacao:renderAtivacao,ttfv:renderTTFV,health:renderHealth,relatorios:renderRelatorios,mapa:renderMapa,
+      ativacao:renderAtivacao,ttfv:renderTTFV,health:renderHealth,relatorios:renderRelatorios,mapa:renderMapa,tarefas:renderTarefas,
       pendencias:renderPendencias,interacoes:renderInteracoes,historico:renderHistorico,auditoria:renderAuditoria,
       backup:renderBackup,usuarios:renderUsuarios,config:renderConfig}[current]||renderDashboard)();
     try{ requestAnimationFrame(autofitValues); }catch(_){ autofitValues(); }
@@ -6508,7 +6671,7 @@ window.App = {
 
   /* ---- V4: navegação da jornada ---- */
   limparContexto(){ filters.cliente=''; buildFilters(); this.refresh(); buildCrumb(el('pageTitle')?el('pageTitle').textContent:''); },
-  abrirCliente(id){ filters.cliente=id; jTab='geral'; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; jCicloEditField=null; this.go('jornada'); },
+  abrirCliente(id){ filters.cliente=id; jTab='geral'; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; jCicloEditField=null; jAtivoOpenIdx=new Set(); this.go('jornada'); },
   fecharCliente(){ filters.cliente=''; jStageMenuOpen=false; jCtxEditField=null; jPendOpen=false; jTlTab='geral'; jCicloEditField=null; this.refresh(); },
   setStatusNegociacao(id,valor){
     jStageMenuOpen=false;
@@ -6530,6 +6693,31 @@ window.App = {
   },
   jCtxToggle(){ jCtxOpen=!jCtxOpen; this.refresh(); },
   jPendToggle(){ jPendOpen=!jPendOpen; this.refresh(); },
+  jAtivoToggleDetalhe(i){ jAtivoOpenIdx.has(i)?jAtivoOpenIdx.delete(i):jAtivoOpenIdx.add(i); this.refresh(); },
+  jSrvBusca(i,v){ const box=el('jSrv_res_'+i); const c=getCli(filters.cliente); if(!box||!c||!c.ativos||!c.ativos[i]) return;
+    box.innerHTML=servicoResultsMarkup(v,c.ativos[i].servicos,'jSrv',i); },
+  jSrvServicoAdd(i,idx){ if(!canAtivos()){ toast('Ação não permitida.'); return; }
+    const d=DB(); const c=getCli(filters.cliente); if(!c||!c.ativos||!c.ativos[i]) return;
+    const nome=SERVICOS_TRINUS[idx]&&SERVICOS_TRINUS[idx].nome; if(!nome) return;
+    if(!Array.isArray(c.ativos[i].servicos)) c.ativos[i].servicos=[];
+    const pos=c.ativos[i].servicos.indexOf(nome);
+    if(pos===-1) c.ativos[i].servicos.push(nome); else c.ativos[i].servicos.splice(pos,1);
+    save(d); this.refresh(); },
+  jSrvServicoDel(i,i2){ if(!canAtivos()){ toast('Ação não permitida.'); return; }
+    const d=DB(); const c=getCli(filters.cliente); if(!c||!c.ativos||!c.ativos[i]||!Array.isArray(c.ativos[i].servicos)) return;
+    c.ativos[i].servicos.splice(i2,1); save(d); this.refresh(); },
+  atModalSetTab(tab){ atModalTab=tab; renderAtModal(); },
+  saveInteracaoRapida(){ if(!can('whatsAdd')){ toast('Ação não permitida.'); return; }
+    const titulo=(el('qi_tit').value||'').trim(); if(!titulo){ alert('Informe um título.'); return; }
+    const d=DB(); const np=nowParts(); const u=getSession();
+    const satBtn=el('qi_sat').querySelector('.qi-sat-btn.on'); const satisfacao=satBtn?Number(satBtn.dataset.v):null;
+    const cli=el('qi_cli').value||'';
+    const novo={id:'in'+Date.now().toString(36),cliente:cli,data:np.iso.slice(0,10),hora:np.hora,
+      canal:'Outro',responsavel:(u&&u.nome)||'',tipo:el('qi_tipo').value,status:INT_STATUS[0],
+      resumo:titulo,texto:(el('qi_desc').value||'').trim(),tags:[],anexos:[],kind:'evento',satisfacao};
+    d.interactions.push(novo);
+    addHistory({modulo:'Interações',cliente:nomeCliente(cli),campo:'Interação rápida',de:'Vazio',para:'Criado · '+novo.tipo});
+    save(d); this.closeModal(); this.refresh(); toast('Interação registrada.'); },
   jTlSet(tab){ jTlTab=tab; this.refresh(); },
   jRespEditToggle(campo){ jCtxEditField=jCtxEditField===campo?null:campo; this.refresh(); },
   jStageMenuToggle(){ jStageMenuOpen=!jStageMenuOpen; this.refresh(); },
@@ -6748,6 +6936,16 @@ window.App = {
   },
   closeUserMenu(){ const m=el('userMenu'); if(m) m.hidden=true; },
   toggleTheme(){ applyThemeToggle(); },
+  setImpersonar(perfil){
+    if(!isRealDev()) return;
+    setImpersonarPerfil(perfil);
+    this.closeUserMenu();
+    buildNav();
+    this.go(current||'dashboard');
+    buildUserChip();
+    const atual=getImpersonarPerfil();
+    toast(atual?('Visualizando como: '+atual):'Voltou para a visualização real (Desenvolvedor)');
+  },
   jTab(t){ jTab=t; renderJornada(); },
 
   /* ---- V4: atividades / kanban ---- */
@@ -6879,7 +7077,7 @@ window.App = {
       rows=d.clientes.map(c=>{ const h=calcHealth(c.id); const sv=calcSurvey(c.id);
         return [c.id,c.nome,c.estado||'',c.cidade||'',(etapaInfo(c.etapa).label||c.etapa||''),c.status||'',c.tipologia||'',c.respOnboarding||'',c.keyAccount||'',c.dataKickoff||'',c.goLivePrevisto||'',c.goLiveReal||'',(c.produtos||[]).join(' | '),ativosTotalCliente(c),h?h.total:'',h?h.cls:'—',sv?sv.media:'']; });
     } else if(tipo==='ativos'){
-      headers=['Cliente','Estado Cliente','Cidade Cliente','Ativo','Tipologia','Status do Ativo','Estado Ativo','Cidade Ativo','Região','Quantidade','Unidades','VGV Estimado','Observações'];
+      headers=['Cliente','Estado Cliente','Cidade Cliente','Ativo','Tipologia','Etapa','Estado Ativo','Cidade Ativo','Região','Quantidade','Unidades','VGV Estimado','Observações'];
       rows=[]; d.clientes.forEach(c=>(c.ativos||[]).forEach(a=>rows.push([c.nome,c.estado||'',c.cidade||'',a.nome||'',a.tipologia||'',a.statusAtivo||'',a.estado||'',a.cidade||'',a.regiao||regiaoDoEstado(a.estado)||'',(+a.quantidade||0),(+a.unidades||0),(+a.vgv||0),a.obs||''])));
     } else if(tipo==='geografico'){
       const ag=ativosAgrega(); const ufs=Object.keys({...ag.cliPorEstado,...ag.porEstado,...ag.vgvPorEstado,...ag.unidPorEstado}).sort();
