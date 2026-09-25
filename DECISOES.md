@@ -399,3 +399,15 @@ De passagem, também corrigido o cabeçalho da tela de detalhe do cliente (`rend
 - `.jctx{top:calc(var(--topbar-h) + 58px)}` — antes era `+14px`. 58px = altura medida da barra de abas (~44px) + 14px de respiro, o mesmo respiro aplicado ao `.jcard`, pra manter os dois alinhados na mesma altura abaixo da barra.
 
 **Teste:** verificado ao vivo em "Ricardo De Lacerda Teodoro Ltda" — `.jtabs-row` tocando a borda direita da viewport (`right` idêntico ao de `.jbody`), `.jcard` e `.jctx` começando ~14px abaixo do fim da barra (sem sobreposição), testado nos dois estados do sidebar (aberto/recolhido) e com scroll (a barra fica fixa por cima do conteúdo que rola por baixo, sem cobrir o sidebar, que também é fixo e já começa abaixo dela). Sem erros de console.
+
+---
+
+## 2026-09-25 (7) — Visual da barra de abas ajustado pra bater com print de referência (fundo liso, divisor fino em vez de sombra)
+
+**Contexto:** usuário mandou um print de referência de outro sistema mostrando o estilo de barra de abas desejado: fundo branco liso (sem tom cinza-azulado diferenciado), abas em caixa alta com a ativa em azul+negrito+sublinhado e as inativas em cinza com peso normal, e uma linha divisória fina cinza-clara logo abaixo de toda a barra separando das abas do conteúdo — nada de sombra/elevação.
+
+**Decisão:** `.jtabs-row` trocou `background:#E6E9F0` (cinza-azulado, da rodada de 25/09 anterior) e `box-shadow:var(--shadow)` por `background:var(--surface)` (branco, igual aos cards) e `border-bottom:1px solid var(--line)` (linha fina, mesmo tom já usado em bordas discretas no resto do app). `.jtab` teve o peso da fonte reduzido de `700` pra `600` nas abas inativas; `.jtab.active` ganhou `font-weight:700` explícito pra manter só a aba ativa em negrito (antes todas eram igualmente bold, só a cor/sublinhado distinguia a ativa).
+
+**Nota:** essa troca de fundo derruba, de propósito, a decisão de 25/09 "fundo da barra de abas diferenciado da página (`#E6E9F0`)" tomada duas rodadas atrás — o usuário mudou de ideia ao ver o print de referência, preferindo o visual mais limpo/liso ao invés do destaque de cor. Registrado aqui como correção explícita, sem apagar a entrada anterior (convenção do arquivo).
+
+**Teste:** a extensão Claude in Chrome caiu no meio da sessão (não reconectou em três tentativas) — perguntado ao usuário como proceder, ele pediu pra tentar reconectar antes de publicar. Na tentativa seguinte a extensão voltou; testado ao vivo em "Ricardo De Lacerda Teodoro Ltda" via `getComputedStyle()`: fundo branco (`rgb(255,255,255)`), `box-shadow:none`, `border-bottom` fino (`~1px solid rgb(231,234,242)`) na barra inteira, aba ativa com `font-weight:700`+sublinhado azul, inativas com `font-weight:600`+cinza. Sem erros de console.
