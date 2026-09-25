@@ -89,5 +89,5 @@ Status: concluído em 2026-09-25.
 
 - [x] Três abas novas na barra da operação: Pós-Kickoff, Ativação, First Value (entre Tarefas e Documentos) — reaproveitam a lógica das telas independentes (`renderPesquisa`/`renderAtivacao`/`renderTTFV`) sem duplicar dados, escopadas ao cliente aberto via `filters.cliente` (que a Jornada já mantém fixo)
 - [x] Botões de atalho "+ Pesquisa"/"+ Ativação"/"+ First Value" renomeados e trocados pra abrir a aba correspondente dentro da operação (`App.jTab(...)`), em vez de navegar pra fora
-- [x] Telas independentes (sidebar) mantidas por enquanto — servem de visão de portfólio até o usuário migrar esse uso pros Dashboards (combinado, ainda não feito)
+- [x] Telas independentes ocultadas da sidebar em 2026-09-25 (2ª rodada) — continuam existindo e funcionais (`hideNav:true` no array `NAV`, mesmo mecanismo já usado por `pipeline`/`cadastroAtivos`/`mapa`), só não aparecem mais como item de navegação. **Lembrar o usuário quando fizer sentido** (ex.: se pedir visão de portfólio de pesquisa/ativação/TTFV antes dos Dashboards cobrirem isso, ou pra decidir reativar/apagar de vez)
 - [ ] Migração da visão de portfólio (todos os clientes de uma vez) pros Dashboards — mencionada pelo usuário como próximo passo, não especificada ainda

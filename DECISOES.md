@@ -473,3 +473,15 @@ De passagem, também corrigido o cabeçalho da tela de detalhe do cliente (`rend
 **Decisão — telas independentes (sidebar) mantidas por enquanto:** `Pesquisa Pós-Kickoff`, `Ativação Operacional` e `Time to First Value` continuam existindo como itens de navegação e rotas próprias (`renderPesquisa`, `renderAtivacao`, `renderTTFV`, inalteradas) — o usuário mencionou explicitamente que pretende usar os **Dashboards** pra visões consolidadas de portfólio no futuro ("depois"), então essas telas de lista (todos os clientes de uma vez, filtráveis) continuam com utilidade até essa migração acontecer. Não foram removidas da sidebar nem do roteador — só passaram a também estar disponíveis embutidas na Jornada, por cliente.
 
 **Teste:** verificado ao vivo em BARION EMPREENDIMENTOS — as 3 novas abas renderizam corretamente (tabela de Pesquisa com os 5 critérios + rating clicável, os 7 grupos de marcos de Ativação com accordion e selects, TTFV com datas herdadas do Cadastro e classificação calculada), os botões de atalho trocam de aba sem sair da operação, e a tela independente de Pesquisa Pós-Kickoff (sidebar) continua funcionando normalmente com todos os clientes. Testada uma edição real de rating (clique + clique de volta pra reverter) — persistiu e reverteu corretamente, sem erros de console em nenhum momento.
+
+---
+
+## 2026-09-25 (12) — Pesquisa Pós-Kickoff, Ativação Operacional e Time to First Value removidas da sidebar (mas não apagadas)
+
+**Contexto:** agora que as três telas também vivem dentro da Jornada (decisão anterior), o usuário pediu pra tirá-las da sidebar de navegação — mas sem apagar de verdade, só ocultar, "até eu decidir se vamos ter que usá-las por algum motivo".
+
+**Decisão:** reaproveitado o mecanismo `hideNav` que o array `NAV` já usa pra outras 3 entradas (`pipeline`, `cadastroAtivos`, `mapa`) — um 6º elemento `true` na linha da rota, que `buildNav()` já respeita (`if(hideNav) return;` antes de desenhar o botão, mas **não** bloqueia a rota em si — só o item some da lista visual). Aplicado o mesmo em `pesquisa`, `ativacao` e `ttfv`. As três telas continuam 100% funcionais — `App.go('pesquisa')`, por exemplo, ainda funciona normalmente — só não aparecem mais como botão na sidebar.
+
+**Combinado com o usuário:** lembrar dele sobre essas 3 telas ocultas quando fizer sentido — por exemplo, se ele pedir uma visão de portfólio (todos os clientes) de pesquisa/ativação/TTFV antes dos Dashboards ganharem essa função, ou se pedir pra reativar/apagar de vez. Registrado também em memória (fora deste arquivo) pra persistir entre sessões.
+
+**Teste:** verificado ao vivo — sidebar não mostra mais as 3 entradas (grupo OPERAÇÃO ficou só com Dashboards/Jornada do Cliente/Cadastro), sem erros de console.
