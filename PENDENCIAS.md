@@ -146,4 +146,19 @@ Status: concluído em 2026-09-25.
 - [x] "Status do Ativo" renomeado pra "Etapa" em todo lugar (Cadastro, Nova Operação, detalhe da Jornada, Histórico, exportação CSV); novos valores: Landbank, Pré-lançamento, Lançamento, Obras, Pós-obras, Pós-operacional
 - [x] Campo "Estado" do cliente (Cadastro e Nova Operação) passou a mostrar só a UF no `<select>`, igual ao campo Estado do ativo (que já era assim)
 - [x] Card "Localização" removido do resumo da aba Ativos; os três KPIs restantes (Quantidade de Ativos/Total de Unidades/VGV Total) reduzidos pra um componente compacto próprio (`.jativo-kpi`), sem mexer no `.kpi` genérico usado em outras telas
-- [ ] **Dado existente não foi migrado**: ativos já cadastrados com as etapas antigas (Estruturação/Comercialização/Entrega/Pós-obra) continuam com o texto antigo no selo, mas o `<select>` de edição não marca nenhuma opção pra esses valores — precisa que alguém abra e resalve cada ativo com a etapa nova, um por um, quando notado. Avaliar se vale um script de migração/mapeamento se isso incomodar no uso real.
+- [ ] **Dado existente não foi migrado**: 24 de 39 ativos ainda com etapa antiga (Entrega 9, Comercialização 6, Estruturação 5, Pós-obra 4). A tela agora mostra o valor como "(etapa antiga)" em vez de "—" (2026-09-25). Mapeamento sugerido em `sql/03-migracao-etapas-ativos.sql`, aguardando confirmação do usuário.
+
+---
+
+## Auditoria completa (2026-09-25) — pontos críticos aguardando decisão
+
+Status: 20 correções de código feitas; itens abaixo precisam de aprovação do usuário. Detalhes em `AUDITORIA.md`.
+
+- [ ] **Ligar "Confirm email"** no Supabase (Authentication → Sign In / Providers). Hoje qualquer pessoa pode se cadastrar com o e-mail de um colega que ainda não criou senha e herdar o perfil dele (inclusive Gestão Executiva).
+- [ ] **Aplicar `sql/01-seguranca-rls-e-cadastro.sql`** — políticas RLS por perfil (hoje todas as tabelas são `using(true)` para qualquer logado), conta nova sempre "Área Parceira", só admin altera perfil, histórico/logins imutáveis. Depois disso, os 9 colegas do `USERS_SEED` precisam ser promovidos manualmente após o 1º acesso.
+- [ ] **Corrigir Site URL de autenticação** no Supabase (URL Configuration): `http://localhost:3000` → `https://onboardops.pages.dev`; Redirect URLs: `https://onboardops.pages.dev/**` e `http://localhost:8080/**`. Sem isso, "Esqueci minha senha" não funciona para ninguém. (Bloqueado para o Claude pelo modo automático.)
+- [ ] **Aplicar `sql/02-colunas-faltantes.sql`** e depois ajustar o código (`activityToRow`/`interactionToRow`/`ttfvToRow` e os `rowTo…`) — hoje Tags/Origem/Ativo vinculado de atividades, Pontos de atenção/Decisões/Pendências/Ativo/Satisfação de interações e "Outra" do First Value somem ao recarregar.
+- [ ] **Backup**: plano grátis do Supabase não faz backup. Decidir entre Supabase Pro (US$ 25/mês) ou exportação manual periódica pela tela Backup & Segurança.
+- [ ] **Dados de teste** no banco: "saaddsd", "werwer" (apagar?) e "Ricardo De Lacerda Teodoro Ltda" (real ou teste?).
+- [ ] **Regra de negócio dos dois estágios** (Ciclo de Negociação × Etapa da jornada): hoje podem se contradizer (RD VILLE em "Proposta" + "onboarding"; BARION com kickoff antes da assinatura).
+- [ ] Documentos/anexos guardados como base64 dentro das tabelas — migrar para Supabase Storage quando o volume crescer (limite de 500 MB no plano grátis).
